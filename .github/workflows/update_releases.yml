@@ -49,7 +49,12 @@ jobs:
           # Create or switch to version branch
           git checkout -B "$BRANCH"
           
-          # Commit and push changes
-          git add pyproject.toml cloudcoil/
-          git commit -m "Update to Kubernetes ${{ matrix.k8s_version }}"
+          # Stage changes
+          git add .          
+          # Only commit and push if there are changes
+          if ! git diff --staged --quiet; then
+            git commit -m "Update to Kubernetes ${{ matrix.k8s_version }}"
+          else
+            echo "No changes to commit"
+          fi
           git push -f origin "$BRANCH"
