@@ -448,7 +448,7 @@ class JSONSchemaProps(BaseModel):
         Optional[List[ValidationRule]],
         Field(
             alias="x-kubernetes-validations",
-            description="x-kubernetes-validations describes a list of validation rules written in the CEL expression language.",
+            description="x-kubernetes-validations describes a list of validation rules written in the CEL expression language. This field is an alpha-level. Using this field requires the feature gate `CustomResourceValidationExpressions` to be enabled.",
         ),
     ] = None
 
