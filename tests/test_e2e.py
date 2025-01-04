@@ -7,7 +7,7 @@ import pytest
 from cloudcoil.apimachinery import ObjectMeta
 from cloudcoil.models.kubernetes.core import v1 as corev1
 
-version = get_version("cloudcoil.models.kubernetes").split("+")[0]
+version = ".".join(get_version("cloudcoil.models.kubernetes").split(".")[:3])
 
 
 @pytest.mark.configure_test_cluster(

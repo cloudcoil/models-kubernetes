@@ -1,6 +1,6 @@
 [project]
 name = "cloudcoil.models.kubernetes"
-version = "1.31.4+v0"
+version = "1.31.4.0"
 description = "Versioned Kubernetes models for cloudcoil"
 authors = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
 maintainers = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
