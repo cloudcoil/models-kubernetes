@@ -1,0 +1,55 @@
+name: Update K8s Versions
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-versions:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        k8s_version: ['1.30.8', '1.31.4']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install uv and set python
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Update version for ${{ matrix.k8s_version }}
+        run: |
+          VERSION="${{ matrix.k8s_version }}.0"
+          MINOR_VERSION=$(echo "${{ matrix.k8s_version }}" | cut -d'.' -f1,2)
+          BRANCH="release-${MINOR_VERSION}"
+          
+          # Update version and input URL using sed
+          sed -i "s/^version = .*/version = \"${VERSION}\"/" pyproject.toml
+          sed -i "s|refs/tags/v[0-9]\+\.[0-9]\+\.[0-9]\+/api|refs/tags/v${{ matrix.k8s_version }}/api|" pyproject.toml
+          
+          # Generate models
+          make gen-models
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create or switch to version branch
+          git checkout -B "$BRANCH"
+          
+          # Commit and push changes
+          git add pyproject.toml cloudcoil/
+          git commit -m "Update to Kubernetes ${{ matrix.k8s_version }}"
+          git push -f origin "$BRANCH"
