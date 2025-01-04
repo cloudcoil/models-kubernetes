@@ -1,6 +1,6 @@
 [project]
 name = "cloudcoil.models.kubernetes"
-version = "1.31.4+0.0.0"
+version = "1.31.4+v0"
 description = "Versioned Kubernetes models for cloudcoil"
 authors = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
 maintainers = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
@@ -14,16 +14,16 @@ classifiers = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cloudcoil",
+    "cloudcoil>=0.0.16",
 ]
 keywords = ["cloud-native", "kubernetes", "pydantic", "python", "async"]
 
 [project.urls]
 Homepage = "https://github.com/cloudcoil/cloudcoil"
 Documentation = "https://cloudcoil.github.io/cloudcoil"
-Repository = "https://github.com/cloudcoil/model-kubernetes"
-Issues = "https://github.com/cloudcoil/model-kubernetes/issues"
-Changelog = "https://github.com/cloudcoil/model-kubernetes/releases"
+Repository = "https://github.com/cloudcoil/models-kubernetes"
+Issues = "https://github.com/cloudcoil/models-kubernetes/issues"
+Changelog = "https://github.com/cloudcoil/models-kubernetes/releases"
 
 [build-system]
 requires = ["hatchling>=1.18.0"]
