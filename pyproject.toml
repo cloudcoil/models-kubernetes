@@ -14,7 +14,7 @@ classifiers = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cloudcoil>=0.0.16",
+    "cloudcoil>=0.0.21",
 ]
 keywords = ["cloud-native", "kubernetes", "pydantic", "python", "async"]
 
@@ -82,7 +82,6 @@ name = "kubernetes"
 input = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/tags/v1.31.4/api/openapi-spec/swagger.json"
 # Rename the definitions to a more pythonic name
 # This is a list of regex substitutions
-output = "cloudcoil"
 substitute = [
     { from = "^io\\.k8s\\.apiextensions-apiserver\\.pkg\\.apis\\.apiextensions\\.(.+)$", to = "apiextensions.\\g<1>"},
     { from = "^io\\.k8s\\.api\\.(.+)$", to = "\\g<1>"},

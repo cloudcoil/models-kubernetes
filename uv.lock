@@ -176,7 +176,7 @@ wheels = [
 
 [[package]]
 name = "cloudcoil"
-version = "0.0.17"
+version = "0.0.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -184,16 +184,15 @@ dependencies = [
     { name = "pyyaml" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d4/2b/7b2c9d763c4477400c89c66d066ac62740fb37f8fd632fc3c9e42c8a1511/cloudcoil-0.0.17.tar.gz", hash = "sha256:72ff900d689401bcab835ee576f69d901464d6e80efcdf3625c5587fee362612", size = 111246 }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/73/b727bcd101489250d416be351269ca38d1441c4eb8ff2f2e5014b147730f/cloudcoil-0.0.21.tar.gz", hash = "sha256:792740e0e2ee878421261a58c4498d104fc57b2c47cedc40575a802c023c131e", size = 106334 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/65/0b880179efda8d30b834edc7e40005378edf89b6661ba65820a55b7e52dd/cloudcoil-0.0.17-py3-none-any.whl", hash = "sha256:adbc64d0975df4c118ab5b7cb14850849f0c07fafa18a7d1cd1ca68787040424", size = 34733 },
+    { url = "https://files.pythonhosted.org/packages/8f/0b/7484a592f664cc71a01a4d14a5d0ba419ae06e530c89e3ee6674246c0267/cloudcoil-0.0.21-py3-none-any.whl", hash = "sha256:8744fd324383ea4ae7b08417b95d58e7bc77bd4e33986890a665ca84f2712661", size = 44458 },
 ]
 
 [package.optional-dependencies]
 codegen = [
     { name = "datamodel-code-generator", extra = ["http"] },
     { name = "ruff" },
-    { name = "tomlkit", marker = "python_full_version < '3.11'" },
 ]
 test = [
     { name = "pytest" },
@@ -227,7 +226,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "cloudcoil", specifier = ">=0.0.16" }]
+requires-dist = [{ name = "cloudcoil", specifier = ">=0.0.21" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1332,15 +1331,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/b9/1ed31d167be802da0fc95020d04cd27b7d7065cc6fbefdd2f9186f60d7bd/tomli-2.2.1-cp313-cp313-win32.whl", hash = "sha256:d3f5614314d758649ab2ab3a62d4f2004c825922f9e370b29416484086b264ec", size = 98724 },
     { url = "https://files.pythonhosted.org/packages/c7/32/b0963458706accd9afcfeb867c0f9175a741bf7b19cd424230714d722198/tomli-2.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:a38aa0308e754b0e3c67e344754dff64999ff9b513e691d0e786265c93583c69", size = 109383 },
     { url = "https://files.pythonhosted.org/packages/6e/c2/61d3e0f47e2b74ef40a68b9e6ad5984f6241a942f7cd3bbfbdbd03861ea9/tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc", size = 14257 },
-]
-
-[[package]]
-name = "tomlkit"
-version = "0.13.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b1/09/a439bec5888f00a54b8b9f05fa94d7f901d6735ef4e55dcec9bc37b5d8fa/tomlkit-0.13.2.tar.gz", hash = "sha256:fff5fe59a87295b278abd31bec92c15d9bc4a06885ab12bcea52c71119392e79", size = 192885 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/b6/a447b5e4ec71e13871be01ba81f5dfc9d0af7e473da256ff46bc0e24026f/tomlkit-0.13.2-py3-none-any.whl", hash = "sha256:7a974427f6e119197f670fbbbeae7bef749a6c14e793db934baefc1b5f03efde", size = 37955 },
 ]
 
 [[package]]
