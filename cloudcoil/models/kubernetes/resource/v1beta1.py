@@ -159,30 +159,10 @@ class ResourcePool(BaseModel):
     ]
 
 
-class BasicDevice(BaseModel):
-    attributes: Annotated[
-        Optional[Dict[str, DeviceAttribute]],
-        Field(
-            description="Attributes defines the set of attributes for this device. The name of each attribute must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
-        ),
-    ] = None
-    capacity: Annotated[
-        Optional[Dict[str, apimachinery.Quantity]],
-        Field(
-            description="Capacity defines the set of capacities for this device. The name of each capacity must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
-        ),
-    ] = None
-
-
-class Device(BaseModel):
-    basic: Annotated[
-        Optional[BasicDevice], Field(description="Basic defines one device instance.")
-    ] = None
-    name: Annotated[
-        str,
-        Field(
-            description="Name is unique identifier among all devices managed by the driver in the pool. It must be a DNS label."
-        ),
+class DeviceCapacity(BaseModel):
+    value: Annotated[
+        apimachinery.Quantity,
+        Field(description="Value defines how much of a certain device capacity is available."),
     ]
 
 
@@ -243,46 +223,6 @@ class OpaqueDeviceConfiguration(BaseModel):
     ]
 
 
-class ResourceSliceSpec(BaseModel):
-    all_nodes: Annotated[
-        Optional[bool],
-        Field(
-            alias="allNodes",
-            description="AllNodes indicates that all nodes have access to the resources in the pool.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
-        ),
-    ] = None
-    devices: Annotated[
-        Optional[List[Device]],
-        Field(
-            description="Devices lists some or all of the devices in this pool.\n\nMust not have more than 128 entries."
-        ),
-    ] = None
-    driver: Annotated[
-        str,
-        Field(
-            description="Driver identifies the DRA driver providing the capacity information. A field selector can be used to list only ResourceSlice objects with a certain driver name.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. This field is immutable."
-        ),
-    ]
-    node_name: Annotated[
-        Optional[str],
-        Field(
-            alias="nodeName",
-            description="NodeName identifies the node which provides the resources in this pool. A field selector can be used to list only ResourceSlice objects belonging to a certain node.\n\nThis field can be used to limit access from nodes to ResourceSlices with the same node name. It also indicates to autoscalers that adding new nodes of the same type as some old node might also make new resources available.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set. This field is immutable.",
-        ),
-    ] = None
-    node_selector: Annotated[
-        Optional[v1.NodeSelector],
-        Field(
-            alias="nodeSelector",
-            description="NodeSelector defines which nodes have access to the resources in the pool, when that pool is not limited to a single node.\n\nMust use exactly one term.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
-        ),
-    ] = None
-    pool: Annotated[
-        ResourcePool,
-        Field(description="Pool describes the pool that this ResourceSlice belongs to."),
-    ]
-
-
 class AllocatedDeviceStatus(BaseModel):
     conditions: Annotated[
         Optional[List[apimachinery.Condition]],
@@ -319,6 +259,33 @@ class AllocatedDeviceStatus(BaseModel):
         str,
         Field(
             description="This name together with the driver name and the device name field identify which device was allocated (`<driver name>/<pool name>/<device name>`).\n\nMust not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes."
+        ),
+    ]
+
+
+class BasicDevice(BaseModel):
+    attributes: Annotated[
+        Optional[Dict[str, DeviceAttribute]],
+        Field(
+            description="Attributes defines the set of attributes for this device. The name of each attribute must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
+        ),
+    ] = None
+    capacity: Annotated[
+        Optional[Dict[str, DeviceCapacity]],
+        Field(
+            description="Capacity defines the set of capacities for this device. The name of each capacity must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
+        ),
+    ] = None
+
+
+class Device(BaseModel):
+    basic: Annotated[
+        Optional[BasicDevice], Field(description="Basic defines one device instance.")
+    ] = None
+    name: Annotated[
+        str,
+        Field(
+            description="Name is unique identifier among all devices managed by the driver in the pool. It must be a DNS label."
         ),
     ]
 
@@ -390,32 +357,44 @@ class DeviceClassSpec(BaseModel):
     ] = None
 
 
-class ResourceSlice(Resource):
-    api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+class ResourceSliceSpec(BaseModel):
+    all_nodes: Annotated[
+        Optional[bool],
         Field(
-            alias="apiVersion",
-            description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            alias="allNodes",
+            description="AllNodes indicates that all nodes have access to the resources in the pool.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
         ),
-    ] = "resource.k8s.io/v1alpha3"
-    kind: Annotated[
-        Optional[Literal["ResourceSlice"]],
-        Field(
-            description="Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
-        ),
-    ] = "ResourceSlice"
-    metadata: Annotated[
-        Optional[apimachinery.ObjectMeta], Field(description="Standard object metadata")
     ] = None
-    spec: Annotated[
-        ResourceSliceSpec,
+    devices: Annotated[
+        Optional[List[Device]],
         Field(
-            description="Contains the information published by the driver.\n\nChanging the spec automatically increments the metadata.generation number."
+            description="Devices lists some or all of the devices in this pool.\n\nMust not have more than 128 entries."
+        ),
+    ] = None
+    driver: Annotated[
+        str,
+        Field(
+            description="Driver identifies the DRA driver providing the capacity information. A field selector can be used to list only ResourceSlice objects with a certain driver name.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. This field is immutable."
         ),
     ]
-
-
-ResourceSliceList = ResourceList["ResourceSlice"]
+    node_name: Annotated[
+        Optional[str],
+        Field(
+            alias="nodeName",
+            description="NodeName identifies the node which provides the resources in this pool. A field selector can be used to list only ResourceSlice objects belonging to a certain node.\n\nThis field can be used to limit access from nodes to ResourceSlices with the same node name. It also indicates to autoscalers that adding new nodes of the same type as some old node might also make new resources available.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set. This field is immutable.",
+        ),
+    ] = None
+    node_selector: Annotated[
+        Optional[v1.NodeSelector],
+        Field(
+            alias="nodeSelector",
+            description="NodeSelector defines which nodes have access to the resources in the pool, when that pool is not limited to a single node.\n\nMust use exactly one term.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
+        ),
+    ] = None
+    pool: Annotated[
+        ResourcePool,
+        Field(description="Pool describes the pool that this ResourceSlice belongs to."),
+    ]
 
 
 class AllocationResult(BaseModel):
@@ -455,12 +434,12 @@ class DeviceClaim(BaseModel):
 
 class DeviceClass(Resource):
     api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+        Optional[Literal["resource.k8s.io/v1beta1"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "resource.k8s.io/v1alpha3"
+    ] = "resource.k8s.io/v1beta1"
     kind: Annotated[
         Optional[Literal["DeviceClass"]],
         Field(
@@ -523,14 +502,42 @@ class ResourceClaimTemplateSpec(BaseModel):
     ]
 
 
-class ResourceClaim(Resource):
+class ResourceSlice(Resource):
     api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+        Optional[Literal["resource.k8s.io/v1beta1"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "resource.k8s.io/v1alpha3"
+    ] = "resource.k8s.io/v1beta1"
+    kind: Annotated[
+        Optional[Literal["ResourceSlice"]],
+        Field(
+            description="Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        ),
+    ] = "ResourceSlice"
+    metadata: Annotated[
+        Optional[apimachinery.ObjectMeta], Field(description="Standard object metadata")
+    ] = None
+    spec: Annotated[
+        ResourceSliceSpec,
+        Field(
+            description="Contains the information published by the driver.\n\nChanging the spec automatically increments the metadata.generation number."
+        ),
+    ]
+
+
+ResourceSliceList = ResourceList["ResourceSlice"]
+
+
+class ResourceClaim(Resource):
+    api_version: Annotated[
+        Optional[Literal["resource.k8s.io/v1beta1"]],
+        Field(
+            alias="apiVersion",
+            description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+        ),
+    ] = "resource.k8s.io/v1beta1"
     kind: Annotated[
         Optional[Literal["ResourceClaim"]],
         Field(
@@ -559,12 +566,12 @@ ResourceClaimList = ResourceList["ResourceClaim"]
 
 class ResourceClaimTemplate(Resource):
     api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+        Optional[Literal["resource.k8s.io/v1beta1"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "resource.k8s.io/v1alpha3"
+    ] = "resource.k8s.io/v1beta1"
     kind: Annotated[
         Optional[Literal["ResourceClaimTemplate"]],
         Field(
