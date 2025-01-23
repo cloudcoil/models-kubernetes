@@ -1,6 +1,6 @@
 [project]
 name = "cloudcoil.models.kubernetes"
-version = "1.31.4.0"
+version = "1.30.9.0"
 description = "Versioned Kubernetes models for cloudcoil"
 authors = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
 maintainers = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
@@ -79,7 +79,7 @@ omit = ["cloudcoil/models/**"]
 # This will be used as the name for the setuptools entrypoints
 namespace = "cloudcoil.models.kubernetes"
 # The input OpenAPI spec
-input = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/tags/v1.31.4/api/openapi-spec/swagger.json"
+input = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/tags/v1.30.9/api/openapi-spec/swagger.json"
 # Rename the definitions to a more pythonic name
 # This is a list of regex substitutions
 transformations = [
