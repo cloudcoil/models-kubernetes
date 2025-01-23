@@ -12,18 +12,27 @@ from cloudcoil.pydantic import BaseBuilder, BaseModel, GenericListBuilder, Self
 from cloudcoil.resources import Resource, ResourceList
 
 
-class LeaseSpec(BaseModel):
+class LeaseCandidateSpec(BaseModel):
     class Builder(BaseBuilder):
         @property
-        def base_class(self) -> Type["LeaseSpec"]:
-            return LeaseSpec
+        def base_class(self) -> Type["LeaseCandidateSpec"]:
+            return LeaseCandidateSpec
 
-        def build(self) -> "LeaseSpec":
-            return LeaseSpec(**self._attrs)
+        def build(self) -> "LeaseCandidateSpec":
+            return LeaseCandidateSpec(**self._attrs)
+
+        def binary_version(self, value: str) -> Self:
+            return self._set("binary_version", value)
+
+        def emulation_version(self, value: Optional[str]) -> Self:
+            return self._set("emulation_version", value)
+
+        def lease_name(self, value: str) -> Self:
+            return self._set("lease_name", value)
 
         """  """
 
-        def acquire_time(
+        def ping_time(
             self,
             value_or_callback: Union[
                 Optional[apimachinery.MicroTime],
@@ -33,19 +42,7 @@ class LeaseSpec(BaseModel):
             value = value_or_callback
             if callable(value_or_callback):
                 value = value_or_callback(apimachinery.MicroTime.builder()).build()
-            return self._set("acquire_time", value)
-
-        def holder_identity(self, value: Optional[str]) -> Self:
-            return self._set("holder_identity", value)
-
-        def lease_duration_seconds(self, value: Optional[int]) -> Self:
-            return self._set("lease_duration_seconds", value)
-
-        def lease_transitions(self, value: Optional[int]) -> Self:
-            return self._set("lease_transitions", value)
-
-        def preferred_holder(self, value: Optional[str]) -> Self:
-            return self._set("preferred_holder", value)
+            return self._set("ping_time", value)
 
         """  """
 
@@ -61,86 +58,79 @@ class LeaseSpec(BaseModel):
                 value = value_or_callback(apimachinery.MicroTime.builder()).build()
             return self._set("renew_time", value)
 
-        def strategy(self, value: Optional[str]) -> Self:
+        def strategy(self, value: str) -> Self:
             return self._set("strategy", value)
 
     @classmethod
     def builder(cls) -> Builder:
         return cls.Builder()
 
-    class ListBuilder(GenericListBuilder["LeaseSpec", Builder]):
+    class ListBuilder(GenericListBuilder["LeaseCandidateSpec", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use LeaseSpec.list_builder() instead."
+                "This class is not meant to be instantiated. Use LeaseCandidateSpec.list_builder() instead."
             )
 
     @classmethod
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    acquire_time: Annotated[
+    binary_version: Annotated[
+        str,
+        Field(
+            alias="binaryVersion",
+            description="BinaryVersion is the binary version. It must be in a semver format without leading `v`. This field is required.",
+        ),
+    ]
+    emulation_version: Annotated[
+        Optional[str],
+        Field(
+            alias="emulationVersion",
+            description='EmulationVersion is the emulation version. It must be in a semver format without leading `v`. EmulationVersion must be less than or equal to BinaryVersion. This field is required when strategy is "OldestEmulationVersion"',
+        ),
+    ] = None
+    lease_name: Annotated[
+        str,
+        Field(
+            alias="leaseName",
+            description="LeaseName is the name of the lease for which this candidate is contending. This field is immutable.",
+        ),
+    ]
+    ping_time: Annotated[
         Optional[apimachinery.MicroTime],
         Field(
-            alias="acquireTime",
-            description="acquireTime is a time when the current lease was acquired.",
-        ),
-    ] = None
-    holder_identity: Annotated[
-        Optional[str],
-        Field(
-            alias="holderIdentity",
-            description="holderIdentity contains the identity of the holder of a current lease. If Coordinated Leader Election is used, the holder identity must be equal to the elected LeaseCandidate.metadata.name field.",
-        ),
-    ] = None
-    lease_duration_seconds: Annotated[
-        Optional[int],
-        Field(
-            alias="leaseDurationSeconds",
-            description="leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measured against the time of last observed renewTime.",
-        ),
-    ] = None
-    lease_transitions: Annotated[
-        Optional[int],
-        Field(
-            alias="leaseTransitions",
-            description="leaseTransitions is the number of transitions of a lease between holders.",
-        ),
-    ] = None
-    preferred_holder: Annotated[
-        Optional[str],
-        Field(
-            alias="preferredHolder",
-            description="PreferredHolder signals to a lease holder that the lease has a more optimal holder and should be given up. This field can only be set if Strategy is also set.",
+            alias="pingTime",
+            description="PingTime is the last time that the server has requested the LeaseCandidate to renew. It is only done during leader election to check if any LeaseCandidates have become ineligible. When PingTime is updated, the LeaseCandidate will respond by updating RenewTime.",
         ),
     ] = None
     renew_time: Annotated[
         Optional[apimachinery.MicroTime],
         Field(
             alias="renewTime",
-            description="renewTime is a time when the current holder of a lease has last updated the lease.",
+            description="RenewTime is the time that the LeaseCandidate was last updated. Any time a Lease needs to do leader election, the PingTime field is updated to signal to the LeaseCandidate that they should update the RenewTime. Old LeaseCandidate objects are also garbage collected if it has been hours since the last renew. The PingTime field is updated regularly to prevent garbage collection for still active LeaseCandidates.",
         ),
     ] = None
     strategy: Annotated[
-        Optional[str],
+        str,
         Field(
-            description="Strategy indicates the strategy for picking the leader for coordinated leader election. If the field is not specified, there is no active coordination for this lease. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled."
+            description="Strategy is the strategy that coordinated leader election will use for picking the leader. If multiple candidates for the same Lease return different strategies, the strategy provided by the candidate with the latest BinaryVersion will be used. If there is still conflict, this is a user error and coordinated leader election will not operate the Lease until resolved. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled."
         ),
-    ] = None
+    ]
 
 
-class Lease(Resource):
+class LeaseCandidate(Resource):
     class Builder(BaseBuilder):
         @property
-        def base_class(self) -> Type["Lease"]:
-            return Lease
+        def base_class(self) -> Type["LeaseCandidate"]:
+            return LeaseCandidate
 
-        def build(self) -> "Lease":
-            return Lease(**self._attrs)
+        def build(self) -> "LeaseCandidate":
+            return LeaseCandidate(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["coordination.k8s.io/v1"]]) -> Self:
+        def api_version(self, value: Optional[Literal["coordination.k8s.io/v1alpha2"]]) -> Self:
             return self._set("api_version", value)
 
-        def kind(self, value: Optional[Literal["Lease"]]) -> Self:
+        def kind(self, value: Optional[Literal["LeaseCandidate"]]) -> Self:
             return self._set("kind", value)
 
         """  """
@@ -162,22 +152,23 @@ class Lease(Resource):
         def spec(
             self,
             value_or_callback: Union[
-                Optional[LeaseSpec], Callable[[LeaseSpec.Builder], LeaseSpec.Builder]
+                Optional[LeaseCandidateSpec],
+                Callable[[LeaseCandidateSpec.Builder], LeaseCandidateSpec.Builder],
             ],
         ) -> Self:
             value = value_or_callback
             if callable(value_or_callback):
-                value = value_or_callback(LeaseSpec.builder()).build()
+                value = value_or_callback(LeaseCandidateSpec.builder()).build()
             return self._set("spec", value)
 
     @classmethod
     def builder(cls) -> Builder:
         return cls.Builder()
 
-    class ListBuilder(GenericListBuilder["Lease", Builder]):
+    class ListBuilder(GenericListBuilder["LeaseCandidate", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use Lease.list_builder() instead."
+                "This class is not meant to be instantiated. Use LeaseCandidate.list_builder() instead."
             )
 
     @classmethod
@@ -185,18 +176,18 @@ class Lease(Resource):
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
     api_version: Annotated[
-        Optional[Literal["coordination.k8s.io/v1"]],
+        Optional[Literal["coordination.k8s.io/v1alpha2"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "coordination.k8s.io/v1"
+    ] = "coordination.k8s.io/v1alpha2"
     kind: Annotated[
-        Optional[Literal["Lease"]],
+        Optional[Literal["LeaseCandidate"]],
         Field(
             description="Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         ),
-    ] = "Lease"
+    ] = "LeaseCandidate"
     metadata: Annotated[
         Optional[apimachinery.ObjectMeta],
         Field(
@@ -204,11 +195,11 @@ class Lease(Resource):
         ),
     ] = None
     spec: Annotated[
-        Optional[LeaseSpec],
+        Optional[LeaseCandidateSpec],
         Field(
             description="spec contains the specification of the Lease. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status"
         ),
     ] = None
 
 
-LeaseList = ResourceList["Lease"]
+LeaseCandidateList = ResourceList["LeaseCandidate"]
