@@ -333,57 +333,22 @@ class ResourcePool(BaseModel):
     ]
 
 
-class BasicDevice(BaseModel):
+class DeviceCapacity(BaseModel):
     class Builder(BaseBuilder):
-        def build(self) -> "BasicDevice":
-            return BasicDevice(**self._attrs)
+        def build(self) -> "DeviceCapacity":
+            return DeviceCapacity(**self._attrs)
 
-        def attributes(self, value: Optional[Dict[str, DeviceAttribute]]) -> Self:
-            return self._set("attributes", value)
-
-        def capacity(self, value: Optional[Dict[str, apimachinery.Quantity]]) -> Self:
-            return self._set("capacity", value)
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder[Self]:
-        return ListBuilder[cls]()  # type: ignore[valid-type]
-
-    attributes: Annotated[
-        Optional[Dict[str, DeviceAttribute]],
-        Field(
-            description="Attributes defines the set of attributes for this device. The name of each attribute must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
-        ),
-    ] = None
-    capacity: Annotated[
-        Optional[Dict[str, apimachinery.Quantity]],
-        Field(
-            description="Capacity defines the set of capacities for this device. The name of each capacity must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
-        ),
-    ] = None
-
-
-class Device(BaseModel):
-    class Builder(BaseBuilder):
-        def build(self) -> "Device":
-            return Device(**self._attrs)
-
-        def basic(
+        def value(
             self,
             value_or_callback: Union[
-                Optional[BasicDevice], Callable[[Type[BasicDevice]], BasicDevice]
+                apimachinery.Quantity,
+                Callable[[Type[apimachinery.Quantity]], apimachinery.Quantity],
             ],
         ) -> Self:
             value = value_or_callback
             if callable(value_or_callback):
-                value = value_or_callback(BasicDevice)
-            return self._set("basic", value)
-
-        def name(self, value: str) -> Self:
-            return self._set("name", value)
+                value = value_or_callback(apimachinery.Quantity)
+            return self._set("value", value)
 
     @classmethod
     def builder(cls) -> Builder:
@@ -393,14 +358,9 @@ class Device(BaseModel):
     def list_builder(cls) -> ListBuilder[Self]:
         return ListBuilder[cls]()  # type: ignore[valid-type]
 
-    basic: Annotated[
-        Optional[BasicDevice], Field(description="Basic defines one device instance.")
-    ] = None
-    name: Annotated[
-        str,
-        Field(
-            description="Name is unique identifier among all devices managed by the driver in the pool. It must be a DNS label."
-        ),
+    value: Annotated[
+        apimachinery.Quantity,
+        Field(description="Value defines how much of a certain device capacity is available."),
     ]
 
 
@@ -527,99 +487,6 @@ class OpaqueDeviceConfiguration(BaseModel):
     ]
 
 
-class ResourceSliceSpec(BaseModel):
-    class Builder(BaseBuilder):
-        def build(self) -> "ResourceSliceSpec":
-            return ResourceSliceSpec(**self._attrs)
-
-        def all_nodes(self, value: Optional[bool]) -> Self:
-            return self._set("all_nodes", value)
-
-        def devices(
-            self,
-            value_or_callback: Union[
-                Optional[List[Device]], Callable[[Type[Device]], List[Device]]
-            ],
-        ) -> Self:
-            value = value_or_callback
-            if callable(value_or_callback):
-                value = value_or_callback(Device)
-            return self._set("devices", value)
-
-        def driver(self, value: str) -> Self:
-            return self._set("driver", value)
-
-        def node_name(self, value: Optional[str]) -> Self:
-            return self._set("node_name", value)
-
-        def node_selector(
-            self,
-            value_or_callback: Union[
-                Optional[v1.NodeSelector],
-                Callable[[Type[v1.NodeSelector]], v1.NodeSelector],
-            ],
-        ) -> Self:
-            value = value_or_callback
-            if callable(value_or_callback):
-                value = value_or_callback(v1.NodeSelector)
-            return self._set("node_selector", value)
-
-        def pool(
-            self,
-            value_or_callback: Union[ResourcePool, Callable[[Type[ResourcePool]], ResourcePool]],
-        ) -> Self:
-            value = value_or_callback
-            if callable(value_or_callback):
-                value = value_or_callback(ResourcePool)
-            return self._set("pool", value)
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder[Self]:
-        return ListBuilder[cls]()  # type: ignore[valid-type]
-
-    all_nodes: Annotated[
-        Optional[bool],
-        Field(
-            alias="allNodes",
-            description="AllNodes indicates that all nodes have access to the resources in the pool.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
-        ),
-    ] = None
-    devices: Annotated[
-        Optional[List[Device]],
-        Field(
-            description="Devices lists some or all of the devices in this pool.\n\nMust not have more than 128 entries."
-        ),
-    ] = None
-    driver: Annotated[
-        str,
-        Field(
-            description="Driver identifies the DRA driver providing the capacity information. A field selector can be used to list only ResourceSlice objects with a certain driver name.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. This field is immutable."
-        ),
-    ]
-    node_name: Annotated[
-        Optional[str],
-        Field(
-            alias="nodeName",
-            description="NodeName identifies the node which provides the resources in this pool. A field selector can be used to list only ResourceSlice objects belonging to a certain node.\n\nThis field can be used to limit access from nodes to ResourceSlices with the same node name. It also indicates to autoscalers that adding new nodes of the same type as some old node might also make new resources available.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set. This field is immutable.",
-        ),
-    ] = None
-    node_selector: Annotated[
-        Optional[v1.NodeSelector],
-        Field(
-            alias="nodeSelector",
-            description="NodeSelector defines which nodes have access to the resources in the pool, when that pool is not limited to a single node.\n\nMust use exactly one term.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
-        ),
-    ] = None
-    pool: Annotated[
-        ResourcePool,
-        Field(description="Pool describes the pool that this ResourceSlice belongs to."),
-    ]
-
-
 class AllocatedDeviceStatus(BaseModel):
     class Builder(BaseBuilder):
         def build(self) -> "AllocatedDeviceStatus":
@@ -713,6 +580,77 @@ class AllocatedDeviceStatus(BaseModel):
         str,
         Field(
             description="This name together with the driver name and the device name field identify which device was allocated (`<driver name>/<pool name>/<device name>`).\n\nMust not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes."
+        ),
+    ]
+
+
+class BasicDevice(BaseModel):
+    class Builder(BaseBuilder):
+        def build(self) -> "BasicDevice":
+            return BasicDevice(**self._attrs)
+
+        def attributes(self, value: Optional[Dict[str, DeviceAttribute]]) -> Self:
+            return self._set("attributes", value)
+
+        def capacity(self, value: Optional[Dict[str, DeviceCapacity]]) -> Self:
+            return self._set("capacity", value)
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder[Self]:
+        return ListBuilder[cls]()  # type: ignore[valid-type]
+
+    attributes: Annotated[
+        Optional[Dict[str, DeviceAttribute]],
+        Field(
+            description="Attributes defines the set of attributes for this device. The name of each attribute must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
+        ),
+    ] = None
+    capacity: Annotated[
+        Optional[Dict[str, DeviceCapacity]],
+        Field(
+            description="Capacity defines the set of capacities for this device. The name of each capacity must be unique in that set.\n\nThe maximum number of attributes and capacities combined is 32."
+        ),
+    ] = None
+
+
+class Device(BaseModel):
+    class Builder(BaseBuilder):
+        def build(self) -> "Device":
+            return Device(**self._attrs)
+
+        def basic(
+            self,
+            value_or_callback: Union[
+                Optional[BasicDevice], Callable[[Type[BasicDevice]], BasicDevice]
+            ],
+        ) -> Self:
+            value = value_or_callback
+            if callable(value_or_callback):
+                value = value_or_callback(BasicDevice)
+            return self._set("basic", value)
+
+        def name(self, value: str) -> Self:
+            return self._set("name", value)
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder[Self]:
+        return ListBuilder[cls]()  # type: ignore[valid-type]
+
+    basic: Annotated[
+        Optional[BasicDevice], Field(description="Basic defines one device instance.")
+    ] = None
+    name: Annotated[
+        str,
+        Field(
+            description="Name is unique identifier among all devices managed by the driver in the pool. It must be a DNS label."
         ),
     ]
 
@@ -943,40 +881,51 @@ class DeviceClassSpec(BaseModel):
     ] = None
 
 
-class ResourceSlice(Resource):
+class ResourceSliceSpec(BaseModel):
     class Builder(BaseBuilder):
-        def build(self) -> "ResourceSlice":
-            return ResourceSlice(**self._attrs)
+        def build(self) -> "ResourceSliceSpec":
+            return ResourceSliceSpec(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["resource.k8s.io/v1alpha3"]]) -> Self:
-            return self._set("api_version", value)
+        def all_nodes(self, value: Optional[bool]) -> Self:
+            return self._set("all_nodes", value)
 
-        def kind(self, value: Optional[Literal["ResourceSlice"]]) -> Self:
-            return self._set("kind", value)
-
-        def metadata(
+        def devices(
             self,
             value_or_callback: Union[
-                Optional[apimachinery.ObjectMeta],
-                Callable[[Type[apimachinery.ObjectMeta]], apimachinery.ObjectMeta],
+                Optional[List[Device]], Callable[[Type[Device]], List[Device]]
             ],
         ) -> Self:
             value = value_or_callback
             if callable(value_or_callback):
-                value = value_or_callback(apimachinery.ObjectMeta)
-            return self._set("metadata", value)
+                value = value_or_callback(Device)
+            return self._set("devices", value)
 
-        def spec(
+        def driver(self, value: str) -> Self:
+            return self._set("driver", value)
+
+        def node_name(self, value: Optional[str]) -> Self:
+            return self._set("node_name", value)
+
+        def node_selector(
             self,
             value_or_callback: Union[
-                ResourceSliceSpec,
-                Callable[[Type[ResourceSliceSpec]], ResourceSliceSpec],
+                Optional[v1.NodeSelector],
+                Callable[[Type[v1.NodeSelector]], v1.NodeSelector],
             ],
         ) -> Self:
             value = value_or_callback
             if callable(value_or_callback):
-                value = value_or_callback(ResourceSliceSpec)
-            return self._set("spec", value)
+                value = value_or_callback(v1.NodeSelector)
+            return self._set("node_selector", value)
+
+        def pool(
+            self,
+            value_or_callback: Union[ResourcePool, Callable[[Type[ResourcePool]], ResourcePool]],
+        ) -> Self:
+            value = value_or_callback
+            if callable(value_or_callback):
+                value = value_or_callback(ResourcePool)
+            return self._set("pool", value)
 
     @classmethod
     def builder(cls) -> Builder:
@@ -986,31 +935,43 @@ class ResourceSlice(Resource):
     def list_builder(cls) -> ListBuilder[Self]:
         return ListBuilder[cls]()  # type: ignore[valid-type]
 
-    api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+    all_nodes: Annotated[
+        Optional[bool],
         Field(
-            alias="apiVersion",
-            description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            alias="allNodes",
+            description="AllNodes indicates that all nodes have access to the resources in the pool.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
         ),
-    ] = "resource.k8s.io/v1alpha3"
-    kind: Annotated[
-        Optional[Literal["ResourceSlice"]],
-        Field(
-            description="Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
-        ),
-    ] = "ResourceSlice"
-    metadata: Annotated[
-        Optional[apimachinery.ObjectMeta], Field(description="Standard object metadata")
     ] = None
-    spec: Annotated[
-        ResourceSliceSpec,
+    devices: Annotated[
+        Optional[List[Device]],
         Field(
-            description="Contains the information published by the driver.\n\nChanging the spec automatically increments the metadata.generation number."
+            description="Devices lists some or all of the devices in this pool.\n\nMust not have more than 128 entries."
+        ),
+    ] = None
+    driver: Annotated[
+        str,
+        Field(
+            description="Driver identifies the DRA driver providing the capacity information. A field selector can be used to list only ResourceSlice objects with a certain driver name.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. This field is immutable."
         ),
     ]
-
-
-ResourceSliceList = ResourceList["ResourceSlice"]
+    node_name: Annotated[
+        Optional[str],
+        Field(
+            alias="nodeName",
+            description="NodeName identifies the node which provides the resources in this pool. A field selector can be used to list only ResourceSlice objects belonging to a certain node.\n\nThis field can be used to limit access from nodes to ResourceSlices with the same node name. It also indicates to autoscalers that adding new nodes of the same type as some old node might also make new resources available.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set. This field is immutable.",
+        ),
+    ] = None
+    node_selector: Annotated[
+        Optional[v1.NodeSelector],
+        Field(
+            alias="nodeSelector",
+            description="NodeSelector defines which nodes have access to the resources in the pool, when that pool is not limited to a single node.\n\nMust use exactly one term.\n\nExactly one of NodeName, NodeSelector and AllNodes must be set.",
+        ),
+    ] = None
+    pool: Annotated[
+        ResourcePool,
+        Field(description="Pool describes the pool that this ResourceSlice belongs to."),
+    ]
 
 
 class AllocationResult(BaseModel):
@@ -1137,7 +1098,7 @@ class DeviceClass(Resource):
         def build(self) -> "DeviceClass":
             return DeviceClass(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["resource.k8s.io/v1alpha3"]]) -> Self:
+        def api_version(self, value: Optional[Literal["resource.k8s.io/v1beta1"]]) -> Self:
             return self._set("api_version", value)
 
         def kind(self, value: Optional[Literal["DeviceClass"]]) -> Self:
@@ -1175,12 +1136,12 @@ class DeviceClass(Resource):
         return ListBuilder[cls]()  # type: ignore[valid-type]
 
     api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+        Optional[Literal["resource.k8s.io/v1beta1"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "resource.k8s.io/v1alpha3"
+    ] = "resource.k8s.io/v1beta1"
     kind: Annotated[
         Optional[Literal["DeviceClass"]],
         Field(
@@ -1353,12 +1314,82 @@ class ResourceClaimTemplateSpec(BaseModel):
     ]
 
 
+class ResourceSlice(Resource):
+    class Builder(BaseBuilder):
+        def build(self) -> "ResourceSlice":
+            return ResourceSlice(**self._attrs)
+
+        def api_version(self, value: Optional[Literal["resource.k8s.io/v1beta1"]]) -> Self:
+            return self._set("api_version", value)
+
+        def kind(self, value: Optional[Literal["ResourceSlice"]]) -> Self:
+            return self._set("kind", value)
+
+        def metadata(
+            self,
+            value_or_callback: Union[
+                Optional[apimachinery.ObjectMeta],
+                Callable[[Type[apimachinery.ObjectMeta]], apimachinery.ObjectMeta],
+            ],
+        ) -> Self:
+            value = value_or_callback
+            if callable(value_or_callback):
+                value = value_or_callback(apimachinery.ObjectMeta)
+            return self._set("metadata", value)
+
+        def spec(
+            self,
+            value_or_callback: Union[
+                ResourceSliceSpec,
+                Callable[[Type[ResourceSliceSpec]], ResourceSliceSpec],
+            ],
+        ) -> Self:
+            value = value_or_callback
+            if callable(value_or_callback):
+                value = value_or_callback(ResourceSliceSpec)
+            return self._set("spec", value)
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder[Self]:
+        return ListBuilder[cls]()  # type: ignore[valid-type]
+
+    api_version: Annotated[
+        Optional[Literal["resource.k8s.io/v1beta1"]],
+        Field(
+            alias="apiVersion",
+            description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+        ),
+    ] = "resource.k8s.io/v1beta1"
+    kind: Annotated[
+        Optional[Literal["ResourceSlice"]],
+        Field(
+            description="Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        ),
+    ] = "ResourceSlice"
+    metadata: Annotated[
+        Optional[apimachinery.ObjectMeta], Field(description="Standard object metadata")
+    ] = None
+    spec: Annotated[
+        ResourceSliceSpec,
+        Field(
+            description="Contains the information published by the driver.\n\nChanging the spec automatically increments the metadata.generation number."
+        ),
+    ]
+
+
+ResourceSliceList = ResourceList["ResourceSlice"]
+
+
 class ResourceClaim(Resource):
     class Builder(BaseBuilder):
         def build(self) -> "ResourceClaim":
             return ResourceClaim(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["resource.k8s.io/v1alpha3"]]) -> Self:
+        def api_version(self, value: Optional[Literal["resource.k8s.io/v1beta1"]]) -> Self:
             return self._set("api_version", value)
 
         def kind(self, value: Optional[Literal["ResourceClaim"]]) -> Self:
@@ -1409,12 +1440,12 @@ class ResourceClaim(Resource):
         return ListBuilder[cls]()  # type: ignore[valid-type]
 
     api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+        Optional[Literal["resource.k8s.io/v1beta1"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "resource.k8s.io/v1alpha3"
+    ] = "resource.k8s.io/v1beta1"
     kind: Annotated[
         Optional[Literal["ResourceClaim"]],
         Field(
@@ -1446,7 +1477,7 @@ class ResourceClaimTemplate(Resource):
         def build(self) -> "ResourceClaimTemplate":
             return ResourceClaimTemplate(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["resource.k8s.io/v1alpha3"]]) -> Self:
+        def api_version(self, value: Optional[Literal["resource.k8s.io/v1beta1"]]) -> Self:
             return self._set("api_version", value)
 
         def kind(self, value: Optional[Literal["ResourceClaimTemplate"]]) -> Self:
@@ -1485,12 +1516,12 @@ class ResourceClaimTemplate(Resource):
         return ListBuilder[cls]()  # type: ignore[valid-type]
 
     api_version: Annotated[
-        Optional[Literal["resource.k8s.io/v1alpha3"]],
+        Optional[Literal["resource.k8s.io/v1beta1"]],
         Field(
             alias="apiVersion",
             description="APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
         ),
-    ] = "resource.k8s.io/v1alpha3"
+    ] = "resource.k8s.io/v1beta1"
     kind: Annotated[
         Optional[Literal["ResourceClaimTemplate"]],
         Field(
