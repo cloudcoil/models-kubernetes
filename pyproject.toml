@@ -14,7 +14,7 @@ classifiers = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cloudcoil>=0.0.21",
+    "cloudcoil>=0.2.0",
 ]
 keywords = ["cloud-native", "kubernetes", "pydantic", "python", "async"]
 
