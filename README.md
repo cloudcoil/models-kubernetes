@@ -1,3 +1,3 @@
 # cloudcoil-models-kubernetes
 
-Versioned Kubernetes models for cloudcoil.
+Versioned kubernetes models for cloudcoil.

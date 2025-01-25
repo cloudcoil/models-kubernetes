@@ -1,7 +1,7 @@
 [project]
 name = "cloudcoil.models.kubernetes"
-version = "1.31.4.0"
-description = "Versioned Kubernetes models for cloudcoil"
+version = "0.0.0"
+description = "Versioned kubernetes models for cloudcoil"
 authors = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
 maintainers = [{ name = "Sambhav Kothari", email = "sambhavs.email@gmail.com" }]
 license = { text = "Apache-2.0" }
@@ -14,9 +14,9 @@ classifiers = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cloudcoil>=0.2.0",
+    "cloudcoil>=0.2.1",
 ]
-keywords = ["cloud-native", "kubernetes", "pydantic", "python", "async"]
+keywords = ["cloud-native", "kubernetes", "kubernetes", "pydantic", "python", "async", "cloudcoil", "cloudcoil-models"]
 
 [project.urls]
 Homepage = "https://github.com/cloudcoil/cloudcoil"
@@ -74,13 +74,15 @@ plugins = ['pydantic.mypy', 'cloudcoil.mypy']
 [tool.coverage.run]
 omit = ["cloudcoil/models/**"]
 
+[tool.hatch.build.targets.wheel]
+only-include = ["cloudcoil"]
+
 [[tool.cloudcoil.codegen.models]]
 # Unique name for the models
 # This will be used as the name for the setuptools entrypoints
 namespace = "cloudcoil.models.kubernetes"
-# The input OpenAPI spec
-input = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/tags/v1.31.4/api/openapi-spec/swagger.json"
-# Rename the definitions to a more pythonic name
+input = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/tags/v1.32.1/api/openapi-spec/swagger.json"
+crd-namespace = "cloudcoil.models.kubernetes"# Rename the definitions to a more pythonic name
 # This is a list of regex substitutions
 transformations = [
     { match = "^io\\.k8s\\.apimachinery\\..*\\.(.+)", replace = "apimachinery.\\g<1>", namespace = "cloudcoil"},
@@ -88,6 +90,3 @@ transformations = [
     { match = "^io\\.k8s\\.api\\.(.+)$", replace = "\\g<1>"},
     { match = "^io\\.k8s\\.kube-aggregator\\.pkg\\.apis\\.(.+)$", replace = "\\g<1>"},
 ]
-
-[tool.hatch.build.targets.wheel]
-only-include = ["cloudcoil"]

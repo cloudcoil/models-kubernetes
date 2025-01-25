@@ -3,7 +3,7 @@ site_author: Sambhav Kothari
 site_description: Cloud-native made easy with Python
 
 repo_name: cloudcoil/cloudcoil
-repo_url: https://github.com/cloudcoil/cloudcoil
+repo_url: https://github.com/cloudcoil/models-kubernetes
 
 theme:
   name: material

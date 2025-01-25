@@ -6,7 +6,7 @@ test:
 lint:
 	uv run ruff check cloudcoil tests
 	uv run ruff format --check cloudcoil tests
-	uv run mypy -p cloudcoil.models.kubernetes
+	uv run mypy -p cloudcoil.models.kubernetes 
 
 .PHONY: fix-lint
 fix-lint:
