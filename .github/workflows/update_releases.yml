@@ -19,7 +19,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
       - name: Install uv and set python
         uses: astral-sh/setup-uv@v4
         with:
@@ -31,8 +32,6 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Update version for ${{ matrix.model_version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         run: |
           uv add cloudcoil -U
           VERSION="${{ matrix.model_version }}.0"
@@ -41,7 +40,7 @@ jobs:
 
           # Update version and input URL using sed
           sed -i "s/^version = .*/version = \"${VERSION}\"/" pyproject.toml
-          sed -i "s|releases/download/v[0-9]\+\.[0-9]\+\.[0-9]\+/|releases/download/v${{ matrix.model_version }}/|" pyproject.toml
+          sed -i "s|refs/tags/v[0-9]\+\.[0-9]\+\.[0-9]\+/|refs/tags/v${{ matrix.model_version }}/|" pyproject.toml
           # Generate models
           make gen-models
           make lint test

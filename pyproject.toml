@@ -82,7 +82,6 @@ only-include = ["cloudcoil"]
 # This will be used as the name for the setuptools entrypoints
 namespace = "cloudcoil.models.kubernetes"
 input = "https://raw.githubusercontent.com/kubernetes/kubernetes/refs/tags/v1.32.1/api/openapi-spec/swagger.json"
-crd-namespace = "cloudcoil.models.kubernetes"
 # Rename the definitions to a more pythonic name
 # This is a list of regex substitutions
 transformations = [
