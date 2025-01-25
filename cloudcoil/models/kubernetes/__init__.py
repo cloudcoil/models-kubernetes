@@ -23,4 +23,3 @@ from . import rbac as rbac
 from . import resource as resource
 from . import scheduling as scheduling
 from . import storage as storage
-from . import storagemigration as storagemigration

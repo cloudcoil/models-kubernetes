@@ -143,6 +143,113 @@ class NonResourceRule(BaseModel):
     """
 
 
+class ResourceAttributes(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["ResourceAttributes"]:
+            return ResourceAttributes
+
+        def build(self) -> "ResourceAttributes":
+            return ResourceAttributes(**self._attrs)
+
+        def group(self, value: Optional[str], /) -> Self:
+            """
+            Group is the API Group of the Resource.  "*" means all.
+            """
+            return self._set("group", value)
+
+        def name(self, value: Optional[str], /) -> Self:
+            """
+            Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
+            """
+            return self._set("name", value)
+
+        def namespace(self, value: Optional[str], /) -> Self:
+            """
+            Namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces "" (empty) is defaulted for LocalSubjectAccessReviews "" (empty) is empty for cluster-scoped resources "" (empty) means "all" for namespace scoped resources from a SubjectAccessReview or SelfSubjectAccessReview
+            """
+            return self._set("namespace", value)
+
+        def resource(self, value: Optional[str], /) -> Self:
+            """
+            Resource is one of the existing resource types.  "*" means all.
+            """
+            return self._set("resource", value)
+
+        def subresource(self, value: Optional[str], /) -> Self:
+            """
+            Subresource is one of the existing resource types.  "" means none.
+            """
+            return self._set("subresource", value)
+
+        def verb(self, value: Optional[str], /) -> Self:
+            """
+            Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
+            """
+            return self._set("verb", value)
+
+        def version(self, value: Optional[str], /) -> Self:
+            """
+            Version is the API Version of the Resource.  "*" means all.
+            """
+            return self._set("version", value)
+
+    class BuilderContext(BuilderContextBase["ResourceAttributes.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = ResourceAttributes.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for ResourceAttributes."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["ResourceAttributes", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use ResourceAttributes.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    group: Optional[str] = None
+    """
+    Group is the API Group of the Resource.  "*" means all.
+    """
+    name: Optional[str] = None
+    """
+    Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
+    """
+    namespace: Optional[str] = None
+    """
+    Namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces "" (empty) is defaulted for LocalSubjectAccessReviews "" (empty) is empty for cluster-scoped resources "" (empty) means "all" for namespace scoped resources from a SubjectAccessReview or SelfSubjectAccessReview
+    """
+    resource: Optional[str] = None
+    """
+    Resource is one of the existing resource types.  "*" means all.
+    """
+    subresource: Optional[str] = None
+    """
+    Subresource is one of the existing resource types.  "" means none.
+    """
+    verb: Optional[str] = None
+    """
+    Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
+    """
+    version: Optional[str] = None
+    """
+    Version is the API Version of the Resource.  "*" means all.
+    """
+
+
 class ResourceRule(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -222,6 +329,133 @@ class ResourceRule(BaseModel):
     """
 
 
+class SelfSubjectAccessReviewSpec(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["SelfSubjectAccessReviewSpec"]:
+            return SelfSubjectAccessReviewSpec
+
+        def build(self) -> "SelfSubjectAccessReviewSpec":
+            return SelfSubjectAccessReviewSpec(**self._attrs)
+
+        @overload
+        def non_resource_attributes(
+            self, value_or_callback: Optional[NonResourceAttributes], /
+        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def non_resource_attributes(
+            self,
+            value_or_callback: Callable[
+                [NonResourceAttributes.Builder],
+                NonResourceAttributes.Builder | NonResourceAttributes,
+            ],
+            /,
+        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def non_resource_attributes(
+            self, value_or_callback: Never = ...
+        ) -> "NonResourceAttributes.BuilderContext": ...
+
+        def non_resource_attributes(self, value_or_callback=None, /):
+            """
+            NonResourceAttributes describes information for a non-resource access request
+            """
+            if self._in_context and value_or_callback is None:
+                context = NonResourceAttributes.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "non_resource_attributes"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(NonResourceAttributes.builder())
+                if isinstance(output, NonResourceAttributes.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("non_resource_attributes", value)
+
+        @overload
+        def resource_attributes(
+            self, value_or_callback: Optional[ResourceAttributes], /
+        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def resource_attributes(
+            self,
+            value_or_callback: Callable[
+                [ResourceAttributes.Builder],
+                ResourceAttributes.Builder | ResourceAttributes,
+            ],
+            /,
+        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def resource_attributes(
+            self, value_or_callback: Never = ...
+        ) -> "ResourceAttributes.BuilderContext": ...
+
+        def resource_attributes(self, value_or_callback=None, /):
+            """
+            ResourceAuthorizationAttributes describes information for a resource access request
+            """
+            if self._in_context and value_or_callback is None:
+                context = ResourceAttributes.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "resource_attributes"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ResourceAttributes.builder())
+                if isinstance(output, ResourceAttributes.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("resource_attributes", value)
+
+    class BuilderContext(BuilderContextBase["SelfSubjectAccessReviewSpec.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = SelfSubjectAccessReviewSpec.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for SelfSubjectAccessReviewSpec."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["SelfSubjectAccessReviewSpec", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use SelfSubjectAccessReviewSpec.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    non_resource_attributes: Annotated[
+        Optional[NonResourceAttributes], Field(alias="nonResourceAttributes")
+    ] = None
+    """
+    NonResourceAttributes describes information for a non-resource access request
+    """
+    resource_attributes: Annotated[
+        Optional[ResourceAttributes], Field(alias="resourceAttributes")
+    ] = None
+    """
+    ResourceAuthorizationAttributes describes information for a resource access request
+    """
+
+
 class SelfSubjectRulesReviewSpec(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -266,6 +500,173 @@ class SelfSubjectRulesReviewSpec(BaseModel):
     namespace: Optional[str] = None
     """
     Namespace to evaluate rules for. Required.
+    """
+
+
+class SubjectAccessReviewSpec(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["SubjectAccessReviewSpec"]:
+            return SubjectAccessReviewSpec
+
+        def build(self) -> "SubjectAccessReviewSpec":
+            return SubjectAccessReviewSpec(**self._attrs)
+
+        def extra(self, value: Optional[Dict[str, List[str]]], /) -> Self:
+            """
+            Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
+            """
+            return self._set("extra", value)
+
+        def groups(self, value: Optional[List[str]], /) -> Self:
+            """
+            Groups is the groups you're testing for.
+            """
+            return self._set("groups", value)
+
+        @overload
+        def non_resource_attributes(
+            self, value_or_callback: Optional[NonResourceAttributes], /
+        ) -> "SubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def non_resource_attributes(
+            self,
+            value_or_callback: Callable[
+                [NonResourceAttributes.Builder],
+                NonResourceAttributes.Builder | NonResourceAttributes,
+            ],
+            /,
+        ) -> "SubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def non_resource_attributes(
+            self, value_or_callback: Never = ...
+        ) -> "NonResourceAttributes.BuilderContext": ...
+
+        def non_resource_attributes(self, value_or_callback=None, /):
+            """
+            NonResourceAttributes describes information for a non-resource access request
+            """
+            if self._in_context and value_or_callback is None:
+                context = NonResourceAttributes.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "non_resource_attributes"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(NonResourceAttributes.builder())
+                if isinstance(output, NonResourceAttributes.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("non_resource_attributes", value)
+
+        @overload
+        def resource_attributes(
+            self, value_or_callback: Optional[ResourceAttributes], /
+        ) -> "SubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def resource_attributes(
+            self,
+            value_or_callback: Callable[
+                [ResourceAttributes.Builder],
+                ResourceAttributes.Builder | ResourceAttributes,
+            ],
+            /,
+        ) -> "SubjectAccessReviewSpec.Builder": ...
+
+        @overload
+        def resource_attributes(
+            self, value_or_callback: Never = ...
+        ) -> "ResourceAttributes.BuilderContext": ...
+
+        def resource_attributes(self, value_or_callback=None, /):
+            """
+            ResourceAuthorizationAttributes describes information for a resource access request
+            """
+            if self._in_context and value_or_callback is None:
+                context = ResourceAttributes.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "resource_attributes"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ResourceAttributes.builder())
+                if isinstance(output, ResourceAttributes.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("resource_attributes", value)
+
+        def uid(self, value: Optional[str], /) -> Self:
+            """
+            UID information about the requesting user.
+            """
+            return self._set("uid", value)
+
+        def user(self, value: Optional[str], /) -> Self:
+            """
+            User is the user you're testing for. If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
+            """
+            return self._set("user", value)
+
+    class BuilderContext(BuilderContextBase["SubjectAccessReviewSpec.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = SubjectAccessReviewSpec.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for SubjectAccessReviewSpec."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["SubjectAccessReviewSpec", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use SubjectAccessReviewSpec.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    extra: Optional[Dict[str, List[str]]] = None
+    """
+    Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
+    """
+    groups: Optional[List[str]] = None
+    """
+    Groups is the groups you're testing for.
+    """
+    non_resource_attributes: Annotated[
+        Optional[NonResourceAttributes], Field(alias="nonResourceAttributes")
+    ] = None
+    """
+    NonResourceAttributes describes information for a non-resource access request
+    """
+    resource_attributes: Annotated[
+        Optional[ResourceAttributes], Field(alias="resourceAttributes")
+    ] = None
+    """
+    ResourceAuthorizationAttributes describes information for a resource access request
+    """
+    uid: Optional[str] = None
+    """
+    UID information about the requesting user.
+    """
+    user: Optional[str] = None
+    """
+    User is the user you're testing for. If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
     """
 
 
@@ -487,703 +888,6 @@ class SubjectRulesReviewStatus(BaseModel):
     resource_rules: Annotated[List[ResourceRule], Field(alias="resourceRules")]
     """
     ResourceRules is the list of actions the subject is allowed to perform on resources. The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-    """
-
-
-class FieldSelectorAttributes(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["FieldSelectorAttributes"]:
-            return FieldSelectorAttributes
-
-        def build(self) -> "FieldSelectorAttributes":
-            return FieldSelectorAttributes(**self._attrs)
-
-        def raw_selector(self, value: Optional[str], /) -> Self:
-            """
-            rawSelector is the serialization of a field selector that would be included in a query parameter. Webhook implementations are encouraged to ignore rawSelector. The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
-            """
-            return self._set("raw_selector", value)
-
-        @overload
-        def requirements(
-            self, value_or_callback: List[apimachinery.FieldSelectorRequirement], /
-        ) -> "FieldSelectorAttributes.Builder": ...
-
-        @overload
-        def requirements(
-            self,
-            value_or_callback: Callable[
-                [
-                    GenericListBuilder[
-                        apimachinery.FieldSelectorRequirement,
-                        apimachinery.FieldSelectorRequirement.Builder,
-                    ]
-                ],
-                GenericListBuilder[
-                    apimachinery.FieldSelectorRequirement,
-                    apimachinery.FieldSelectorRequirement.Builder,
-                ]
-                | List[apimachinery.FieldSelectorRequirement],
-            ],
-            /,
-        ) -> "FieldSelectorAttributes.Builder": ...
-
-        @overload
-        def requirements(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[apimachinery.FieldSelectorRequirement.Builder]: ...
-
-        def requirements(self, value_or_callback=None, /):
-            """
-            requirements is the parsed interpretation of a field selector. All requirements must be met for a resource instance to match the selector. Webhook implementations should handle requirements, but how to handle them is up to the webhook. Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements are not understood.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[apimachinery.FieldSelectorRequirement.Builder]()
-                context._parent_builder = self
-                context._field_name = "requirements"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(apimachinery.FieldSelectorRequirement.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("requirements", value)
-
-    class BuilderContext(BuilderContextBase["FieldSelectorAttributes.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = FieldSelectorAttributes.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for FieldSelectorAttributes."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["FieldSelectorAttributes", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use FieldSelectorAttributes.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    raw_selector: Annotated[Optional[str], Field(alias="rawSelector")] = None
-    """
-    rawSelector is the serialization of a field selector that would be included in a query parameter. Webhook implementations are encouraged to ignore rawSelector. The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
-    """
-    requirements: Optional[List[apimachinery.FieldSelectorRequirement]] = None
-    """
-    requirements is the parsed interpretation of a field selector. All requirements must be met for a resource instance to match the selector. Webhook implementations should handle requirements, but how to handle them is up to the webhook. Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements are not understood.
-    """
-
-
-class LabelSelectorAttributes(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["LabelSelectorAttributes"]:
-            return LabelSelectorAttributes
-
-        def build(self) -> "LabelSelectorAttributes":
-            return LabelSelectorAttributes(**self._attrs)
-
-        def raw_selector(self, value: Optional[str], /) -> Self:
-            """
-            rawSelector is the serialization of a field selector that would be included in a query parameter. Webhook implementations are encouraged to ignore rawSelector. The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
-            """
-            return self._set("raw_selector", value)
-
-        @overload
-        def requirements(
-            self, value_or_callback: List[apimachinery.LabelSelectorRequirement], /
-        ) -> "LabelSelectorAttributes.Builder": ...
-
-        @overload
-        def requirements(
-            self,
-            value_or_callback: Callable[
-                [
-                    GenericListBuilder[
-                        apimachinery.LabelSelectorRequirement,
-                        apimachinery.LabelSelectorRequirement.Builder,
-                    ]
-                ],
-                GenericListBuilder[
-                    apimachinery.LabelSelectorRequirement,
-                    apimachinery.LabelSelectorRequirement.Builder,
-                ]
-                | List[apimachinery.LabelSelectorRequirement],
-            ],
-            /,
-        ) -> "LabelSelectorAttributes.Builder": ...
-
-        @overload
-        def requirements(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[apimachinery.LabelSelectorRequirement.Builder]: ...
-
-        def requirements(self, value_or_callback=None, /):
-            """
-            requirements is the parsed interpretation of a label selector. All requirements must be met for a resource instance to match the selector. Webhook implementations should handle requirements, but how to handle them is up to the webhook. Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements are not understood.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[apimachinery.LabelSelectorRequirement.Builder]()
-                context._parent_builder = self
-                context._field_name = "requirements"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(apimachinery.LabelSelectorRequirement.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("requirements", value)
-
-    class BuilderContext(BuilderContextBase["LabelSelectorAttributes.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = LabelSelectorAttributes.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for LabelSelectorAttributes."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["LabelSelectorAttributes", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use LabelSelectorAttributes.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    raw_selector: Annotated[Optional[str], Field(alias="rawSelector")] = None
-    """
-    rawSelector is the serialization of a field selector that would be included in a query parameter. Webhook implementations are encouraged to ignore rawSelector. The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
-    """
-    requirements: Optional[List[apimachinery.LabelSelectorRequirement]] = None
-    """
-    requirements is the parsed interpretation of a label selector. All requirements must be met for a resource instance to match the selector. Webhook implementations should handle requirements, but how to handle them is up to the webhook. Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements are not understood.
-    """
-
-
-class ResourceAttributes(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["ResourceAttributes"]:
-            return ResourceAttributes
-
-        def build(self) -> "ResourceAttributes":
-            return ResourceAttributes(**self._attrs)
-
-        @overload
-        def field_selector(
-            self, value_or_callback: Optional[FieldSelectorAttributes], /
-        ) -> "ResourceAttributes.Builder": ...
-
-        @overload
-        def field_selector(
-            self,
-            value_or_callback: Callable[
-                [FieldSelectorAttributes.Builder],
-                FieldSelectorAttributes.Builder | FieldSelectorAttributes,
-            ],
-            /,
-        ) -> "ResourceAttributes.Builder": ...
-
-        @overload
-        def field_selector(
-            self, value_or_callback: Never = ...
-        ) -> "FieldSelectorAttributes.BuilderContext": ...
-
-        def field_selector(self, value_or_callback=None, /):
-            """
-                    fieldSelector describes the limitation on access based on field.  It can only limit access, not broaden it.
-
-            This field  is alpha-level. To use this field, you must enable the `AuthorizeWithSelectors` feature gate (disabled by default).
-            """
-            if self._in_context and value_or_callback is None:
-                context = FieldSelectorAttributes.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "field_selector"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(FieldSelectorAttributes.builder())
-                if isinstance(output, FieldSelectorAttributes.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("field_selector", value)
-
-        def group(self, value: Optional[str], /) -> Self:
-            """
-            Group is the API Group of the Resource.  "*" means all.
-            """
-            return self._set("group", value)
-
-        @overload
-        def label_selector(
-            self, value_or_callback: Optional[LabelSelectorAttributes], /
-        ) -> "ResourceAttributes.Builder": ...
-
-        @overload
-        def label_selector(
-            self,
-            value_or_callback: Callable[
-                [LabelSelectorAttributes.Builder],
-                LabelSelectorAttributes.Builder | LabelSelectorAttributes,
-            ],
-            /,
-        ) -> "ResourceAttributes.Builder": ...
-
-        @overload
-        def label_selector(
-            self, value_or_callback: Never = ...
-        ) -> "LabelSelectorAttributes.BuilderContext": ...
-
-        def label_selector(self, value_or_callback=None, /):
-            """
-                    labelSelector describes the limitation on access based on labels.  It can only limit access, not broaden it.
-
-            This field  is alpha-level. To use this field, you must enable the `AuthorizeWithSelectors` feature gate (disabled by default).
-            """
-            if self._in_context and value_or_callback is None:
-                context = LabelSelectorAttributes.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "label_selector"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(LabelSelectorAttributes.builder())
-                if isinstance(output, LabelSelectorAttributes.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("label_selector", value)
-
-        def name(self, value: Optional[str], /) -> Self:
-            """
-            Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
-            """
-            return self._set("name", value)
-
-        def namespace(self, value: Optional[str], /) -> Self:
-            """
-            Namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces "" (empty) is defaulted for LocalSubjectAccessReviews "" (empty) is empty for cluster-scoped resources "" (empty) means "all" for namespace scoped resources from a SubjectAccessReview or SelfSubjectAccessReview
-            """
-            return self._set("namespace", value)
-
-        def resource(self, value: Optional[str], /) -> Self:
-            """
-            Resource is one of the existing resource types.  "*" means all.
-            """
-            return self._set("resource", value)
-
-        def subresource(self, value: Optional[str], /) -> Self:
-            """
-            Subresource is one of the existing resource types.  "" means none.
-            """
-            return self._set("subresource", value)
-
-        def verb(self, value: Optional[str], /) -> Self:
-            """
-            Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
-            """
-            return self._set("verb", value)
-
-        def version(self, value: Optional[str], /) -> Self:
-            """
-            Version is the API Version of the Resource.  "*" means all.
-            """
-            return self._set("version", value)
-
-    class BuilderContext(BuilderContextBase["ResourceAttributes.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = ResourceAttributes.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for ResourceAttributes."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["ResourceAttributes", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use ResourceAttributes.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    field_selector: Annotated[Optional[FieldSelectorAttributes], Field(alias="fieldSelector")] = (
-        None
-    )
-    """
-    fieldSelector describes the limitation on access based on field.  It can only limit access, not broaden it.
-
-    This field  is alpha-level. To use this field, you must enable the `AuthorizeWithSelectors` feature gate (disabled by default).
-    """
-    group: Optional[str] = None
-    """
-    Group is the API Group of the Resource.  "*" means all.
-    """
-    label_selector: Annotated[Optional[LabelSelectorAttributes], Field(alias="labelSelector")] = (
-        None
-    )
-    """
-    labelSelector describes the limitation on access based on labels.  It can only limit access, not broaden it.
-
-    This field  is alpha-level. To use this field, you must enable the `AuthorizeWithSelectors` feature gate (disabled by default).
-    """
-    name: Optional[str] = None
-    """
-    Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
-    """
-    namespace: Optional[str] = None
-    """
-    Namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces "" (empty) is defaulted for LocalSubjectAccessReviews "" (empty) is empty for cluster-scoped resources "" (empty) means "all" for namespace scoped resources from a SubjectAccessReview or SelfSubjectAccessReview
-    """
-    resource: Optional[str] = None
-    """
-    Resource is one of the existing resource types.  "*" means all.
-    """
-    subresource: Optional[str] = None
-    """
-    Subresource is one of the existing resource types.  "" means none.
-    """
-    verb: Optional[str] = None
-    """
-    Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
-    """
-    version: Optional[str] = None
-    """
-    Version is the API Version of the Resource.  "*" means all.
-    """
-
-
-class SelfSubjectAccessReviewSpec(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["SelfSubjectAccessReviewSpec"]:
-            return SelfSubjectAccessReviewSpec
-
-        def build(self) -> "SelfSubjectAccessReviewSpec":
-            return SelfSubjectAccessReviewSpec(**self._attrs)
-
-        @overload
-        def non_resource_attributes(
-            self, value_or_callback: Optional[NonResourceAttributes], /
-        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def non_resource_attributes(
-            self,
-            value_or_callback: Callable[
-                [NonResourceAttributes.Builder],
-                NonResourceAttributes.Builder | NonResourceAttributes,
-            ],
-            /,
-        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def non_resource_attributes(
-            self, value_or_callback: Never = ...
-        ) -> "NonResourceAttributes.BuilderContext": ...
-
-        def non_resource_attributes(self, value_or_callback=None, /):
-            """
-            NonResourceAttributes describes information for a non-resource access request
-            """
-            if self._in_context and value_or_callback is None:
-                context = NonResourceAttributes.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "non_resource_attributes"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(NonResourceAttributes.builder())
-                if isinstance(output, NonResourceAttributes.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("non_resource_attributes", value)
-
-        @overload
-        def resource_attributes(
-            self, value_or_callback: Optional[ResourceAttributes], /
-        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def resource_attributes(
-            self,
-            value_or_callback: Callable[
-                [ResourceAttributes.Builder],
-                ResourceAttributes.Builder | ResourceAttributes,
-            ],
-            /,
-        ) -> "SelfSubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def resource_attributes(
-            self, value_or_callback: Never = ...
-        ) -> "ResourceAttributes.BuilderContext": ...
-
-        def resource_attributes(self, value_or_callback=None, /):
-            """
-            ResourceAuthorizationAttributes describes information for a resource access request
-            """
-            if self._in_context and value_or_callback is None:
-                context = ResourceAttributes.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "resource_attributes"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ResourceAttributes.builder())
-                if isinstance(output, ResourceAttributes.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("resource_attributes", value)
-
-    class BuilderContext(BuilderContextBase["SelfSubjectAccessReviewSpec.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = SelfSubjectAccessReviewSpec.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for SelfSubjectAccessReviewSpec."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["SelfSubjectAccessReviewSpec", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use SelfSubjectAccessReviewSpec.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    non_resource_attributes: Annotated[
-        Optional[NonResourceAttributes], Field(alias="nonResourceAttributes")
-    ] = None
-    """
-    NonResourceAttributes describes information for a non-resource access request
-    """
-    resource_attributes: Annotated[
-        Optional[ResourceAttributes], Field(alias="resourceAttributes")
-    ] = None
-    """
-    ResourceAuthorizationAttributes describes information for a resource access request
-    """
-
-
-class SubjectAccessReviewSpec(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["SubjectAccessReviewSpec"]:
-            return SubjectAccessReviewSpec
-
-        def build(self) -> "SubjectAccessReviewSpec":
-            return SubjectAccessReviewSpec(**self._attrs)
-
-        def extra(self, value: Optional[Dict[str, List[str]]], /) -> Self:
-            """
-            Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
-            """
-            return self._set("extra", value)
-
-        def groups(self, value: Optional[List[str]], /) -> Self:
-            """
-            Groups is the groups you're testing for.
-            """
-            return self._set("groups", value)
-
-        @overload
-        def non_resource_attributes(
-            self, value_or_callback: Optional[NonResourceAttributes], /
-        ) -> "SubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def non_resource_attributes(
-            self,
-            value_or_callback: Callable[
-                [NonResourceAttributes.Builder],
-                NonResourceAttributes.Builder | NonResourceAttributes,
-            ],
-            /,
-        ) -> "SubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def non_resource_attributes(
-            self, value_or_callback: Never = ...
-        ) -> "NonResourceAttributes.BuilderContext": ...
-
-        def non_resource_attributes(self, value_or_callback=None, /):
-            """
-            NonResourceAttributes describes information for a non-resource access request
-            """
-            if self._in_context and value_or_callback is None:
-                context = NonResourceAttributes.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "non_resource_attributes"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(NonResourceAttributes.builder())
-                if isinstance(output, NonResourceAttributes.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("non_resource_attributes", value)
-
-        @overload
-        def resource_attributes(
-            self, value_or_callback: Optional[ResourceAttributes], /
-        ) -> "SubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def resource_attributes(
-            self,
-            value_or_callback: Callable[
-                [ResourceAttributes.Builder],
-                ResourceAttributes.Builder | ResourceAttributes,
-            ],
-            /,
-        ) -> "SubjectAccessReviewSpec.Builder": ...
-
-        @overload
-        def resource_attributes(
-            self, value_or_callback: Never = ...
-        ) -> "ResourceAttributes.BuilderContext": ...
-
-        def resource_attributes(self, value_or_callback=None, /):
-            """
-            ResourceAuthorizationAttributes describes information for a resource access request
-            """
-            if self._in_context and value_or_callback is None:
-                context = ResourceAttributes.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "resource_attributes"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ResourceAttributes.builder())
-                if isinstance(output, ResourceAttributes.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("resource_attributes", value)
-
-        def uid(self, value: Optional[str], /) -> Self:
-            """
-            UID information about the requesting user.
-            """
-            return self._set("uid", value)
-
-        def user(self, value: Optional[str], /) -> Self:
-            """
-            User is the user you're testing for. If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
-            """
-            return self._set("user", value)
-
-    class BuilderContext(BuilderContextBase["SubjectAccessReviewSpec.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = SubjectAccessReviewSpec.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for SubjectAccessReviewSpec."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["SubjectAccessReviewSpec", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use SubjectAccessReviewSpec.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    extra: Optional[Dict[str, List[str]]] = None
-    """
-    Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
-    """
-    groups: Optional[List[str]] = None
-    """
-    Groups is the groups you're testing for.
-    """
-    non_resource_attributes: Annotated[
-        Optional[NonResourceAttributes], Field(alias="nonResourceAttributes")
-    ] = None
-    """
-    NonResourceAttributes describes information for a non-resource access request
-    """
-    resource_attributes: Annotated[
-        Optional[ResourceAttributes], Field(alias="resourceAttributes")
-    ] = None
-    """
-    ResourceAuthorizationAttributes describes information for a resource access request
-    """
-    uid: Optional[str] = None
-    """
-    UID information about the requesting user.
-    """
-    user: Optional[str] = None
-    """
-    User is the user you're testing for. If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
     """
 
 

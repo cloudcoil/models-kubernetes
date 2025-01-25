@@ -106,69 +106,6 @@ class AWSElasticBlockStoreVolumeSource(BaseModel):
     """
 
 
-class AppArmorProfile(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["AppArmorProfile"]:
-            return AppArmorProfile
-
-        def build(self) -> "AppArmorProfile":
-            return AppArmorProfile(**self._attrs)
-
-        def localhost_profile(self, value: Optional[str], /) -> Self:
-            """
-            localhostProfile indicates a profile loaded on the node that should be used. The profile must be preconfigured on the node to work. Must match the loaded name of the profile. Must be set if and only if type is "Localhost".
-            """
-            return self._set("localhost_profile", value)
-
-        def type(self, value: str, /) -> Self:
-            """
-                  type indicates which kind of AppArmor profile will be applied. Valid options are:
-            Localhost - a profile pre-loaded on the node.
-            RuntimeDefault - the container runtime's default profile.
-            Unconfined - no AppArmor enforcement.
-            """
-            return self._set("type", value)
-
-    class BuilderContext(BuilderContextBase["AppArmorProfile.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = AppArmorProfile.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for AppArmorProfile."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["AppArmorProfile", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use AppArmorProfile.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    localhost_profile: Annotated[Optional[str], Field(alias="localhostProfile")] = None
-    """
-    localhostProfile indicates a profile loaded on the node that should be used. The profile must be preconfigured on the node to work. Must match the loaded name of the profile. Must be set if and only if type is "Localhost".
-    """
-    type: str
-    """
-    type indicates which kind of AppArmor profile will be applied. Valid options are:
-      Localhost - a profile pre-loaded on the node.
-      RuntimeDefault - the container runtime's default profile.
-      Unconfined - no AppArmor enforcement.
-    """
-
-
 class AttachedVolume(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -524,6 +461,73 @@ class Capabilities(BaseModel):
     """
 
 
+class ClaimSource(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["ClaimSource"]:
+            return ClaimSource
+
+        def build(self) -> "ClaimSource":
+            return ClaimSource(**self._attrs)
+
+        def resource_claim_name(self, value: Optional[str], /) -> Self:
+            """
+            ResourceClaimName is the name of a ResourceClaim object in the same namespace as this pod.
+            """
+            return self._set("resource_claim_name", value)
+
+        def resource_claim_template_name(self, value: Optional[str], /) -> Self:
+            """
+                    ResourceClaimTemplateName is the name of a ResourceClaimTemplate object in the same namespace as this pod.
+
+            The template will be used to create a new ResourceClaim, which will be bound to this pod. When this pod is deleted, the ResourceClaim will also be deleted. The pod name and resource name, along with a generated component, will be used to form a unique name for the ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
+
+            This field is immutable and no changes will be made to the corresponding ResourceClaim by the control plane after creating the ResourceClaim.
+            """
+            return self._set("resource_claim_template_name", value)
+
+    class BuilderContext(BuilderContextBase["ClaimSource.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = ClaimSource.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for ClaimSource."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["ClaimSource", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use ClaimSource.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    resource_claim_name: Annotated[Optional[str], Field(alias="resourceClaimName")] = None
+    """
+    ResourceClaimName is the name of a ResourceClaim object in the same namespace as this pod.
+    """
+    resource_claim_template_name: Annotated[
+        Optional[str], Field(alias="resourceClaimTemplateName")
+    ] = None
+    """
+    ResourceClaimTemplateName is the name of a ResourceClaimTemplate object in the same namespace as this pod.
+
+    The template will be used to create a new ResourceClaim, which will be bound to this pod. When this pod is deleted, the ResourceClaim will also be deleted. The pod name and resource name, along with a generated component, will be used to form a unique name for the ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
+
+    This field is immutable and no changes will be made to the corresponding ResourceClaim by the control plane after creating the ResourceClaim.
+    """
+
+
 class ClientIPConfig(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -659,7 +663,7 @@ class ConfigMapEnvSource(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -697,7 +701,7 @@ class ConfigMapEnvSource(BaseModel):
 
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -722,7 +726,7 @@ class ConfigMapKeySelector(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -764,7 +768,7 @@ class ConfigMapKeySelector(BaseModel):
     """
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -1928,7 +1932,7 @@ class HostAlias(BaseModel):
             """
             return self._set("hostnames", value)
 
-        def ip(self, value: str, /) -> Self:
+        def ip(self, value: Optional[str], /) -> Self:
             """
             IP address of the host file entry.
             """
@@ -1964,7 +1968,7 @@ class HostAlias(BaseModel):
     """
     Hostnames for the above IP address.
     """
-    ip: str
+    ip: Optional[str] = None
     """
     IP address of the host file entry.
     """
@@ -1979,7 +1983,7 @@ class HostIP(BaseModel):
         def build(self) -> "HostIP":
             return HostIP(**self._attrs)
 
-        def ip(self, value: str, /) -> Self:
+        def ip(self, value: Optional[str], /) -> Self:
             """
             IP is the IP address assigned to the host
             """
@@ -2011,7 +2015,7 @@ class HostIP(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    ip: str
+    ip: Optional[str] = None
     """
     IP is the IP address assigned to the host
     """
@@ -2071,63 +2075,6 @@ class HostPathVolumeSource(BaseModel):
     type: Optional[str] = None
     """
     type for HostPath Volume Defaults to "" More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
-    """
-
-
-class ImageVolumeSource(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["ImageVolumeSource"]:
-            return ImageVolumeSource
-
-        def build(self) -> "ImageVolumeSource":
-            return ImageVolumeSource(**self._attrs)
-
-        def pull_policy(self, value: Optional[str], /) -> Self:
-            """
-            Policy for pulling OCI objects. Possible values are: Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
-            """
-            return self._set("pull_policy", value)
-
-        def reference(self, value: Optional[str], /) -> Self:
-            """
-            Required: Image or artifact reference to be used. Behaves in the same way as pod.spec.containers[*].image. Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets. More info: https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.
-            """
-            return self._set("reference", value)
-
-    class BuilderContext(BuilderContextBase["ImageVolumeSource.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = ImageVolumeSource.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for ImageVolumeSource."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["ImageVolumeSource", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use ImageVolumeSource.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    pull_policy: Annotated[Optional[str], Field(alias="pullPolicy")] = None
-    """
-    Policy for pulling OCI objects. Possible values are: Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
-    """
-    reference: Optional[str] = None
-    """
-    Required: Image or artifact reference to be used. Behaves in the same way as pod.spec.containers[*].image. Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets. More info: https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.
     """
 
 
@@ -2198,73 +2145,6 @@ class KeyToPath(BaseModel):
     """
 
 
-class LinuxContainerUser(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["LinuxContainerUser"]:
-            return LinuxContainerUser
-
-        def build(self) -> "LinuxContainerUser":
-            return LinuxContainerUser(**self._attrs)
-
-        def gid(self, value: int, /) -> Self:
-            """
-            GID is the primary gid initially attached to the first process in the container
-            """
-            return self._set("gid", value)
-
-        def supplemental_groups(self, value: Optional[List[int]], /) -> Self:
-            """
-            SupplementalGroups are the supplemental groups initially attached to the first process in the container
-            """
-            return self._set("supplemental_groups", value)
-
-        def uid(self, value: int, /) -> Self:
-            """
-            UID is the primary uid initially attached to the first process in the container
-            """
-            return self._set("uid", value)
-
-    class BuilderContext(BuilderContextBase["LinuxContainerUser.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = LinuxContainerUser.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for LinuxContainerUser."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["LinuxContainerUser", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use LinuxContainerUser.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    gid: int
-    """
-    GID is the primary gid initially attached to the first process in the container
-    """
-    supplemental_groups: Annotated[Optional[List[int]], Field(alias="supplementalGroups")] = None
-    """
-    SupplementalGroups are the supplemental groups initially attached to the first process in the container
-    """
-    uid: int
-    """
-    UID is the primary uid initially attached to the first process in the container
-    """
-
-
 class LocalObjectReference(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -2276,7 +2156,7 @@ class LocalObjectReference(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -2308,7 +2188,7 @@ class LocalObjectReference(BaseModel):
 
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
 
 
@@ -2945,114 +2825,6 @@ class NodeDaemonEndpoints(BaseModel):
     """
 
 
-class NodeFeatures(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["NodeFeatures"]:
-            return NodeFeatures
-
-        def build(self) -> "NodeFeatures":
-            return NodeFeatures(**self._attrs)
-
-        def supplemental_groups_policy(self, value: Optional[bool], /) -> Self:
-            """
-            SupplementalGroupsPolicy is set to true if the runtime supports SupplementalGroupsPolicy and ContainerUser.
-            """
-            return self._set("supplemental_groups_policy", value)
-
-    class BuilderContext(BuilderContextBase["NodeFeatures.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = NodeFeatures.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for NodeFeatures."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["NodeFeatures", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use NodeFeatures.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    supplemental_groups_policy: Annotated[
-        Optional[bool], Field(alias="supplementalGroupsPolicy")
-    ] = None
-    """
-    SupplementalGroupsPolicy is set to true if the runtime supports SupplementalGroupsPolicy and ContainerUser.
-    """
-
-
-class NodeRuntimeHandlerFeatures(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["NodeRuntimeHandlerFeatures"]:
-            return NodeRuntimeHandlerFeatures
-
-        def build(self) -> "NodeRuntimeHandlerFeatures":
-            return NodeRuntimeHandlerFeatures(**self._attrs)
-
-        def recursive_read_only_mounts(self, value: Optional[bool], /) -> Self:
-            """
-            RecursiveReadOnlyMounts is set to true if the runtime handler supports RecursiveReadOnlyMounts.
-            """
-            return self._set("recursive_read_only_mounts", value)
-
-        def user_namespaces(self, value: Optional[bool], /) -> Self:
-            """
-            UserNamespaces is set to true if the runtime handler supports UserNamespaces, including for volumes.
-            """
-            return self._set("user_namespaces", value)
-
-    class BuilderContext(BuilderContextBase["NodeRuntimeHandlerFeatures.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = NodeRuntimeHandlerFeatures.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for NodeRuntimeHandlerFeatures."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["NodeRuntimeHandlerFeatures", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use NodeRuntimeHandlerFeatures.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    recursive_read_only_mounts: Annotated[
-        Optional[bool], Field(alias="recursiveReadOnlyMounts")
-    ] = None
-    """
-    RecursiveReadOnlyMounts is set to true if the runtime handler supports RecursiveReadOnlyMounts.
-    """
-    user_namespaces: Annotated[Optional[bool], Field(alias="userNamespaces")] = None
-    """
-    UserNamespaces is set to true if the runtime handler supports UserNamespaces, including for volumes.
-    """
-
-
 class NodeSelectorRequirement(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -3284,7 +3056,7 @@ class NodeSystemInfo(BaseModel):
 
         def kube_proxy_version(self, value: str, /) -> Self:
             """
-            Deprecated: KubeProxy Version reported by the node.
+            KubeProxy Version reported by the node.
             """
             return self._set("kube_proxy_version", value)
 
@@ -3362,7 +3134,7 @@ class NodeSystemInfo(BaseModel):
     """
     kube_proxy_version: Annotated[str, Field(alias="kubeProxyVersion")]
     """
-    Deprecated: KubeProxy Version reported by the node.
+    KubeProxy Version reported by the node.
     """
     kubelet_version: Annotated[str, Field(alias="kubeletVersion")]
     """
@@ -3675,14 +3447,11 @@ class PodDNSConfigOption(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name is this DNS resolver option's name. Required.
+            Required.
             """
             return self._set("name", value)
 
         def value(self, value: Optional[str], /) -> Self:
-            """
-            Value is this DNS resolver option's value.
-            """
             return self._set("value", value)
 
     class BuilderContext(BuilderContextBase["PodDNSConfigOption.Builder"]):
@@ -3713,12 +3482,9 @@ class PodDNSConfigOption(BaseModel):
 
     name: Optional[str] = None
     """
-    Name is this DNS resolver option's name. Required.
+    Required.
     """
     value: Optional[str] = None
-    """
-    Value is this DNS resolver option's value.
-    """
 
 
 class PodIP(BaseModel):
@@ -3730,7 +3496,7 @@ class PodIP(BaseModel):
         def build(self) -> "PodIP":
             return PodIP(**self._attrs)
 
-        def ip(self, value: str, /) -> Self:
+        def ip(self, value: Optional[str], /) -> Self:
             """
             IP is the IP address assigned to the pod
             """
@@ -3762,7 +3528,7 @@ class PodIP(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    ip: str
+    ip: Optional[str] = None
     """
     IP is the IP address assigned to the pod
     """
@@ -3877,25 +3643,39 @@ class PodResourceClaim(BaseModel):
             """
             return self._set("name", value)
 
-        def resource_claim_name(self, value: Optional[str], /) -> Self:
+        @overload
+        def source(
+            self, value_or_callback: Optional[ClaimSource], /
+        ) -> "PodResourceClaim.Builder": ...
+
+        @overload
+        def source(
+            self,
+            value_or_callback: Callable[[ClaimSource.Builder], ClaimSource.Builder | ClaimSource],
+            /,
+        ) -> "PodResourceClaim.Builder": ...
+
+        @overload
+        def source(self, value_or_callback: Never = ...) -> "ClaimSource.BuilderContext": ...
+
+        def source(self, value_or_callback=None, /):
             """
-                    ResourceClaimName is the name of a ResourceClaim object in the same namespace as this pod.
-
-            Exactly one of ResourceClaimName and ResourceClaimTemplateName must be set.
+            Source describes where to find the ResourceClaim.
             """
-            return self._set("resource_claim_name", value)
+            if self._in_context and value_or_callback is None:
+                context = ClaimSource.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "source"
+                return context
 
-        def resource_claim_template_name(self, value: Optional[str], /) -> Self:
-            """
-                    ResourceClaimTemplateName is the name of a ResourceClaimTemplate object in the same namespace as this pod.
-
-            The template will be used to create a new ResourceClaim, which will be bound to this pod. When this pod is deleted, the ResourceClaim will also be deleted. The pod name and resource name, along with a generated component, will be used to form a unique name for the ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
-
-            This field is immutable and no changes will be made to the corresponding ResourceClaim by the control plane after creating the ResourceClaim.
-
-            Exactly one of ResourceClaimName and ResourceClaimTemplateName must be set.
-            """
-            return self._set("resource_claim_template_name", value)
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ClaimSource.builder())
+                if isinstance(output, ClaimSource.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("source", value)
 
     class BuilderContext(BuilderContextBase["PodResourceClaim.Builder"]):
         def model_post_init(self, __context) -> None:
@@ -3927,23 +3707,9 @@ class PodResourceClaim(BaseModel):
     """
     Name uniquely identifies this resource claim inside the pod. This must be a DNS_LABEL.
     """
-    resource_claim_name: Annotated[Optional[str], Field(alias="resourceClaimName")] = None
+    source: Optional[ClaimSource] = None
     """
-    ResourceClaimName is the name of a ResourceClaim object in the same namespace as this pod.
-
-    Exactly one of ResourceClaimName and ResourceClaimTemplateName must be set.
-    """
-    resource_claim_template_name: Annotated[
-        Optional[str], Field(alias="resourceClaimTemplateName")
-    ] = None
-    """
-    ResourceClaimTemplateName is the name of a ResourceClaimTemplate object in the same namespace as this pod.
-
-    The template will be used to create a new ResourceClaim, which will be bound to this pod. When this pod is deleted, the ResourceClaim will also be deleted. The pod name and resource name, along with a generated component, will be used to form a unique name for the ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
-
-    This field is immutable and no changes will be made to the corresponding ResourceClaim by the control plane after creating the ResourceClaim.
-
-    Exactly one of ResourceClaimName and ResourceClaimTemplateName must be set.
+    Source describes where to find the ResourceClaim.
     """
 
 
@@ -3964,7 +3730,7 @@ class PodResourceClaimStatus(BaseModel):
 
         def resource_claim_name(self, value: Optional[str], /) -> Self:
             """
-            ResourceClaimName is the name of the ResourceClaim that was generated for the Pod in the namespace of the Pod. If this is unset, then generating a ResourceClaim was not necessary. The pod.spec.resourceClaims entry can be ignored in this case.
+            ResourceClaimName is the name of the ResourceClaim that was generated for the Pod in the namespace of the Pod. It this is unset, then generating a ResourceClaim was not necessary. The pod.spec.resourceClaims entry can be ignored in this case.
             """
             return self._set("resource_claim_name", value)
 
@@ -4000,7 +3766,7 @@ class PodResourceClaimStatus(BaseModel):
     """
     resource_claim_name: Annotated[Optional[str], Field(alias="resourceClaimName")] = None
     """
-    ResourceClaimName is the name of the ResourceClaim that was generated for the Pod in the namespace of the Pod. If this is unset, then generating a ResourceClaim was not necessary. The pod.spec.resourceClaims entry can be ignored in this case.
+    ResourceClaimName is the name of the ResourceClaim that was generated for the Pod in the namespace of the Pod. It this is unset, then generating a ResourceClaim was not necessary. The pod.spec.resourceClaims entry can be ignored in this case.
     """
 
 
@@ -4542,12 +4308,6 @@ class ResourceClaim(BaseModel):
             """
             return self._set("name", value)
 
-        def request(self, value: Optional[str], /) -> Self:
-            """
-            Request is the name chosen for a request in the referenced claim. If empty, everything from the claim is made available, otherwise only the result of this request.
-            """
-            return self._set("request", value)
-
     class BuilderContext(BuilderContextBase["ResourceClaim.Builder"]):
         def model_post_init(self, __context) -> None:
             self._builder = ResourceClaim.Builder()
@@ -4577,173 +4337,6 @@ class ResourceClaim(BaseModel):
     name: str
     """
     Name must match the name of one entry in pod.spec.resourceClaims of the Pod where this field is used. It makes that resource available inside a container.
-    """
-    request: Optional[str] = None
-    """
-    Request is the name chosen for a request in the referenced claim. If empty, everything from the claim is made available, otherwise only the result of this request.
-    """
-
-
-class ResourceHealth(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["ResourceHealth"]:
-            return ResourceHealth
-
-        def build(self) -> "ResourceHealth":
-            return ResourceHealth(**self._attrs)
-
-        def health(self, value: Optional[str], /) -> Self:
-            """
-                    Health of the resource. can be one of:
-             - Healthy: operates as normal
-             - Unhealthy: reported unhealthy. We consider this a temporary health issue
-                          since we do not have a mechanism today to distinguish
-                          temporary and permanent issues.
-             - Unknown: The status cannot be determined.
-                        For example, Device Plugin got unregistered and hasn't been re-registered since.
-
-            In future we may want to introduce the PermanentlyUnhealthy Status.
-            """
-            return self._set("health", value)
-
-        def resource_id(self, value: str, /) -> Self:
-            """
-            ResourceID is the unique identifier of the resource. See the ResourceID type for more information.
-            """
-            return self._set("resource_id", value)
-
-    class BuilderContext(BuilderContextBase["ResourceHealth.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = ResourceHealth.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for ResourceHealth."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["ResourceHealth", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use ResourceHealth.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    health: Optional[str] = None
-    """
-    Health of the resource. can be one of:
-     - Healthy: operates as normal
-     - Unhealthy: reported unhealthy. We consider this a temporary health issue
-                  since we do not have a mechanism today to distinguish
-                  temporary and permanent issues.
-     - Unknown: The status cannot be determined.
-                For example, Device Plugin got unregistered and hasn't been re-registered since.
-
-    In future we may want to introduce the PermanentlyUnhealthy Status.
-    """
-    resource_id: Annotated[str, Field(alias="resourceID")]
-    """
-    ResourceID is the unique identifier of the resource. See the ResourceID type for more information.
-    """
-
-
-class ResourceStatus(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["ResourceStatus"]:
-            return ResourceStatus
-
-        def build(self) -> "ResourceStatus":
-            return ResourceStatus(**self._attrs)
-
-        def name(self, value: str, /) -> Self:
-            """
-            Name of the resource. Must be unique within the pod and in case of non-DRA resource, match one of the resources from the pod spec. For DRA resources, the value must be "claim:<claim_name>/<request>". When this status is reported about a container, the "claim_name" and "request" must match one of the claims of this container.
-            """
-            return self._set("name", value)
-
-        @overload
-        def resources(
-            self, value_or_callback: List[ResourceHealth], /
-        ) -> "ResourceStatus.Builder": ...
-
-        @overload
-        def resources(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[ResourceHealth, ResourceHealth.Builder]],
-                GenericListBuilder[ResourceHealth, ResourceHealth.Builder] | List[ResourceHealth],
-            ],
-            /,
-        ) -> "ResourceStatus.Builder": ...
-
-        @overload
-        def resources(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[ResourceHealth.Builder]: ...
-
-        def resources(self, value_or_callback=None, /):
-            """
-            List of unique resources health. Each element in the list contains an unique resource ID and its health. At a minimum, for the lifetime of a Pod, resource ID must uniquely identify the resource allocated to the Pod on the Node. If other Pod on the same Node reports the status with the same resource ID, it must be the same resource they share. See ResourceID type definition for a specific format it has in various use cases.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[ResourceHealth.Builder]()
-                context._parent_builder = self
-                context._field_name = "resources"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ResourceHealth.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("resources", value)
-
-    class BuilderContext(BuilderContextBase["ResourceStatus.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = ResourceStatus.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for ResourceStatus."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["ResourceStatus", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use ResourceStatus.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    name: str
-    """
-    Name of the resource. Must be unique within the pod and in case of non-DRA resource, match one of the resources from the pod spec. For DRA resources, the value must be "claim:<claim_name>/<request>". When this status is reported about a container, the "claim_name" and "request" must match one of the claims of this container.
-    """
-    resources: Optional[List[ResourceHealth]] = None
-    """
-    List of unique resources health. Each element in the list contains an unique resource ID and its health. At a minimum, for the lifetime of a Pod, resource ID must uniquely identify the resource allocated to the Pod on the Node. If other Pod on the same Node reports the status with the same resource ID, it must be the same resource they share. See ResourceID type definition for a specific format it has in various use cases.
     """
 
 
@@ -5133,7 +4726,7 @@ class SecretEnvSource(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -5171,7 +4764,7 @@ class SecretEnvSource(BaseModel):
 
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -5196,7 +4789,7 @@ class SecretKeySelector(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -5238,7 +4831,7 @@ class SecretKeySelector(BaseModel):
     """
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -5294,7 +4887,7 @@ class SecretProjection(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -5336,7 +4929,7 @@ class SecretProjection(BaseModel):
     """
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -6450,7 +6043,7 @@ class VolumeMount(BaseModel):
 
         def mount_propagation(self, value: Optional[str], /) -> Self:
             """
-            mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10. When RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified (which defaults to None).
+            mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10.
             """
             return self._set("mount_propagation", value)
 
@@ -6465,20 +6058,6 @@ class VolumeMount(BaseModel):
             Mounted read-only if true, read-write otherwise (false or unspecified). Defaults to false.
             """
             return self._set("read_only", value)
-
-        def recursive_read_only(self, value: Optional[str], /) -> Self:
-            """
-                    RecursiveReadOnly specifies whether read-only mounts should be handled recursively.
-
-            If ReadOnly is false, this field has no meaning and must be unspecified.
-
-            If ReadOnly is true, and this field is set to Disabled, the mount is not made recursively read-only.  If this field is set to IfPossible, the mount is made recursively read-only, if it is supported by the container runtime.  If this field is set to Enabled, the mount is made recursively read-only if it is supported by the container runtime, otherwise the pod will not be started and an error will be generated to indicate the reason.
-
-            If this field is set to IfPossible or Enabled, MountPropagation must be set to None (or be unspecified, which defaults to None).
-
-            If this field is not specified, it is treated as an equivalent of Disabled.
-            """
-            return self._set("recursive_read_only", value)
 
         def sub_path(self, value: Optional[str], /) -> Self:
             """
@@ -6524,7 +6103,7 @@ class VolumeMount(BaseModel):
     """
     mount_propagation: Annotated[Optional[str], Field(alias="mountPropagation")] = None
     """
-    mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10. When RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified (which defaults to None).
+    mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10.
     """
     name: str
     """
@@ -6534,18 +6113,6 @@ class VolumeMount(BaseModel):
     """
     Mounted read-only if true, read-write otherwise (false or unspecified). Defaults to false.
     """
-    recursive_read_only: Annotated[Optional[str], Field(alias="recursiveReadOnly")] = None
-    """
-    RecursiveReadOnly specifies whether read-only mounts should be handled recursively.
-
-    If ReadOnly is false, this field has no meaning and must be unspecified.
-
-    If ReadOnly is true, and this field is set to Disabled, the mount is not made recursively read-only.  If this field is set to IfPossible, the mount is made recursively read-only, if it is supported by the container runtime.  If this field is set to Enabled, the mount is made recursively read-only if it is supported by the container runtime, otherwise the pod will not be started and an error will be generated to indicate the reason.
-
-    If this field is set to IfPossible or Enabled, MountPropagation must be set to None (or be unspecified, which defaults to None).
-
-    If this field is not specified, it is treated as an equivalent of Disabled.
-    """
     sub_path: Annotated[Optional[str], Field(alias="subPath")] = None
     """
     Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
@@ -6553,83 +6120,6 @@ class VolumeMount(BaseModel):
     sub_path_expr: Annotated[Optional[str], Field(alias="subPathExpr")] = None
     """
     Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
-    """
-
-
-class VolumeMountStatus(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["VolumeMountStatus"]:
-            return VolumeMountStatus
-
-        def build(self) -> "VolumeMountStatus":
-            return VolumeMountStatus(**self._attrs)
-
-        def mount_path(self, value: str, /) -> Self:
-            """
-            MountPath corresponds to the original VolumeMount.
-            """
-            return self._set("mount_path", value)
-
-        def name(self, value: str, /) -> Self:
-            """
-            Name corresponds to the name of the original VolumeMount.
-            """
-            return self._set("name", value)
-
-        def read_only(self, value: Optional[bool], /) -> Self:
-            """
-            ReadOnly corresponds to the original VolumeMount.
-            """
-            return self._set("read_only", value)
-
-        def recursive_read_only(self, value: Optional[str], /) -> Self:
-            """
-            RecursiveReadOnly must be set to Disabled, Enabled, or unspecified (for non-readonly mounts). An IfPossible value in the original VolumeMount must be translated to Disabled or Enabled, depending on the mount result.
-            """
-            return self._set("recursive_read_only", value)
-
-    class BuilderContext(BuilderContextBase["VolumeMountStatus.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = VolumeMountStatus.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for VolumeMountStatus."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["VolumeMountStatus", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use VolumeMountStatus.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    mount_path: Annotated[str, Field(alias="mountPath")]
-    """
-    MountPath corresponds to the original VolumeMount.
-    """
-    name: str
-    """
-    Name corresponds to the name of the original VolumeMount.
-    """
-    read_only: Annotated[Optional[bool], Field(alias="readOnly")] = None
-    """
-    ReadOnly corresponds to the original VolumeMount.
-    """
-    recursive_read_only: Annotated[Optional[str], Field(alias="recursiveReadOnly")] = None
-    """
-    RecursiveReadOnly must be set to Disabled, Enabled, or unspecified (for non-readonly mounts). An IfPossible value in the original VolumeMount must be translated to Disabled or Enabled, depending on the mount result.
     """
 
 
@@ -7744,7 +7234,7 @@ class ConfigMapProjection(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -7786,7 +7276,7 @@ class ConfigMapProjection(BaseModel):
     """
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -7850,7 +7340,7 @@ class ConfigMapVolumeSource(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+            Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
             """
             return self._set("name", value)
 
@@ -7896,7 +7386,7 @@ class ConfigMapVolumeSource(BaseModel):
     """
     name: Optional[str] = None
     """
-    Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+    Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
     """
     optional: Optional[bool] = None
     """
@@ -8154,84 +7644,6 @@ class ContainerStateTerminated(BaseModel):
     started_at: Annotated[Optional[apimachinery.Time], Field(alias="startedAt")] = None
     """
     Time at which previous execution of the container started
-    """
-
-
-class ContainerUser(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["ContainerUser"]:
-            return ContainerUser
-
-        def build(self) -> "ContainerUser":
-            return ContainerUser(**self._attrs)
-
-        @overload
-        def linux(
-            self, value_or_callback: Optional[LinuxContainerUser], /
-        ) -> "ContainerUser.Builder": ...
-
-        @overload
-        def linux(
-            self,
-            value_or_callback: Callable[
-                [LinuxContainerUser.Builder],
-                LinuxContainerUser.Builder | LinuxContainerUser,
-            ],
-            /,
-        ) -> "ContainerUser.Builder": ...
-
-        @overload
-        def linux(self, value_or_callback: Never = ...) -> "LinuxContainerUser.BuilderContext": ...
-
-        def linux(self, value_or_callback=None, /):
-            """
-            Linux holds user identity information initially attached to the first process of the containers in Linux. Note that the actual running identity can be changed if the process has enough privilege to do so.
-            """
-            if self._in_context and value_or_callback is None:
-                context = LinuxContainerUser.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "linux"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(LinuxContainerUser.builder())
-                if isinstance(output, LinuxContainerUser.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("linux", value)
-
-    class BuilderContext(BuilderContextBase["ContainerUser.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = ContainerUser.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for ContainerUser."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["ContainerUser", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use ContainerUser.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    linux: Optional[LinuxContainerUser] = None
-    """
-    Linux holds user identity information initially attached to the first process of the containers in Linux. Note that the actual running identity can be changed if the process has enough privilege to do so.
     """
 
 
@@ -9981,9 +9393,6 @@ class NamespaceCondition(BaseModel):
         ) -> "apimachinery.Time.BuilderContext": ...
 
         def last_transition_time(self, value_or_callback=None, /):
-            """
-            Last time the condition transitioned from one status to another.
-            """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.Time.BuilderContext()
                 context._parent_builder = self
@@ -10000,15 +9409,9 @@ class NamespaceCondition(BaseModel):
             return self._set("last_transition_time", value)
 
         def message(self, value: Optional[str], /) -> Self:
-            """
-            Human-readable message indicating details about last transition.
-            """
             return self._set("message", value)
 
         def reason(self, value: Optional[str], /) -> Self:
-            """
-            Unique, one-word, CamelCase reason for the condition's last transition.
-            """
             return self._set("reason", value)
 
         def status(self, value: str, /) -> Self:
@@ -10052,17 +9455,8 @@ class NamespaceCondition(BaseModel):
     last_transition_time: Annotated[
         Optional[apimachinery.Time], Field(alias="lastTransitionTime")
     ] = None
-    """
-    Last time the condition transitioned from one status to another.
-    """
     message: Optional[str] = None
-    """
-    Human-readable message indicating details about last transition.
-    """
     reason: Optional[str] = None
-    """
-    Unique, one-word, CamelCase reason for the condition's last transition.
-    """
     status: str
     """
     Status of the condition, one of True, False, Unknown.
@@ -10331,96 +9725,6 @@ class NodeCondition(BaseModel):
     """
 
 
-class NodeRuntimeHandler(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["NodeRuntimeHandler"]:
-            return NodeRuntimeHandler
-
-        def build(self) -> "NodeRuntimeHandler":
-            return NodeRuntimeHandler(**self._attrs)
-
-        @overload
-        def features(
-            self, value_or_callback: Optional[NodeRuntimeHandlerFeatures], /
-        ) -> "NodeRuntimeHandler.Builder": ...
-
-        @overload
-        def features(
-            self,
-            value_or_callback: Callable[
-                [NodeRuntimeHandlerFeatures.Builder],
-                NodeRuntimeHandlerFeatures.Builder | NodeRuntimeHandlerFeatures,
-            ],
-            /,
-        ) -> "NodeRuntimeHandler.Builder": ...
-
-        @overload
-        def features(
-            self, value_or_callback: Never = ...
-        ) -> "NodeRuntimeHandlerFeatures.BuilderContext": ...
-
-        def features(self, value_or_callback=None, /):
-            """
-            Supported features.
-            """
-            if self._in_context and value_or_callback is None:
-                context = NodeRuntimeHandlerFeatures.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "features"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(NodeRuntimeHandlerFeatures.builder())
-                if isinstance(output, NodeRuntimeHandlerFeatures.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("features", value)
-
-        def name(self, value: Optional[str], /) -> Self:
-            """
-            Runtime handler name. Empty for the default runtime handler.
-            """
-            return self._set("name", value)
-
-    class BuilderContext(BuilderContextBase["NodeRuntimeHandler.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = NodeRuntimeHandler.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for NodeRuntimeHandler."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["NodeRuntimeHandler", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use NodeRuntimeHandler.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    features: Optional[NodeRuntimeHandlerFeatures] = None
-    """
-    Supported features.
-    """
-    name: Optional[str] = None
-    """
-    Runtime handler name. Empty for the default runtime handler.
-    """
-
-
 class NodeSelector(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -10531,7 +9835,7 @@ class NodeStatus(BaseModel):
 
         def addresses(self, value_or_callback=None, /):
             """
-            List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/reference/node/node-status/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
+            List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[NodeAddress.Builder]()
@@ -10556,7 +9860,7 @@ class NodeStatus(BaseModel):
 
         def capacity(self, value: Optional[Dict[str, apimachinery.Quantity]], /) -> Self:
             """
-            Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/reference/node/node-status/#capacity
+            Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
             """
             return self._set("capacity", value)
 
@@ -10580,7 +9884,7 @@ class NodeStatus(BaseModel):
 
         def conditions(self, value_or_callback=None, /):
             """
-            Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/reference/node/node-status/#condition
+            Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[NodeCondition.Builder]()
@@ -10673,42 +9977,6 @@ class NodeStatus(BaseModel):
             return self._set("daemon_endpoints", value)
 
         @overload
-        def features(
-            self, value_or_callback: Optional[NodeFeatures], /
-        ) -> "NodeStatus.Builder": ...
-
-        @overload
-        def features(
-            self,
-            value_or_callback: Callable[
-                [NodeFeatures.Builder], NodeFeatures.Builder | NodeFeatures
-            ],
-            /,
-        ) -> "NodeStatus.Builder": ...
-
-        @overload
-        def features(self, value_or_callback: Never = ...) -> "NodeFeatures.BuilderContext": ...
-
-        def features(self, value_or_callback=None, /):
-            """
-            Features describes the set of features implemented by the CRI implementation.
-            """
-            if self._in_context and value_or_callback is None:
-                context = NodeFeatures.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "features"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(NodeFeatures.builder())
-                if isinstance(output, NodeFeatures.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("features", value)
-
-        @overload
         def images(self, value_or_callback: List[ContainerImage], /) -> "NodeStatus.Builder": ...
 
         @overload
@@ -10764,7 +10032,7 @@ class NodeStatus(BaseModel):
 
         def node_info(self, value_or_callback=None, /):
             """
-            Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/reference/node/node-status/#info
+            Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info
             """
             if self._in_context and value_or_callback is None:
                 context = NodeSystemInfo.BuilderContext()
@@ -10786,46 +10054,6 @@ class NodeStatus(BaseModel):
             NodePhase is the recently observed lifecycle phase of the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#phase The field is never populated, and now is deprecated.
             """
             return self._set("phase", value)
-
-        @overload
-        def runtime_handlers(
-            self, value_or_callback: List[NodeRuntimeHandler], /
-        ) -> "NodeStatus.Builder": ...
-
-        @overload
-        def runtime_handlers(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[NodeRuntimeHandler, NodeRuntimeHandler.Builder]],
-                GenericListBuilder[NodeRuntimeHandler, NodeRuntimeHandler.Builder]
-                | List[NodeRuntimeHandler],
-            ],
-            /,
-        ) -> "NodeStatus.Builder": ...
-
-        @overload
-        def runtime_handlers(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[NodeRuntimeHandler.Builder]: ...
-
-        def runtime_handlers(self, value_or_callback=None, /):
-            """
-            The available runtime handlers.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[NodeRuntimeHandler.Builder]()
-                context._parent_builder = self
-                context._field_name = "runtime_handlers"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(NodeRuntimeHandler.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("runtime_handlers", value)
 
         @overload
         def volumes_attached(
@@ -10900,7 +10128,7 @@ class NodeStatus(BaseModel):
 
     addresses: Optional[List[NodeAddress]] = None
     """
-    List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/reference/node/node-status/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
+    List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
     """
     allocatable: Optional[Dict[str, apimachinery.Quantity]] = None
     """
@@ -10908,11 +10136,11 @@ class NodeStatus(BaseModel):
     """
     capacity: Optional[Dict[str, apimachinery.Quantity]] = None
     """
-    Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/reference/node/node-status/#capacity
+    Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
     """
     conditions: Optional[List[NodeCondition]] = None
     """
-    Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/reference/node/node-status/#condition
+    Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition
     """
     config: Optional[NodeConfigStatus] = None
     """
@@ -10924,27 +10152,17 @@ class NodeStatus(BaseModel):
     """
     Endpoints of daemons running on the Node.
     """
-    features: Optional[NodeFeatures] = None
-    """
-    Features describes the set of features implemented by the CRI implementation.
-    """
     images: Optional[List[ContainerImage]] = None
     """
     List of container images on this node
     """
     node_info: Annotated[Optional[NodeSystemInfo], Field(alias="nodeInfo")] = None
     """
-    Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/reference/node/node-status/#info
+    Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info
     """
     phase: Optional[str] = None
     """
     NodePhase is the recently observed lifecycle phase of the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#phase The field is never populated, and now is deprecated.
-    """
-    runtime_handlers: Annotated[
-        Optional[List[NodeRuntimeHandler]], Field(alias="runtimeHandlers")
-    ] = None
-    """
-    The available runtime handlers.
     """
     volumes_attached: Annotated[Optional[List[AttachedVolume]], Field(alias="volumesAttached")] = (
         None
@@ -11053,20 +10271,14 @@ class PersistentVolumeClaimCondition(BaseModel):
 
         def reason(self, value: Optional[str], /) -> Self:
             """
-            reason is a unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports "Resizing" that means the underlying persistent volume is being resized.
+            reason is a unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports "ResizeStarted" that means the underlying persistent volume is being resized.
             """
             return self._set("reason", value)
 
         def status(self, value: str, /) -> Self:
-            """
-            Status is the status of the condition. Can be True, False, Unknown. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
-            """
             return self._set("status", value)
 
         def type(self, value: str, /) -> Self:
-            """
-            Type is the type of the condition. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
-            """
             return self._set("type", value)
 
     class BuilderContext(BuilderContextBase["PersistentVolumeClaimCondition.Builder"]):
@@ -11111,16 +10323,10 @@ class PersistentVolumeClaimCondition(BaseModel):
     """
     reason: Optional[str] = None
     """
-    reason is a unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports "Resizing" that means the underlying persistent volume is being resized.
+    reason is a unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports "ResizeStarted" that means the underlying persistent volume is being resized.
     """
     status: str
-    """
-    Status is the status of the condition. Can be True, False, Unknown. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
-    """
     type: str
-    """
-    Type is the type of the condition. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
-    """
 
 
 class PersistentVolumeClaimStatus(BaseModel):
@@ -11226,7 +10432,7 @@ class PersistentVolumeClaimStatus(BaseModel):
 
         def conditions(self, value_or_callback=None, /):
             """
-            conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'Resizing'.
+            conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'ResizeStarted'.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[PersistentVolumeClaimCondition.Builder]()
@@ -11245,7 +10451,7 @@ class PersistentVolumeClaimStatus(BaseModel):
 
         def current_volume_attributes_class_name(self, value: Optional[str], /) -> Self:
             """
-            currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+            currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is an alpha field and requires enabling VolumeAttributesClass feature.
             """
             return self._set("current_volume_attributes_class_name", value)
 
@@ -11271,7 +10477,7 @@ class PersistentVolumeClaimStatus(BaseModel):
 
         def modify_volume_status(self, value_or_callback=None, /):
             """
-            ModifyVolumeStatus represents the status object of ControllerModifyVolume operation. When this is unset, there is no ModifyVolume operation being attempted. This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+            ModifyVolumeStatus represents the status object of ControllerModifyVolume operation. When this is unset, there is no ModifyVolume operation being attempted. This is an alpha field and requires enabling VolumeAttributesClass feature.
             """
             if self._in_context and value_or_callback is None:
                 context = ModifyVolumeStatus.BuilderContext()
@@ -11381,19 +10587,19 @@ class PersistentVolumeClaimStatus(BaseModel):
     """
     conditions: Optional[List[PersistentVolumeClaimCondition]] = None
     """
-    conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'Resizing'.
+    conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'ResizeStarted'.
     """
     current_volume_attributes_class_name: Annotated[
         Optional[str], Field(alias="currentVolumeAttributesClassName")
     ] = None
     """
-    currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+    currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is an alpha field and requires enabling VolumeAttributesClass feature.
     """
     modify_volume_status: Annotated[
         Optional[ModifyVolumeStatus], Field(alias="modifyVolumeStatus")
     ] = None
     """
-    ModifyVolumeStatus represents the status object of ControllerModifyVolume operation. When this is unset, there is no ModifyVolume operation being attempted. This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+    ModifyVolumeStatus represents the status object of ControllerModifyVolume operation. When this is unset, there is no ModifyVolume operation being attempted. This is an alpha field and requires enabling VolumeAttributesClass feature.
     """
     phase: Optional[str] = None
     """
@@ -11432,7 +10638,7 @@ class PersistentVolumeStatus(BaseModel):
 
         def last_phase_transition_time(self, value_or_callback=None, /):
             """
-            lastPhaseTransitionTime is the time the phase transitioned from one to another and automatically resets to current time everytime a volume phase transitions.
+            lastPhaseTransitionTime is the time the phase transitioned from one to another and automatically resets to current time everytime a volume phase transitions. This is a beta field and requires the PersistentVolumeLastPhaseTransitionTime feature to be enabled (enabled by default).
             """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.Time.BuilderContext()
@@ -11497,7 +10703,7 @@ class PersistentVolumeStatus(BaseModel):
         Optional[apimachinery.Time], Field(alias="lastPhaseTransitionTime")
     ] = None
     """
-    lastPhaseTransitionTime is the time the phase transitioned from one to another and automatically resets to current time everytime a volume phase transitions.
+    lastPhaseTransitionTime is the time the phase transitioned from one to another and automatically resets to current time everytime a volume phase transitions. This is a beta field and requires the PersistentVolumeLastPhaseTransitionTime feature to be enabled (enabled by default).
     """
     message: Optional[str] = None
     """
@@ -11788,44 +10994,6 @@ class PodSecurityContext(BaseModel):
         def build(self) -> "PodSecurityContext":
             return PodSecurityContext(**self._attrs)
 
-        @overload
-        def app_armor_profile(
-            self, value_or_callback: Optional[AppArmorProfile], /
-        ) -> "PodSecurityContext.Builder": ...
-
-        @overload
-        def app_armor_profile(
-            self,
-            value_or_callback: Callable[
-                [AppArmorProfile.Builder], AppArmorProfile.Builder | AppArmorProfile
-            ],
-            /,
-        ) -> "PodSecurityContext.Builder": ...
-
-        @overload
-        def app_armor_profile(
-            self, value_or_callback: Never = ...
-        ) -> "AppArmorProfile.BuilderContext": ...
-
-        def app_armor_profile(self, value_or_callback=None, /):
-            """
-            appArmorProfile is the AppArmor options to use by the containers in this pod. Note that this field cannot be set when spec.os.name is windows.
-            """
-            if self._in_context and value_or_callback is None:
-                context = AppArmorProfile.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "app_armor_profile"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(AppArmorProfile.builder())
-                if isinstance(output, AppArmorProfile.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("app_armor_profile", value)
-
         def fs_group(self, value: Optional[int], /) -> Self:
             """
                     A special supplemental group that applies to all containers in a pod. Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod:
@@ -11859,22 +11027,6 @@ class PodSecurityContext(BaseModel):
             The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
             """
             return self._set("run_as_user", value)
-
-        def se_linux_change_policy(self, value: Optional[str], /) -> Self:
-            """
-                    seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod. It has no effect on nodes that do not support SELinux or to volumes does not support SELinux. Valid values are "MountOption" and "Recursive".
-
-            "Recursive" means relabeling of all files on all Pod volumes by the container runtime. This may be slow for large volumes, but allows mixing privileged and unprivileged Pods sharing the same volume on the same node.
-
-            "MountOption" mounts all eligible Pod volumes with `-o context` mount option. This requires all Pods that share the same volume to use the same SELinux label. It is not possible to share the same volume among privileged and unprivileged Pods. Eligible volumes are in-tree FibreChannel and iSCSI volumes, and all CSI volumes whose CSI driver announces SELinux support by setting spec.seLinuxMount: true in their CSIDriver instance. Other volumes are always re-labelled recursively. "MountOption" value is allowed only when SELinuxMount feature gate is enabled.
-
-            If not specified and SELinuxMount feature gate is enabled, "MountOption" is used. If not specified and SELinuxMount feature gate is disabled, "MountOption" is used for ReadWriteOncePod volumes and "Recursive" for all other volumes.
-
-            This field affects only Pods that have SELinux label set, either in PodSecurityContext or in SecurityContext of all containers.
-
-            All Pods that use the same volume should use the same seLinuxChangePolicy, otherwise some pods can get stuck in ContainerCreating state. Note that this field cannot be set when spec.os.name is windows.
-            """
-            return self._set("se_linux_change_policy", value)
 
         @overload
         def se_linux_options(
@@ -11954,15 +11106,9 @@ class PodSecurityContext(BaseModel):
 
         def supplemental_groups(self, value: Optional[List[int]], /) -> Self:
             """
-            A list of groups applied to the first process run in each container, in addition to the container's primary GID and fsGroup (if specified).  If the SupplementalGroupsPolicy feature is enabled, the supplementalGroupsPolicy field determines whether these are in addition to or instead of any group memberships defined in the container image. If unspecified, no additional groups are added, though group memberships defined in the container image may still be used, depending on the supplementalGroupsPolicy field. Note that this field cannot be set when spec.os.name is windows.
+            A list of groups applied to the first process run in each container, in addition to the container's primary GID, the fsGroup (if specified), and group memberships defined in the container image for the uid of the container process. If unspecified, no additional groups are added to any container. Note that group memberships defined in the container image for the uid of the container process are still effective, even if they are not included in this list. Note that this field cannot be set when spec.os.name is windows.
             """
             return self._set("supplemental_groups", value)
-
-        def supplemental_groups_policy(self, value: Optional[str], /) -> Self:
-            """
-            Defines how supplemental groups of the first container processes are calculated. Valid values are "Merge" and "Strict". If not specified, "Merge" is used. (Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled and the container runtime must implement support for this feature. Note that this field cannot be set when spec.os.name is windows.
-            """
-            return self._set("supplemental_groups_policy", value)
 
         @overload
         def sysctls(self, value_or_callback: List[Sysctl], /) -> "PodSecurityContext.Builder": ...
@@ -12064,10 +11210,6 @@ class PodSecurityContext(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    app_armor_profile: Annotated[Optional[AppArmorProfile], Field(alias="appArmorProfile")] = None
-    """
-    appArmorProfile is the AppArmor options to use by the containers in this pod. Note that this field cannot be set when spec.os.name is windows.
-    """
     fs_group: Annotated[Optional[int], Field(alias="fsGroup")] = None
     """
     A special supplemental group that applies to all containers in a pod. Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod:
@@ -12092,20 +11234,6 @@ class PodSecurityContext(BaseModel):
     """
     The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
     """
-    se_linux_change_policy: Annotated[Optional[str], Field(alias="seLinuxChangePolicy")] = None
-    """
-    seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod. It has no effect on nodes that do not support SELinux or to volumes does not support SELinux. Valid values are "MountOption" and "Recursive".
-
-    "Recursive" means relabeling of all files on all Pod volumes by the container runtime. This may be slow for large volumes, but allows mixing privileged and unprivileged Pods sharing the same volume on the same node.
-
-    "MountOption" mounts all eligible Pod volumes with `-o context` mount option. This requires all Pods that share the same volume to use the same SELinux label. It is not possible to share the same volume among privileged and unprivileged Pods. Eligible volumes are in-tree FibreChannel and iSCSI volumes, and all CSI volumes whose CSI driver announces SELinux support by setting spec.seLinuxMount: true in their CSIDriver instance. Other volumes are always re-labelled recursively. "MountOption" value is allowed only when SELinuxMount feature gate is enabled.
-
-    If not specified and SELinuxMount feature gate is enabled, "MountOption" is used. If not specified and SELinuxMount feature gate is disabled, "MountOption" is used for ReadWriteOncePod volumes and "Recursive" for all other volumes.
-
-    This field affects only Pods that have SELinux label set, either in PodSecurityContext or in SecurityContext of all containers.
-
-    All Pods that use the same volume should use the same seLinuxChangePolicy, otherwise some pods can get stuck in ContainerCreating state. Note that this field cannot be set when spec.os.name is windows.
-    """
     se_linux_options: Annotated[Optional[SELinuxOptions], Field(alias="seLinuxOptions")] = None
     """
     The SELinux context to be applied to all containers. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
@@ -12116,13 +11244,7 @@ class PodSecurityContext(BaseModel):
     """
     supplemental_groups: Annotated[Optional[List[int]], Field(alias="supplementalGroups")] = None
     """
-    A list of groups applied to the first process run in each container, in addition to the container's primary GID and fsGroup (if specified).  If the SupplementalGroupsPolicy feature is enabled, the supplementalGroupsPolicy field determines whether these are in addition to or instead of any group memberships defined in the container image. If unspecified, no additional groups are added, though group memberships defined in the container image may still be used, depending on the supplementalGroupsPolicy field. Note that this field cannot be set when spec.os.name is windows.
-    """
-    supplemental_groups_policy: Annotated[
-        Optional[str], Field(alias="supplementalGroupsPolicy")
-    ] = None
-    """
-    Defines how supplemental groups of the first container processes are calculated. Valid values are "Merge" and "Strict". If not specified, "Merge" is used. (Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled and the container runtime must implement support for this feature. Note that this field cannot be set when spec.os.name is windows.
+    A list of groups applied to the first process run in each container, in addition to the container's primary GID, the fsGroup (if specified), and group memberships defined in the container image for the uid of the container process. If unspecified, no additional groups are added to any container. Note that group memberships defined in the container image for the uid of the container process are still effective, even if they are not included in this list. Note that this field cannot be set when spec.os.name is windows.
     """
     sysctls: Optional[List[Sysctl]] = None
     """
@@ -13088,44 +12210,6 @@ class SecurityContext(BaseModel):
             return self._set("allow_privilege_escalation", value)
 
         @overload
-        def app_armor_profile(
-            self, value_or_callback: Optional[AppArmorProfile], /
-        ) -> "SecurityContext.Builder": ...
-
-        @overload
-        def app_armor_profile(
-            self,
-            value_or_callback: Callable[
-                [AppArmorProfile.Builder], AppArmorProfile.Builder | AppArmorProfile
-            ],
-            /,
-        ) -> "SecurityContext.Builder": ...
-
-        @overload
-        def app_armor_profile(
-            self, value_or_callback: Never = ...
-        ) -> "AppArmorProfile.BuilderContext": ...
-
-        def app_armor_profile(self, value_or_callback=None, /):
-            """
-            appArmorProfile is the AppArmor options to use by this container. If set, this profile overrides the pod's appArmorProfile. Note that this field cannot be set when spec.os.name is windows.
-            """
-            if self._in_context and value_or_callback is None:
-                context = AppArmorProfile.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "app_armor_profile"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(AppArmorProfile.builder())
-                if isinstance(output, AppArmorProfile.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("app_armor_profile", value)
-
-        @overload
         def capabilities(
             self, value_or_callback: Optional[Capabilities], /
         ) -> "SecurityContext.Builder": ...
@@ -13169,7 +12253,7 @@ class SecurityContext(BaseModel):
 
         def proc_mount(self, value: Optional[str], /) -> Self:
             """
-            procMount denotes the type of proc mount to use for the containers. The default value is Default which uses the container runtime defaults for readonly paths and masked paths. This requires the ProcMountType feature flag to be enabled. Note that this field cannot be set when spec.os.name is windows.
+            procMount denotes the type of proc mount to use for the containers. The default is DefaultProcMount which uses the container runtime defaults for readonly paths and masked paths. This requires the ProcMountType feature flag to be enabled. Note that this field cannot be set when spec.os.name is windows.
             """
             return self._set("proc_mount", value)
 
@@ -13344,10 +12428,6 @@ class SecurityContext(BaseModel):
     """
     AllowPrivilegeEscalation controls whether a process can gain more privileges than its parent process. This bool directly controls if the no_new_privs flag will be set on the container process. AllowPrivilegeEscalation is true always when the container is: 1) run as Privileged 2) has CAP_SYS_ADMIN Note that this field cannot be set when spec.os.name is windows.
     """
-    app_armor_profile: Annotated[Optional[AppArmorProfile], Field(alias="appArmorProfile")] = None
-    """
-    appArmorProfile is the AppArmor options to use by this container. If set, this profile overrides the pod's appArmorProfile. Note that this field cannot be set when spec.os.name is windows.
-    """
     capabilities: Optional[Capabilities] = None
     """
     The capabilities to add/drop when running containers. Defaults to the default set of capabilities granted by the container runtime. Note that this field cannot be set when spec.os.name is windows.
@@ -13358,7 +12438,7 @@ class SecurityContext(BaseModel):
     """
     proc_mount: Annotated[Optional[str], Field(alias="procMount")] = None
     """
-    procMount denotes the type of proc mount to use for the containers. The default value is Default which uses the container runtime defaults for readonly paths and masked paths. This requires the ProcMountType feature flag to be enabled. Note that this field cannot be set when spec.os.name is windows.
+    procMount denotes the type of proc mount to use for the containers. The default is DefaultProcMount which uses the container runtime defaults for readonly paths and masked paths. This requires the ProcMountType feature flag to be enabled. Note that this field cannot be set when spec.os.name is windows.
     """
     read_only_root_filesystem: Annotated[Optional[bool], Field(alias="readOnlyRootFilesystem")] = (
         None
@@ -13727,12 +12807,6 @@ class ServiceSpec(BaseModel):
                     value = output
             return self._set("session_affinity_config", value)
 
-        def traffic_distribution(self, value: Optional[str], /) -> Self:
-            """
-            TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to "PreferClose", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is a beta field and requires enabling ServiceTrafficDistribution feature.
-            """
-            return self._set("traffic_distribution", value)
-
         def type(self, value: Optional[str], /) -> Self:
             """
             type determines how the Service is exposed. Defaults to ClusterIP. Valid options are ExternalName, ClusterIP, NodePort, and LoadBalancer. "ClusterIP" allocates a cluster-internal IP address for load-balancing to endpoints. Endpoints are determined by the selector or if that is not specified, by manual construction of an Endpoints object or EndpointSlice objects. If clusterIP is "None", no virtual IP is allocated and the endpoints are published as a set of endpoints rather than a virtual IP. "NodePort" builds on ClusterIP and allocates a port on every node which routes to the same endpoints as the clusterIP. "LoadBalancer" builds on NodePort and creates an external load-balancer (if supported in the current cloud) which routes to the same endpoints as the clusterIP. "ExternalName" aliases this service to the specified externalName. Several other fields do not apply to ExternalName services. More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
@@ -13848,10 +12922,6 @@ class ServiceSpec(BaseModel):
     ] = None
     """
     sessionAffinityConfig contains the configurations of session affinity.
-    """
-    traffic_distribution: Annotated[Optional[str], Field(alias="trafficDistribution")] = None
-    """
-    TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to "PreferClose", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is a beta field and requires enabling ServiceTrafficDistribution feature.
     """
     type: Optional[str] = None
     """
@@ -14914,45 +13984,6 @@ class ContainerStatus(BaseModel):
             """
             return self._set("allocated_resources", value)
 
-        @overload
-        def allocated_resources_status(
-            self, value_or_callback: List[ResourceStatus], /
-        ) -> "ContainerStatus.Builder": ...
-
-        @overload
-        def allocated_resources_status(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[ResourceStatus, ResourceStatus.Builder]],
-                GenericListBuilder[ResourceStatus, ResourceStatus.Builder] | List[ResourceStatus],
-            ],
-            /,
-        ) -> "ContainerStatus.Builder": ...
-
-        @overload
-        def allocated_resources_status(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[ResourceStatus.Builder]: ...
-
-        def allocated_resources_status(self, value_or_callback=None, /):
-            """
-            AllocatedResourcesStatus represents the status of various resources allocated for this Pod.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[ResourceStatus.Builder]()
-                context._parent_builder = self
-                context._field_name = "allocated_resources_status"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ResourceStatus.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("allocated_resources_status", value)
-
         def container_id(self, value: Optional[str], /) -> Self:
             """
             ContainerID is the ID of the container in the format '<type>://<container_id>'. Where type is a container runtime identifier, returned from Version call of CRI API (for example "containerd").
@@ -15108,82 +14139,6 @@ class ContainerStatus(BaseModel):
                     value = output
             return self._set("state", value)
 
-        @overload
-        def user(
-            self, value_or_callback: Optional[ContainerUser], /
-        ) -> "ContainerStatus.Builder": ...
-
-        @overload
-        def user(
-            self,
-            value_or_callback: Callable[
-                [ContainerUser.Builder], ContainerUser.Builder | ContainerUser
-            ],
-            /,
-        ) -> "ContainerStatus.Builder": ...
-
-        @overload
-        def user(self, value_or_callback: Never = ...) -> "ContainerUser.BuilderContext": ...
-
-        def user(self, value_or_callback=None, /):
-            """
-            User represents user identity information initially attached to the first process of the container
-            """
-            if self._in_context and value_or_callback is None:
-                context = ContainerUser.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "user"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ContainerUser.builder())
-                if isinstance(output, ContainerUser.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("user", value)
-
-        @overload
-        def volume_mounts(
-            self, value_or_callback: List[VolumeMountStatus], /
-        ) -> "ContainerStatus.Builder": ...
-
-        @overload
-        def volume_mounts(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[VolumeMountStatus, VolumeMountStatus.Builder]],
-                GenericListBuilder[VolumeMountStatus, VolumeMountStatus.Builder]
-                | List[VolumeMountStatus],
-            ],
-            /,
-        ) -> "ContainerStatus.Builder": ...
-
-        @overload
-        def volume_mounts(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[VolumeMountStatus.Builder]: ...
-
-        def volume_mounts(self, value_or_callback=None, /):
-            """
-            Status of volume mounts.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[VolumeMountStatus.Builder]()
-                context._parent_builder = self
-                context._field_name = "volume_mounts"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(VolumeMountStatus.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("volume_mounts", value)
-
     class BuilderContext(BuilderContextBase["ContainerStatus.Builder"]):
         def model_post_init(self, __context) -> None:
             self._builder = ContainerStatus.Builder()
@@ -15215,12 +14170,6 @@ class ContainerStatus(BaseModel):
     ] = None
     """
     AllocatedResources represents the compute resources allocated for this container by the node. Kubelet sets this value to Container.Resources.Requests upon successful pod admission and after successfully admitting desired pod resize.
-    """
-    allocated_resources_status: Annotated[
-        Optional[List[ResourceStatus]], Field(alias="allocatedResourcesStatus")
-    ] = None
-    """
-    AllocatedResourcesStatus represents the status of various resources allocated for this Pod.
     """
     container_id: Annotated[Optional[str], Field(alias="containerID")] = None
     """
@@ -15264,14 +14213,6 @@ class ContainerStatus(BaseModel):
     """
     State holds details about the container's current condition.
     """
-    user: Optional[ContainerUser] = None
-    """
-    User represents user identity information initially attached to the first process of the container
-    """
-    volume_mounts: Annotated[Optional[List[VolumeMountStatus]], Field(alias="volumeMounts")] = None
-    """
-    Status of volume mounts.
-    """
 
 
 class DownwardAPIVolumeFile(BaseModel):
@@ -15305,7 +14246,7 @@ class DownwardAPIVolumeFile(BaseModel):
 
         def field_ref(self, value_or_callback=None, /):
             """
-            Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+            Required: Selects a field of the pod: only annotations, labels, name and namespace are supported.
             """
             if self._in_context and value_or_callback is None:
                 context = ObjectFieldSelector.BuilderContext()
@@ -15401,7 +14342,7 @@ class DownwardAPIVolumeFile(BaseModel):
 
     field_ref: Annotated[Optional[ObjectFieldSelector], Field(alias="fieldRef")] = None
     """
-    Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+    Required: Selects a field of the pod: only annotations, labels, name and namespace are supported.
     """
     mode: Optional[int] = None
     """
@@ -16345,7 +15286,7 @@ class LifecycleHandler(BaseModel):
 
         def exec(self, value_or_callback=None, /):
             """
-            Exec specifies a command to execute in the container.
+            Exec specifies the action to take.
             """
             if self._in_context and value_or_callback is None:
                 context = ExecAction.BuilderContext()
@@ -16381,7 +15322,7 @@ class LifecycleHandler(BaseModel):
 
         def http_get(self, value_or_callback=None, /):
             """
-            HTTPGet specifies an HTTP GET request to perform.
+            HTTPGet specifies the http request to perform.
             """
             if self._in_context and value_or_callback is None:
                 context = HTTPGetAction.BuilderContext()
@@ -16415,7 +15356,7 @@ class LifecycleHandler(BaseModel):
 
         def sleep(self, value_or_callback=None, /):
             """
-            Sleep represents a duration that the container should sleep.
+            Sleep represents the duration that the container should sleep before being terminated.
             """
             if self._in_context and value_or_callback is None:
                 context = SleepAction.BuilderContext()
@@ -16453,7 +15394,7 @@ class LifecycleHandler(BaseModel):
 
         def tcp_socket(self, value_or_callback=None, /):
             """
-            Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for backward compatibility. There is no validation of this field and lifecycle hooks will fail at runtime when it is specified.
+            Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for the backward compatibility. There are no validation of this field and lifecycle hooks will fail in runtime when tcp handler is specified.
             """
             if self._in_context and value_or_callback is None:
                 context = TCPSocketAction.BuilderContext()
@@ -16498,19 +15439,19 @@ class LifecycleHandler(BaseModel):
 
     exec: Optional[ExecAction] = None
     """
-    Exec specifies a command to execute in the container.
+    Exec specifies the action to take.
     """
     http_get: Annotated[Optional[HTTPGetAction], Field(alias="httpGet")] = None
     """
-    HTTPGet specifies an HTTP GET request to perform.
+    HTTPGet specifies the http request to perform.
     """
     sleep: Optional[SleepAction] = None
     """
-    Sleep represents a duration that the container should sleep.
+    Sleep represents the duration that the container should sleep before being terminated.
     """
     tcp_socket: Annotated[Optional[TCPSocketAction], Field(alias="tcpSocket")] = None
     """
-    Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for backward compatibility. There is no validation of this field and lifecycle hooks will fail at runtime when it is specified.
+    Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for the backward compatibility. There are no validation of this field and lifecycle hooks will fail in runtime when tcp handler is specified.
     """
 
 
@@ -17319,7 +16260,7 @@ class PersistentVolumeClaimSpec(BaseModel):
 
         def volume_attributes_class_name(self, value: Optional[str], /) -> Self:
             """
-            volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim. If specified, the CSI driver will create or update the volume with the attributes defined in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName, it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass will be applied to the claim but it's not allowed to reset this field to empty string once it is set. If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass will be set by the persistentvolume controller if it exists. If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/ (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
+            volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim. If specified, the CSI driver will create or update the volume with the attributes defined in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName, it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass will be applied to the claim but it's not allowed to reset this field to empty string once it is set. If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass will be set by the persistentvolume controller if it exists. If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
             """
             return self._set("volume_attributes_class_name", value)
 
@@ -17396,7 +16337,7 @@ class PersistentVolumeClaimSpec(BaseModel):
         Optional[str], Field(alias="volumeAttributesClassName")
     ] = None
     """
-    volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim. If specified, the CSI driver will create or update the volume with the attributes defined in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName, it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass will be applied to the claim but it's not allowed to reset this field to empty string once it is set. If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass will be set by the persistentvolume controller if it exists. If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/ (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
+    volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim. If specified, the CSI driver will create or update the volume with the attributes defined in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName, it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass will be applied to the claim but it's not allowed to reset this field to empty string once it is set. If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass will be set by the persistentvolume controller if it exists. If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
     """
     volume_mode: Annotated[Optional[str], Field(alias="volumeMode")] = None
     """
@@ -17568,7 +16509,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def aws_elastic_block_store(self, value_or_callback=None, /):
             """
-            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
             """
             if self._in_context and value_or_callback is None:
                 context = AWSElasticBlockStoreVolumeSource.BuilderContext()
@@ -17607,7 +16548,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def azure_disk(self, value_or_callback=None, /):
             """
-            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureDiskVolumeSource.BuilderContext()
@@ -17646,7 +16587,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def azure_file(self, value_or_callback=None, /):
             """
-            azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+            azureFile represents an Azure File Service mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureFilePersistentVolumeSource.BuilderContext()
@@ -17691,7 +16632,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def cephfs(self, value_or_callback=None, /):
             """
-            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = CephFSPersistentVolumeSource.BuilderContext()
@@ -17730,7 +16671,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def cinder(self, value_or_callback=None, /):
             """
-            cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+            cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = CinderPersistentVolumeSource.BuilderContext()
@@ -17805,7 +16746,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def csi(self, value_or_callback=None, /):
             """
-            csi represents storage that is handled by an external CSI driver.
+            csi represents storage that is handled by an external CSI driver (Beta feature).
             """
             if self._in_context and value_or_callback is None:
                 context = CSIPersistentVolumeSource.BuilderContext()
@@ -17880,7 +16821,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def flex_volume(self, value_or_callback=None, /):
             """
-            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
             """
             if self._in_context and value_or_callback is None:
                 context = FlexPersistentVolumeSource.BuilderContext()
@@ -17919,7 +16860,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def flocker(self, value_or_callback=None, /):
             """
-            flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+            flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running
             """
             if self._in_context and value_or_callback is None:
                 context = FlockerVolumeSource.BuilderContext()
@@ -17958,7 +16899,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def gce_persistent_disk(self, value_or_callback=None, /):
             """
-            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
             """
             if self._in_context and value_or_callback is None:
                 context = GCEPersistentDiskVolumeSource.BuilderContext()
@@ -17997,7 +16938,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def glusterfs(self, value_or_callback=None, /):
             """
-            glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+            glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. More info: https://examples.k8s.io/volumes/glusterfs/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = GlusterfsPersistentVolumeSource.BuilderContext()
@@ -18238,7 +17179,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def photon_persistent_disk(self, value_or_callback=None, /):
             """
-            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PhotonPersistentDiskVolumeSource.BuilderContext()
@@ -18277,7 +17218,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def portworx_volume(self, value_or_callback=None, /):
             """
-            portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+            portworxVolume represents a portworx volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PortworxVolumeSource.BuilderContext()
@@ -18316,7 +17257,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def quobyte(self, value_or_callback=None, /):
             """
-            quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+            quobyte represents a Quobyte mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = QuobyteVolumeSource.BuilderContext()
@@ -18355,7 +17296,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def rbd(self, value_or_callback=None, /):
             """
-            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = RBDPersistentVolumeSource.BuilderContext()
@@ -18394,7 +17335,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def scale_io(self, value_or_callback=None, /):
             """
-            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
             """
             if self._in_context and value_or_callback is None:
                 context = ScaleIOPersistentVolumeSource.BuilderContext()
@@ -18439,7 +17380,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def storageos(self, value_or_callback=None, /):
             """
-            storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported. More info: https://examples.k8s.io/volumes/storageos/README.md
+            storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod More info: https://examples.k8s.io/volumes/storageos/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = StorageOSPersistentVolumeSource.BuilderContext()
@@ -18458,7 +17399,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def volume_attributes_class_name(self, value: Optional[str], /) -> Self:
             """
-            Name of VolumeAttributesClass to which this persistent volume belongs. Empty value is not allowed. When this field is not set, it indicates that this volume does not belong to any VolumeAttributesClass. This field is mutable and can be changed by the CSI driver after a volume has been updated successfully to a new class. For an unbound PersistentVolume, the volumeAttributesClassName will be matched with unbound PersistentVolumeClaims during the binding process. This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+            Name of VolumeAttributesClass to which this persistent volume belongs. Empty value is not allowed. When this field is not set, it indicates that this volume does not belong to any VolumeAttributesClass. This field is mutable and can be changed by the CSI driver after a volume has been updated successfully to a new class. For an unbound PersistentVolume, the volumeAttributesClassName will be matched with unbound PersistentVolumeClaims during the binding process. This is an alpha field and requires enabling VolumeAttributesClass feature.
             """
             return self._set("volume_attributes_class_name", value)
 
@@ -18490,7 +17431,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def vsphere_volume(self, value_or_callback=None, /):
             """
-            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = VsphereVirtualDiskVolumeSource.BuilderContext()
@@ -18541,17 +17482,17 @@ class PersistentVolumeSpec(BaseModel):
         Optional[AWSElasticBlockStoreVolumeSource], Field(alias="awsElasticBlockStore")
     ] = None
     """
-    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
     """
     azure_disk: Annotated[Optional[AzureDiskVolumeSource], Field(alias="azureDisk")] = None
     """
-    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
     """
     azure_file: Annotated[Optional[AzureFilePersistentVolumeSource], Field(alias="azureFile")] = (
         None
     )
     """
-    azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+    azureFile represents an Azure File Service mount on the host and bind mount to the pod.
     """
     capacity: Optional[Dict[str, apimachinery.Quantity]] = None
     """
@@ -18559,11 +17500,11 @@ class PersistentVolumeSpec(BaseModel):
     """
     cephfs: Optional[CephFSPersistentVolumeSource] = None
     """
-    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
     """
     cinder: Optional[CinderPersistentVolumeSource] = None
     """
-    cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+    cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
     """
     claim_ref: Annotated[Optional[ObjectReference], Field(alias="claimRef")] = None
     """
@@ -18571,7 +17512,7 @@ class PersistentVolumeSpec(BaseModel):
     """
     csi: Optional[CSIPersistentVolumeSource] = None
     """
-    csi represents storage that is handled by an external CSI driver.
+    csi represents storage that is handled by an external CSI driver (Beta feature).
     """
     fc: Optional[FCVolumeSource] = None
     """
@@ -18579,21 +17520,21 @@ class PersistentVolumeSpec(BaseModel):
     """
     flex_volume: Annotated[Optional[FlexPersistentVolumeSource], Field(alias="flexVolume")] = None
     """
-    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
     """
     flocker: Optional[FlockerVolumeSource] = None
     """
-    flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+    flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running
     """
     gce_persistent_disk: Annotated[
         Optional[GCEPersistentDiskVolumeSource], Field(alias="gcePersistentDisk")
     ] = None
     """
-    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
     """
     glusterfs: Optional[GlusterfsPersistentVolumeSource] = None
     """
-    glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+    glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. More info: https://examples.k8s.io/volumes/glusterfs/README.md
     """
     host_path: Annotated[Optional[HostPathVolumeSource], Field(alias="hostPath")] = None
     """
@@ -18629,23 +17570,23 @@ class PersistentVolumeSpec(BaseModel):
         Optional[PhotonPersistentDiskVolumeSource], Field(alias="photonPersistentDisk")
     ] = None
     """
-    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
     """
     portworx_volume: Annotated[Optional[PortworxVolumeSource], Field(alias="portworxVolume")] = None
     """
-    portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+    portworxVolume represents a portworx volume attached and mounted on kubelets host machine
     """
     quobyte: Optional[QuobyteVolumeSource] = None
     """
-    quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+    quobyte represents a Quobyte mount on the host that shares a pod's lifetime
     """
     rbd: Optional[RBDPersistentVolumeSource] = None
     """
-    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
     """
     scale_io: Annotated[Optional[ScaleIOPersistentVolumeSource], Field(alias="scaleIO")] = None
     """
-    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
     """
     storage_class_name: Annotated[Optional[str], Field(alias="storageClassName")] = None
     """
@@ -18653,13 +17594,13 @@ class PersistentVolumeSpec(BaseModel):
     """
     storageos: Optional[StorageOSPersistentVolumeSource] = None
     """
-    storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported. More info: https://examples.k8s.io/volumes/storageos/README.md
+    storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod More info: https://examples.k8s.io/volumes/storageos/README.md
     """
     volume_attributes_class_name: Annotated[
         Optional[str], Field(alias="volumeAttributesClassName")
     ] = None
     """
-    Name of VolumeAttributesClass to which this persistent volume belongs. Empty value is not allowed. When this field is not set, it indicates that this volume does not belong to any VolumeAttributesClass. This field is mutable and can be changed by the CSI driver after a volume has been updated successfully to a new class. For an unbound PersistentVolume, the volumeAttributesClassName will be matched with unbound PersistentVolumeClaims during the binding process. This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+    Name of VolumeAttributesClass to which this persistent volume belongs. Empty value is not allowed. When this field is not set, it indicates that this volume does not belong to any VolumeAttributesClass. This field is mutable and can be changed by the CSI driver after a volume has been updated successfully to a new class. For an unbound PersistentVolume, the volumeAttributesClassName will be matched with unbound PersistentVolumeClaims during the binding process. This is an alpha field and requires enabling VolumeAttributesClass feature.
     """
     volume_mode: Annotated[Optional[str], Field(alias="volumeMode")] = None
     """
@@ -18669,7 +17610,7 @@ class PersistentVolumeSpec(BaseModel):
         Optional[VsphereVirtualDiskVolumeSource], Field(alias="vsphereVolume")
     ] = None
     """
-    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
     """
 
 
@@ -18723,13 +17664,13 @@ class PodAffinityTerm(BaseModel):
 
         def match_label_keys(self, value: Optional[List[str]], /) -> Self:
             """
-            MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both matchLabelKeys and labelSelector. Also, matchLabelKeys cannot be set when labelSelector isn't set. This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
+            MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `LabelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector. Also, MatchLabelKeys cannot be set when LabelSelector isn't set. This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
             """
             return self._set("match_label_keys", value)
 
         def mismatch_label_keys(self, value: Optional[List[str]], /) -> Self:
             """
-            MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both mismatchLabelKeys and labelSelector. Also, mismatchLabelKeys cannot be set when labelSelector isn't set. This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
+            MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `LabelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both MismatchLabelKeys and LabelSelector. Also, MismatchLabelKeys cannot be set when LabelSelector isn't set. This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
             """
             return self._set("mismatch_label_keys", value)
 
@@ -18818,11 +17759,11 @@ class PodAffinityTerm(BaseModel):
     """
     match_label_keys: Annotated[Optional[List[str]], Field(alias="matchLabelKeys")] = None
     """
-    MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both matchLabelKeys and labelSelector. Also, matchLabelKeys cannot be set when labelSelector isn't set. This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
+    MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `LabelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector. Also, MatchLabelKeys cannot be set when LabelSelector isn't set. This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
     """
     mismatch_label_keys: Annotated[Optional[List[str]], Field(alias="mismatchLabelKeys")] = None
     """
-    MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both mismatchLabelKeys and labelSelector. Also, mismatchLabelKeys cannot be set when labelSelector isn't set. This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
+    MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `LabelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both MismatchLabelKeys and LabelSelector. Also, MismatchLabelKeys cannot be set when LabelSelector isn't set. This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
     """
     namespace_selector: Annotated[
         Optional[apimachinery.LabelSelector], Field(alias="namespaceSelector")
@@ -18909,7 +17850,7 @@ class PodStatus(BaseModel):
 
         def container_statuses(self, value_or_callback=None, /):
             """
-            Statuses of containers in this pod. Each container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+            The list has one entry per container in the manifest. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ContainerStatus.Builder]()
@@ -18949,7 +17890,7 @@ class PodStatus(BaseModel):
 
         def ephemeral_container_statuses(self, value_or_callback=None, /):
             """
-            Statuses for any ephemeral containers that have run in this pod. Each ephemeral container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+            Status for any ephemeral containers that have run in this pod.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ContainerStatus.Builder]()
@@ -19032,7 +17973,7 @@ class PodStatus(BaseModel):
 
         def init_container_statuses(self, value_or_callback=None, /):
             """
-            Statuses of init containers in this pod. The most recent successful non-restartable init container will have ready = true, the most recently started container will have startTime set. Each init container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
+            The list has one entry per init container in the manifest. The most recent successful init container will have ready = true, the most recently started container will have startTime set. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ContainerStatus.Builder]()
@@ -19243,13 +18184,13 @@ class PodStatus(BaseModel):
         Optional[List[ContainerStatus]], Field(alias="containerStatuses")
     ] = None
     """
-    Statuses of containers in this pod. Each container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+    The list has one entry per container in the manifest. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
     """
     ephemeral_container_statuses: Annotated[
         Optional[List[ContainerStatus]], Field(alias="ephemeralContainerStatuses")
     ] = None
     """
-    Statuses for any ephemeral containers that have run in this pod. Each ephemeral container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+    Status for any ephemeral containers that have run in this pod.
     """
     host_ip: Annotated[Optional[str], Field(alias="hostIP")] = None
     """
@@ -19263,7 +18204,7 @@ class PodStatus(BaseModel):
         Optional[List[ContainerStatus]], Field(alias="initContainerStatuses")
     ] = None
     """
-    Statuses of init containers in this pod. The most recent successful non-restartable init container will have ready = true, the most recently started container will have startTime set. Each init container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
+    The list has one entry per init container in the manifest. The most recent successful init container will have ready = true, the most recently started container will have startTime set. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
     """
     message: Optional[str] = None
     """
@@ -19337,7 +18278,7 @@ class Probe(BaseModel):
 
         def exec(self, value_or_callback=None, /):
             """
-            Exec specifies a command to execute in the container.
+            Exec specifies the action to take.
             """
             if self._in_context and value_or_callback is None:
                 context = ExecAction.BuilderContext()
@@ -19375,7 +18316,7 @@ class Probe(BaseModel):
 
         def grpc(self, value_or_callback=None, /):
             """
-            GRPC specifies a GRPC HealthCheckRequest.
+            GRPC specifies an action involving a GRPC port.
             """
             if self._in_context and value_or_callback is None:
                 context = GRPCAction.BuilderContext()
@@ -19409,7 +18350,7 @@ class Probe(BaseModel):
 
         def http_get(self, value_or_callback=None, /):
             """
-            HTTPGet specifies an HTTP GET request to perform.
+            HTTPGet specifies the http request to perform.
             """
             if self._in_context and value_or_callback is None:
                 context = HTTPGetAction.BuilderContext()
@@ -19465,7 +18406,7 @@ class Probe(BaseModel):
 
         def tcp_socket(self, value_or_callback=None, /):
             """
-            TCPSocket specifies a connection to a TCP port.
+            TCPSocket specifies an action involving a TCP port.
             """
             if self._in_context and value_or_callback is None:
                 context = TCPSocketAction.BuilderContext()
@@ -19522,7 +18463,7 @@ class Probe(BaseModel):
 
     exec: Optional[ExecAction] = None
     """
-    Exec specifies a command to execute in the container.
+    Exec specifies the action to take.
     """
     failure_threshold: Annotated[Optional[int], Field(alias="failureThreshold")] = None
     """
@@ -19530,11 +18471,11 @@ class Probe(BaseModel):
     """
     grpc: Optional[GRPCAction] = None
     """
-    GRPC specifies a GRPC HealthCheckRequest.
+    GRPC specifies an action involving a GRPC port.
     """
     http_get: Annotated[Optional[HTTPGetAction], Field(alias="httpGet")] = None
     """
-    HTTPGet specifies an HTTP GET request to perform.
+    HTTPGet specifies the http request to perform.
     """
     initial_delay_seconds: Annotated[Optional[int], Field(alias="initialDelaySeconds")] = None
     """
@@ -19550,7 +18491,7 @@ class Probe(BaseModel):
     """
     tcp_socket: Annotated[Optional[TCPSocketAction], Field(alias="tcpSocket")] = None
     """
-    TCPSocket specifies a connection to a TCP port.
+    TCPSocket specifies an action involving a TCP port.
     """
     termination_grace_period_seconds: Annotated[
         Optional[int], Field(alias="terminationGracePeriodSeconds")
@@ -19935,7 +18876,7 @@ class ServiceAccount(Resource):
 
         def secrets(self, value_or_callback=None, /):
             """
-            Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". The "kubernetes.io/enforce-mountable-secrets" annotation is deprecated since v1.32. Prefer separate namespaces to isolate access to mounted secrets. This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
+            Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ObjectReference.Builder]()
@@ -20004,7 +18945,7 @@ class ServiceAccount(Resource):
     """
     secrets: Optional[List[ObjectReference]] = None
     """
-    Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". The "kubernetes.io/enforce-mountable-secrets" annotation is deprecated since v1.32. Prefer separate namespaces to isolate access to mounted secrets. This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
+    Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
     """
 
 
@@ -20202,6 +19143,8 @@ class TopologySpreadConstraint(BaseModel):
                     MinDomains indicates a minimum number of eligible domains. When the number of eligible domains with matching topology keys is less than minDomains, Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed. And when the number of eligible domains with matching topology keys equals or greater than minDomains, this value has no effect on scheduling. As a result, when the number of eligible domains is less than minDomains, scheduler won't schedule more than maxSkew Pods to those domains. If value is nil, the constraint behaves as if MinDomains is equal to 1. Valid values are integers greater than 0. When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
 
             For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same labelSelector spread as 2/2/2: | zone1 | zone2 | zone3 | |  P P  |  P P  |  P P  | The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0. In this situation, new pod with the same labelSelector cannot be scheduled, because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones, it will violate MaxSkew.
+
+            This is a beta field and requires the MinDomainsInPodTopologySpread feature gate to be enabled (enabled by default).
             """
             return self._set("min_domains", value)
 
@@ -20283,6 +19226,8 @@ class TopologySpreadConstraint(BaseModel):
     MinDomains indicates a minimum number of eligible domains. When the number of eligible domains with matching topology keys is less than minDomains, Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed. And when the number of eligible domains with matching topology keys equals or greater than minDomains, this value has no effect on scheduling. As a result, when the number of eligible domains is less than minDomains, scheduler won't schedule more than maxSkew Pods to those domains. If value is nil, the constraint behaves as if MinDomains is equal to 1. Valid values are integers greater than 0. When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
 
     For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same labelSelector spread as 2/2/2: | zone1 | zone2 | zone3 | |  P P  |  P P  |  P P  | The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0. In this situation, new pod with the same labelSelector cannot be scheduled, because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones, it will violate MaxSkew.
+
+    This is a beta field and requires the MinDomainsInPodTopologySpread feature gate to be enabled (enabled by default).
     """
     node_affinity_policy: Annotated[Optional[str], Field(alias="nodeAffinityPolicy")] = None
     """
@@ -23720,7 +22665,7 @@ class ProjectedVolumeSource(BaseModel):
 
         def sources(self, value_or_callback=None, /):
             """
-            sources is the list of volume projections. Each entry in this list handles one source.
+            sources is the list of volume projections
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[VolumeProjection.Builder]()
@@ -23769,7 +22714,7 @@ class ProjectedVolumeSource(BaseModel):
     """
     sources: Optional[List[VolumeProjection]] = None
     """
-    sources is the list of volume projections. Each entry in this list handles one source.
+    sources is the list of volume projections
     """
 
 
@@ -23804,7 +22749,7 @@ class Volume(BaseModel):
 
         def aws_elastic_block_store(self, value_or_callback=None, /):
             """
-            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
             """
             if self._in_context and value_or_callback is None:
                 context = AWSElasticBlockStoreVolumeSource.BuilderContext()
@@ -23843,7 +22788,7 @@ class Volume(BaseModel):
 
         def azure_disk(self, value_or_callback=None, /):
             """
-            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureDiskVolumeSource.BuilderContext()
@@ -23882,7 +22827,7 @@ class Volume(BaseModel):
 
         def azure_file(self, value_or_callback=None, /):
             """
-            azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+            azureFile represents an Azure File Service mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureFileVolumeSource.BuilderContext()
@@ -23919,7 +22864,7 @@ class Volume(BaseModel):
 
         def cephfs(self, value_or_callback=None, /):
             """
-            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = CephFSVolumeSource.BuilderContext()
@@ -23956,7 +22901,7 @@ class Volume(BaseModel):
 
         def cinder(self, value_or_callback=None, /):
             """
-            cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+            cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = CinderVolumeSource.BuilderContext()
@@ -24029,7 +22974,7 @@ class Volume(BaseModel):
 
         def csi(self, value_or_callback=None, /):
             """
-            csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+            csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
             """
             if self._in_context and value_or_callback is None:
                 context = CSIVolumeSource.BuilderContext()
@@ -24231,7 +23176,7 @@ class Volume(BaseModel):
 
         def flex_volume(self, value_or_callback=None, /):
             """
-            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
             """
             if self._in_context and value_or_callback is None:
                 context = FlexVolumeSource.BuilderContext()
@@ -24270,7 +23215,7 @@ class Volume(BaseModel):
 
         def flocker(self, value_or_callback=None, /):
             """
-            flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+            flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running
             """
             if self._in_context and value_or_callback is None:
                 context = FlockerVolumeSource.BuilderContext()
@@ -24309,7 +23254,7 @@ class Volume(BaseModel):
 
         def gce_persistent_disk(self, value_or_callback=None, /):
             """
-            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
             """
             if self._in_context and value_or_callback is None:
                 context = GCEPersistentDiskVolumeSource.BuilderContext()
@@ -24348,7 +23293,7 @@ class Volume(BaseModel):
 
         def git_repo(self, value_or_callback=None, /):
             """
-            gitRepo represents a git repository at a particular revision. Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
+            gitRepo represents a git repository at a particular revision. DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
             """
             if self._in_context and value_or_callback is None:
                 context = GitRepoVolumeSource.BuilderContext()
@@ -24387,7 +23332,7 @@ class Volume(BaseModel):
 
         def glusterfs(self, value_or_callback=None, /):
             """
-            glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+            glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/glusterfs/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = GlusterfsVolumeSource.BuilderContext()
@@ -24442,45 +23387,6 @@ class Volume(BaseModel):
                 else:
                     value = output
             return self._set("host_path", value)
-
-        @overload
-        def image(self, value_or_callback: Optional[ImageVolumeSource], /) -> "Volume.Builder": ...
-
-        @overload
-        def image(
-            self,
-            value_or_callback: Callable[
-                [ImageVolumeSource.Builder],
-                ImageVolumeSource.Builder | ImageVolumeSource,
-            ],
-            /,
-        ) -> "Volume.Builder": ...
-
-        @overload
-        def image(self, value_or_callback: Never = ...) -> "ImageVolumeSource.BuilderContext": ...
-
-        def image(self, value_or_callback=None, /):
-            """
-                    image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine. The volume is resolved at pod startup depending on which PullPolicy value is provided:
-
-            - Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
-
-            The volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation. A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message. The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field. The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images. The volume will be mounted read-only (ro) and non-executable files (noexec). Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath). The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ImageVolumeSource.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "image"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ImageVolumeSource.builder())
-                if isinstance(output, ImageVolumeSource.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("image", value)
 
         @overload
         def iscsi(self, value_or_callback: Optional[ISCSIVolumeSource], /) -> "Volume.Builder": ...
@@ -24618,7 +23524,7 @@ class Volume(BaseModel):
 
         def photon_persistent_disk(self, value_or_callback=None, /):
             """
-            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PhotonPersistentDiskVolumeSource.BuilderContext()
@@ -24657,7 +23563,7 @@ class Volume(BaseModel):
 
         def portworx_volume(self, value_or_callback=None, /):
             """
-            portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+            portworxVolume represents a portworx volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PortworxVolumeSource.BuilderContext()
@@ -24735,7 +23641,7 @@ class Volume(BaseModel):
 
         def quobyte(self, value_or_callback=None, /):
             """
-            quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+            quobyte represents a Quobyte mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = QuobyteVolumeSource.BuilderContext()
@@ -24769,7 +23675,7 @@ class Volume(BaseModel):
 
         def rbd(self, value_or_callback=None, /):
             """
-            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = RBDVolumeSource.BuilderContext()
@@ -24808,7 +23714,7 @@ class Volume(BaseModel):
 
         def scale_io(self, value_or_callback=None, /):
             """
-            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
             """
             if self._in_context and value_or_callback is None:
                 context = ScaleIOVolumeSource.BuilderContext()
@@ -24884,7 +23790,7 @@ class Volume(BaseModel):
 
         def storageos(self, value_or_callback=None, /):
             """
-            storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+            storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
             """
             if self._in_context and value_or_callback is None:
                 context = StorageOSVolumeSource.BuilderContext()
@@ -24923,7 +23829,7 @@ class Volume(BaseModel):
 
         def vsphere_volume(self, value_or_callback=None, /):
             """
-            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = VsphereVirtualDiskVolumeSource.BuilderContext()
@@ -24970,23 +23876,23 @@ class Volume(BaseModel):
         Optional[AWSElasticBlockStoreVolumeSource], Field(alias="awsElasticBlockStore")
     ] = None
     """
-    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
     """
     azure_disk: Annotated[Optional[AzureDiskVolumeSource], Field(alias="azureDisk")] = None
     """
-    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
     """
     azure_file: Annotated[Optional[AzureFileVolumeSource], Field(alias="azureFile")] = None
     """
-    azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+    azureFile represents an Azure File Service mount on the host and bind mount to the pod.
     """
     cephfs: Optional[CephFSVolumeSource] = None
     """
-    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
     """
     cinder: Optional[CinderVolumeSource] = None
     """
-    cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+    cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
     """
     config_map: Annotated[Optional[ConfigMapVolumeSource], Field(alias="configMap")] = None
     """
@@ -24994,7 +23900,7 @@ class Volume(BaseModel):
     """
     csi: Optional[CSIVolumeSource] = None
     """
-    csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+    csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
     """
     downward_api: Annotated[Optional[DownwardAPIVolumeSource], Field(alias="downwardAPI")] = None
     """
@@ -25027,37 +23933,29 @@ class Volume(BaseModel):
     """
     flex_volume: Annotated[Optional[FlexVolumeSource], Field(alias="flexVolume")] = None
     """
-    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
     """
     flocker: Optional[FlockerVolumeSource] = None
     """
-    flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+    flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running
     """
     gce_persistent_disk: Annotated[
         Optional[GCEPersistentDiskVolumeSource], Field(alias="gcePersistentDisk")
     ] = None
     """
-    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
     """
     git_repo: Annotated[Optional[GitRepoVolumeSource], Field(alias="gitRepo")] = None
     """
-    gitRepo represents a git repository at a particular revision. Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
+    gitRepo represents a git repository at a particular revision. DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
     """
     glusterfs: Optional[GlusterfsVolumeSource] = None
     """
-    glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+    glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/glusterfs/README.md
     """
     host_path: Annotated[Optional[HostPathVolumeSource], Field(alias="hostPath")] = None
     """
     hostPath represents a pre-existing file or directory on the host machine that is directly exposed to the container. This is generally used for system agents or other privileged things that are allowed to see the host machine. Most containers will NOT need this. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
-    """
-    image: Optional[ImageVolumeSource] = None
-    """
-    image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine. The volume is resolved at pod startup depending on which PullPolicy value is provided:
-
-    - Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
-
-    The volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation. A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message. The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field. The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images. The volume will be mounted read-only (ro) and non-executable files (noexec). Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath). The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
     """
     iscsi: Optional[ISCSIVolumeSource] = None
     """
@@ -25082,11 +23980,11 @@ class Volume(BaseModel):
         Optional[PhotonPersistentDiskVolumeSource], Field(alias="photonPersistentDisk")
     ] = None
     """
-    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
     """
     portworx_volume: Annotated[Optional[PortworxVolumeSource], Field(alias="portworxVolume")] = None
     """
-    portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+    portworxVolume represents a portworx volume attached and mounted on kubelets host machine
     """
     projected: Optional[ProjectedVolumeSource] = None
     """
@@ -25094,15 +23992,15 @@ class Volume(BaseModel):
     """
     quobyte: Optional[QuobyteVolumeSource] = None
     """
-    quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+    quobyte represents a Quobyte mount on the host that shares a pod's lifetime
     """
     rbd: Optional[RBDVolumeSource] = None
     """
-    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
     """
     scale_io: Annotated[Optional[ScaleIOVolumeSource], Field(alias="scaleIO")] = None
     """
-    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
     """
     secret: Optional[SecretVolumeSource] = None
     """
@@ -25110,13 +24008,13 @@ class Volume(BaseModel):
     """
     storageos: Optional[StorageOSVolumeSource] = None
     """
-    storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+    storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
     """
     vsphere_volume: Annotated[
         Optional[VsphereVirtualDiskVolumeSource], Field(alias="vsphereVolume")
     ] = None
     """
-    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
     """
 
 
@@ -25316,7 +24214,7 @@ class PodSpec(BaseModel):
 
         def host_aliases(self, value_or_callback=None, /):
             """
-            HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified.
+            HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified. This is only valid for non-hostNetwork pods.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[HostAlias.Builder]()
@@ -25442,7 +24340,7 @@ class PodSpec(BaseModel):
 
         def node_name(self, value: Optional[str], /) -> Self:
             """
-            NodeName indicates in which node this pod is scheduled. If empty, this pod is a candidate for scheduling by the scheduler defined in schedulerName. Once this field is set, the kubelet for this node becomes responsible for the lifecycle of this pod. This field should not be used to express a desire for the pod to be scheduled on a specific node. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodename
+            NodeName is a request to schedule this pod onto a specific node. If it is non-empty, the scheduler simply schedules this pod onto that node, assuming that it fits resource requirements.
             """
             return self._set("node_name", value)
 
@@ -25469,7 +24367,7 @@ class PodSpec(BaseModel):
 
             If the OS field is set to linux, the following fields must be unset: -securityContext.windowsOptions
 
-            If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.hostUsers - spec.securityContext.appArmorProfile - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.securityContext.supplementalGroupsPolicy - spec.containers[*].securityContext.appArmorProfile - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup
+            If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.hostUsers - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup
             """
             if self._in_context and value_or_callback is None:
                 context = PodOS.BuilderContext()
@@ -25594,49 +24492,6 @@ class PodSpec(BaseModel):
                     value = output
             return self._set("resource_claims", value)
 
-        @overload
-        def resources(
-            self, value_or_callback: Optional[ResourceRequirements], /
-        ) -> "PodSpec.Builder": ...
-
-        @overload
-        def resources(
-            self,
-            value_or_callback: Callable[
-                [ResourceRequirements.Builder],
-                ResourceRequirements.Builder | ResourceRequirements,
-            ],
-            /,
-        ) -> "PodSpec.Builder": ...
-
-        @overload
-        def resources(
-            self, value_or_callback: Never = ...
-        ) -> "ResourceRequirements.BuilderContext": ...
-
-        def resources(self, value_or_callback=None, /):
-            """
-                    Resources is the total amount of CPU and Memory resources required by all containers in the pod. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. ResourceClaims are not supported.
-
-            This field enables fine-grained control over resource allocation for the entire pod, allowing resource sharing among containers in a pod.
-
-            This is an alpha field and requires enabling the PodLevelResources feature gate.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ResourceRequirements.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "resources"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ResourceRequirements.builder())
-                if isinstance(output, ResourceRequirements.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("resources", value)
-
         def restart_policy(self, value: Optional[str], /) -> Self:
             """
             Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
@@ -25681,6 +24536,8 @@ class PodSpec(BaseModel):
                     SchedulingGates is an opaque list of values that if specified will block scheduling the pod. If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the scheduler will not attempt to schedule the pod.
 
             SchedulingGates can only be set at pod creation time, and be removed only afterwards.
+
+            This is a beta feature enabled by the PodSchedulingReadiness feature gate.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[PodSchedulingGate.Builder]()
@@ -25738,7 +24595,7 @@ class PodSpec(BaseModel):
 
         def service_account(self, value: Optional[str], /) -> Self:
             """
-            DeprecatedServiceAccount is a deprecated alias for ServiceAccountName. Deprecated: Use serviceAccountName instead.
+            DeprecatedServiceAccount is a depreciated alias for ServiceAccountName. Deprecated: Use serviceAccountName instead.
             """
             return self._set("service_account", value)
 
@@ -25750,7 +24607,7 @@ class PodSpec(BaseModel):
 
         def set_hostname_as_fqdn(self, value: Optional[bool], /) -> Self:
             """
-            If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
+            If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
             """
             return self._set("set_hostname_as_fqdn", value)
 
@@ -25948,7 +24805,7 @@ class PodSpec(BaseModel):
     """
     host_aliases: Annotated[Optional[List[HostAlias]], Field(alias="hostAliases")] = None
     """
-    HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified.
+    HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified. This is only valid for non-hostNetwork pods.
     """
     host_ipc: Annotated[Optional[bool], Field(alias="hostIPC")] = None
     """
@@ -25982,7 +24839,7 @@ class PodSpec(BaseModel):
     """
     node_name: Annotated[Optional[str], Field(alias="nodeName")] = None
     """
-    NodeName indicates in which node this pod is scheduled. If empty, this pod is a candidate for scheduling by the scheduler defined in schedulerName. Once this field is set, the kubelet for this node becomes responsible for the lifecycle of this pod. This field should not be used to express a desire for the pod to be scheduled on a specific node. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodename
+    NodeName is a request to schedule this pod onto a specific node. If it is non-empty, the scheduler simply schedules this pod onto that node, assuming that it fits resource requirements.
     """
     node_selector: Annotated[Optional[Dict[str, str]], Field(alias="nodeSelector")] = None
     """
@@ -25994,7 +24851,7 @@ class PodSpec(BaseModel):
 
     If the OS field is set to linux, the following fields must be unset: -securityContext.windowsOptions
 
-    If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.hostUsers - spec.securityContext.appArmorProfile - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.securityContext.supplementalGroupsPolicy - spec.containers[*].securityContext.appArmorProfile - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup
+    If the OS field is set to windows, following fields must be unset: - spec.hostPID - spec.hostIPC - spec.hostUsers - spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile - spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls - spec.shareProcessNamespace - spec.securityContext.runAsUser - spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups - spec.containers[*].securityContext.seLinuxOptions - spec.containers[*].securityContext.seccompProfile - spec.containers[*].securityContext.capabilities - spec.containers[*].securityContext.readOnlyRootFilesystem - spec.containers[*].securityContext.privileged - spec.containers[*].securityContext.allowPrivilegeEscalation - spec.containers[*].securityContext.procMount - spec.containers[*].securityContext.runAsUser - spec.containers[*].securityContext.runAsGroup
     """
     overhead: Optional[Dict[str, apimachinery.Quantity]] = None
     """
@@ -26028,14 +24885,6 @@ class PodSpec(BaseModel):
 
     This field is immutable.
     """
-    resources: Optional[ResourceRequirements] = None
-    """
-    Resources is the total amount of CPU and Memory resources required by all containers in the pod. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. ResourceClaims are not supported.
-
-    This field enables fine-grained control over resource allocation for the entire pod, allowing resource sharing among containers in a pod.
-
-    This is an alpha field and requires enabling the PodLevelResources feature gate.
-    """
     restart_policy: Annotated[Optional[str], Field(alias="restartPolicy")] = None
     """
     Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
@@ -26055,6 +24904,8 @@ class PodSpec(BaseModel):
     SchedulingGates is an opaque list of values that if specified will block scheduling the pod. If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the scheduler will not attempt to schedule the pod.
 
     SchedulingGates can only be set at pod creation time, and be removed only afterwards.
+
+    This is a beta feature enabled by the PodSchedulingReadiness feature gate.
     """
     security_context: Annotated[Optional[PodSecurityContext], Field(alias="securityContext")] = None
     """
@@ -26062,7 +24913,7 @@ class PodSpec(BaseModel):
     """
     service_account: Annotated[Optional[str], Field(alias="serviceAccount")] = None
     """
-    DeprecatedServiceAccount is a deprecated alias for ServiceAccountName. Deprecated: Use serviceAccountName instead.
+    DeprecatedServiceAccount is a depreciated alias for ServiceAccountName. Deprecated: Use serviceAccountName instead.
     """
     service_account_name: Annotated[Optional[str], Field(alias="serviceAccountName")] = None
     """
@@ -26070,7 +24921,7 @@ class PodSpec(BaseModel):
     """
     set_hostname_as_fqdn: Annotated[Optional[bool], Field(alias="setHostnameAsFQDN")] = None
     """
-    If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
+    If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
     """
     share_process_namespace: Annotated[Optional[bool], Field(alias="shareProcessNamespace")] = None
     """

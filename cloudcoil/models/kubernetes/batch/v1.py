@@ -342,63 +342,6 @@ class PodFailurePolicyRule(BaseModel):
     """
 
 
-class SuccessPolicyRule(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["SuccessPolicyRule"]:
-            return SuccessPolicyRule
-
-        def build(self) -> "SuccessPolicyRule":
-            return SuccessPolicyRule(**self._attrs)
-
-        def succeeded_count(self, value: Optional[int], /) -> Self:
-            """
-            succeededCount specifies the minimal required size of the actual set of the succeeded indexes for the Job. When succeededCount is used along with succeededIndexes, the check is constrained only to the set of indexes specified by succeededIndexes. For example, given that succeededIndexes is "1-4", succeededCount is "3", and completed indexes are "1", "3", and "5", the Job isn't declared as succeeded because only "1" and "3" indexes are considered in that rules. When this field is null, this doesn't default to any value and is never evaluated at any time. When specified it needs to be a positive integer.
-            """
-            return self._set("succeeded_count", value)
-
-        def succeeded_indexes(self, value: Optional[str], /) -> Self:
-            """
-            succeededIndexes specifies the set of indexes which need to be contained in the actual set of the succeeded indexes for the Job. The list of indexes must be within 0 to ".spec.completions-1" and must not contain duplicates. At least one element is required. The indexes are represented as intervals separated by commas. The intervals can be a decimal integer or a pair of decimal integers separated by a hyphen. The number are listed in represented by the first and last element of the series, separated by a hyphen. For example, if the completed indexes are 1, 3, 4, 5 and 7, they are represented as "1,3-5,7". When this field is null, this field doesn't default to any value and is never evaluated at any time.
-            """
-            return self._set("succeeded_indexes", value)
-
-    class BuilderContext(BuilderContextBase["SuccessPolicyRule.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = SuccessPolicyRule.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for SuccessPolicyRule."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["SuccessPolicyRule", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use SuccessPolicyRule.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    succeeded_count: Annotated[Optional[int], Field(alias="succeededCount")] = None
-    """
-    succeededCount specifies the minimal required size of the actual set of the succeeded indexes for the Job. When succeededCount is used along with succeededIndexes, the check is constrained only to the set of indexes specified by succeededIndexes. For example, given that succeededIndexes is "1-4", succeededCount is "3", and completed indexes are "1", "3", and "5", the Job isn't declared as succeeded because only "1" and "3" indexes are considered in that rules. When this field is null, this doesn't default to any value and is never evaluated at any time. When specified it needs to be a positive integer.
-    """
-    succeeded_indexes: Annotated[Optional[str], Field(alias="succeededIndexes")] = None
-    """
-    succeededIndexes specifies the set of indexes which need to be contained in the actual set of the succeeded indexes for the Job. The list of indexes must be within 0 to ".spec.completions-1" and must not contain duplicates. At least one element is required. The indexes are represented as intervals separated by commas. The intervals can be a decimal integer or a pair of decimal integers separated by a hyphen. The number are listed in represented by the first and last element of the series, separated by a hyphen. For example, if the completed indexes are 1, 3, 4, 5 and 7, they are represented as "1,3-5,7". When this field is null, this field doesn't default to any value and is never evaluated at any time.
-    """
-
-
 class UncountedTerminatedPods(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -803,7 +746,7 @@ class JobStatus(BaseModel):
 
         def active(self, value: Optional[int], /) -> Self:
             """
-            The number of pending and running pods which are not terminating (without a deletionTimestamp). The value is zero for finished jobs.
+            The number of pending and running pods.
             """
             return self._set("active", value)
 
@@ -835,7 +778,7 @@ class JobStatus(BaseModel):
 
         def completion_time(self, value_or_callback=None, /):
             """
-            Represents time when the job was completed. It is not guaranteed to be set in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC. The completion time is set when the job finishes successfully, and only then. The value cannot be updated or removed. The value indicates the same or later point in time as the startTime field.
+            Represents time when the job was completed. It is not guaranteed to be set in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC. The completion time is only set when the job finishes successfully.
             """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.Time.BuilderContext()
@@ -872,11 +815,7 @@ class JobStatus(BaseModel):
 
         def conditions(self, value_or_callback=None, /):
             """
-                    The latest available observations of an object's current state. When a Job fails, one of the conditions will have type "Failed" and status true. When a Job is suspended, one of the conditions will have type "Suspended" and status true; when the Job is resumed, the status of this condition will become false. When a Job is completed, one of the conditions will have type "Complete" and status true.
-
-            A job is considered finished when it is in a terminal condition, either "Complete" or "Failed". A Job cannot have both the "Complete" and "Failed" conditions. Additionally, it cannot be in the "Complete" and "FailureTarget" conditions. The "Complete", "Failed" and "FailureTarget" conditions cannot be disabled.
-
-            More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
+            The latest available observations of an object's current state. When a Job fails, one of the conditions will have type "Failed" and status true. When a Job is suspended, one of the conditions will have type "Suspended" and status true; when the Job is resumed, the status of this condition will become false. When a Job is completed, one of the conditions will have type "Complete" and status true. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[JobCondition.Builder]()
@@ -895,21 +834,19 @@ class JobStatus(BaseModel):
 
         def failed(self, value: Optional[int], /) -> Self:
             """
-            The number of pods which reached phase Failed. The value increases monotonically.
+            The number of pods which reached phase Failed.
             """
             return self._set("failed", value)
 
         def failed_indexes(self, value: Optional[str], /) -> Self:
             """
-                    FailedIndexes holds the failed indexes when spec.backoffLimitPerIndex is set. The indexes are represented in the text format analogous as for the `completedIndexes` field, ie. they are kept as decimal integers separated by commas. The numbers are listed in increasing order. Three or more consecutive numbers are compressed and represented by the first and last element of the series, separated by a hyphen. For example, if the failed indexes are 1, 3, 4, 5 and 7, they are represented as "1,3-5,7". The set of failed indexes cannot overlap with the set of completed indexes.
-
-            This field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).
+            FailedIndexes holds the failed indexes when backoffLimitPerIndex=true. The indexes are represented in the text format analogous as for the `completedIndexes` field, ie. they are kept as decimal integers separated by commas. The numbers are listed in increasing order. Three or more consecutive numbers are compressed and represented by the first and last element of the series, separated by a hyphen. For example, if the failed indexes are 1, 3, 4, 5 and 7, they are represented as "1,3-5,7". This field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).
             """
             return self._set("failed_indexes", value)
 
         def ready(self, value: Optional[int], /) -> Self:
             """
-            The number of active pods which have a Ready condition and are not terminating (without a deletionTimestamp).
+            The number of pods which have a Ready condition.
             """
             return self._set("ready", value)
 
@@ -935,9 +872,7 @@ class JobStatus(BaseModel):
 
         def start_time(self, value_or_callback=None, /):
             """
-                    Represents time when the job controller started processing a job. When a Job is created in the suspended state, this field is not set until the first time it is resumed. This field is reset every time a Job is resumed from suspension. It is represented in RFC3339 form and is in UTC.
-
-            Once set, the field can only be removed when the job is suspended. The field cannot be modified while the job is unsuspended or finished.
+            Represents time when the job controller started processing a job. When a Job is created in the suspended state, this field is not set until the first time it is resumed. This field is reset every time a Job is resumed from suspension. It is represented in RFC3339 form and is in UTC.
             """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.Time.BuilderContext()
@@ -956,7 +891,7 @@ class JobStatus(BaseModel):
 
         def succeeded(self, value: Optional[int], /) -> Self:
             """
-            The number of pods which reached phase Succeeded. The value increases monotonically for a given spec. However, it may decrease in reaction to scale down of elastic indexed jobs.
+            The number of pods which reached phase Succeeded.
             """
             return self._set("succeeded", value)
 
@@ -997,7 +932,7 @@ class JobStatus(BaseModel):
             1. Add the pod UID to the arrays in this field. 2. Remove the pod finalizer. 3. Remove the pod UID from the arrays while increasing the corresponding
                 counter.
 
-            Old jobs might not be tracked using this field, in which case the field remains null. The structure is empty for finished jobs.
+            Old jobs might not be tracked using this field, in which case the field remains null.
             """
             if self._in_context and value_or_callback is None:
                 context = UncountedTerminatedPods.BuilderContext()
@@ -1042,7 +977,7 @@ class JobStatus(BaseModel):
 
     active: Optional[int] = None
     """
-    The number of pending and running pods which are not terminating (without a deletionTimestamp). The value is zero for finished jobs.
+    The number of pending and running pods.
     """
     completed_indexes: Annotated[Optional[str], Field(alias="completedIndexes")] = None
     """
@@ -1050,39 +985,31 @@ class JobStatus(BaseModel):
     """
     completion_time: Annotated[Optional[apimachinery.Time], Field(alias="completionTime")] = None
     """
-    Represents time when the job was completed. It is not guaranteed to be set in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC. The completion time is set when the job finishes successfully, and only then. The value cannot be updated or removed. The value indicates the same or later point in time as the startTime field.
+    Represents time when the job was completed. It is not guaranteed to be set in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC. The completion time is only set when the job finishes successfully.
     """
     conditions: Optional[List[JobCondition]] = None
     """
-    The latest available observations of an object's current state. When a Job fails, one of the conditions will have type "Failed" and status true. When a Job is suspended, one of the conditions will have type "Suspended" and status true; when the Job is resumed, the status of this condition will become false. When a Job is completed, one of the conditions will have type "Complete" and status true.
-
-    A job is considered finished when it is in a terminal condition, either "Complete" or "Failed". A Job cannot have both the "Complete" and "Failed" conditions. Additionally, it cannot be in the "Complete" and "FailureTarget" conditions. The "Complete", "Failed" and "FailureTarget" conditions cannot be disabled.
-
-    More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
+    The latest available observations of an object's current state. When a Job fails, one of the conditions will have type "Failed" and status true. When a Job is suspended, one of the conditions will have type "Suspended" and status true; when the Job is resumed, the status of this condition will become false. When a Job is completed, one of the conditions will have type "Complete" and status true. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
     """
     failed: Optional[int] = None
     """
-    The number of pods which reached phase Failed. The value increases monotonically.
+    The number of pods which reached phase Failed.
     """
     failed_indexes: Annotated[Optional[str], Field(alias="failedIndexes")] = None
     """
-    FailedIndexes holds the failed indexes when spec.backoffLimitPerIndex is set. The indexes are represented in the text format analogous as for the `completedIndexes` field, ie. they are kept as decimal integers separated by commas. The numbers are listed in increasing order. Three or more consecutive numbers are compressed and represented by the first and last element of the series, separated by a hyphen. For example, if the failed indexes are 1, 3, 4, 5 and 7, they are represented as "1,3-5,7". The set of failed indexes cannot overlap with the set of completed indexes.
-
-    This field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).
+    FailedIndexes holds the failed indexes when backoffLimitPerIndex=true. The indexes are represented in the text format analogous as for the `completedIndexes` field, ie. they are kept as decimal integers separated by commas. The numbers are listed in increasing order. Three or more consecutive numbers are compressed and represented by the first and last element of the series, separated by a hyphen. For example, if the failed indexes are 1, 3, 4, 5 and 7, they are represented as "1,3-5,7". This field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).
     """
     ready: Optional[int] = None
     """
-    The number of active pods which have a Ready condition and are not terminating (without a deletionTimestamp).
+    The number of pods which have a Ready condition.
     """
     start_time: Annotated[Optional[apimachinery.Time], Field(alias="startTime")] = None
     """
     Represents time when the job controller started processing a job. When a Job is created in the suspended state, this field is not set until the first time it is resumed. This field is reset every time a Job is resumed from suspension. It is represented in RFC3339 form and is in UTC.
-
-    Once set, the field can only be removed when the job is suspended. The field cannot be modified while the job is unsuspended or finished.
     """
     succeeded: Optional[int] = None
     """
-    The number of pods which reached phase Succeeded. The value increases monotonically for a given spec. However, it may decrease in reaction to scale down of elastic indexed jobs.
+    The number of pods which reached phase Succeeded.
     """
     terminating: Optional[int] = None
     """
@@ -1101,7 +1028,7 @@ class JobStatus(BaseModel):
     1. Add the pod UID to the arrays in this field. 2. Remove the pod finalizer. 3. Remove the pod UID from the arrays while increasing the corresponding
         counter.
 
-    Old jobs might not be tracked using this field, in which case the field remains null. The structure is empty for finished jobs.
+    Old jobs might not be tracked using this field, in which case the field remains null.
     """
 
 
@@ -1186,87 +1113,6 @@ class PodFailurePolicy(BaseModel):
     """
 
 
-class SuccessPolicy(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["SuccessPolicy"]:
-            return SuccessPolicy
-
-        def build(self) -> "SuccessPolicy":
-            return SuccessPolicy(**self._attrs)
-
-        @overload
-        def rules(
-            self, value_or_callback: List[SuccessPolicyRule], /
-        ) -> "SuccessPolicy.Builder": ...
-
-        @overload
-        def rules(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[SuccessPolicyRule, SuccessPolicyRule.Builder]],
-                GenericListBuilder[SuccessPolicyRule, SuccessPolicyRule.Builder]
-                | List[SuccessPolicyRule],
-            ],
-            /,
-        ) -> "SuccessPolicy.Builder": ...
-
-        @overload
-        def rules(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[SuccessPolicyRule.Builder]: ...
-
-        def rules(self, value_or_callback=None, /):
-            """
-            rules represents the list of alternative rules for the declaring the Jobs as successful before `.status.succeeded >= .spec.completions`. Once any of the rules are met, the "SucceededCriteriaMet" condition is added, and the lingering pods are removed. The terminal state for such a Job has the "Complete" condition. Additionally, these rules are evaluated in order; Once the Job meets one of the rules, other rules are ignored. At most 20 elements are allowed.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[SuccessPolicyRule.Builder]()
-                context._parent_builder = self
-                context._field_name = "rules"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(SuccessPolicyRule.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("rules", value)
-
-    class BuilderContext(BuilderContextBase["SuccessPolicy.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = SuccessPolicy.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for SuccessPolicy."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["SuccessPolicy", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use SuccessPolicy.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    rules: List[SuccessPolicyRule]
-    """
-    rules represents the list of alternative rules for the declaring the Jobs as successful before `.status.succeeded >= .spec.completions`. Once any of the rules are met, the "SucceededCriteriaMet" condition is added, and the lingering pods are removed. The terminal state for such a Job has the "Complete" condition. Additionally, these rules are evaluated in order; Once the Job meets one of the rules, other rules are ignored. At most 20 elements are allowed.
-    """
-
-
 class JobSpec(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -1312,14 +1158,6 @@ class JobSpec(BaseModel):
             """
             return self._set("completions", value)
 
-        def managed_by(self, value: Optional[str], /) -> Self:
-            """
-                    ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.
-
-            This field is beta-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (enabled by default).
-            """
-            return self._set("managed_by", value)
-
         def manual_selector(self, value: Optional[bool], /) -> Self:
             """
             manualSelector controls generation of pod labels and pod selectors. Leave `manualSelector` unset unless you are certain what you are doing. When false or unset, the system pick labels unique to this job and appends those labels to the pod template.  When true, the user is responsible for picking unique labels and specifying the selector.  Failure to pick a unique label may cause this and other jobs to not function correctly.  However, You may see `manualSelector=true` in jobs that were created with the old `extensions/v1beta1` API. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector
@@ -1359,7 +1197,9 @@ class JobSpec(BaseModel):
 
         def pod_failure_policy(self, value_or_callback=None, /):
             """
-            Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.
+                    Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.
+
+            This field is beta-level. It can be used when the `JobPodFailurePolicy` feature gate is enabled (enabled by default).
             """
             if self._in_context and value_or_callback is None:
                 context = PodFailurePolicy.BuilderContext()
@@ -1425,46 +1265,6 @@ class JobSpec(BaseModel):
                 else:
                     value = output
             return self._set("selector", value)
-
-        @overload
-        def success_policy(
-            self, value_or_callback: Optional[SuccessPolicy], /
-        ) -> "JobSpec.Builder": ...
-
-        @overload
-        def success_policy(
-            self,
-            value_or_callback: Callable[
-                [SuccessPolicy.Builder], SuccessPolicy.Builder | SuccessPolicy
-            ],
-            /,
-        ) -> "JobSpec.Builder": ...
-
-        @overload
-        def success_policy(
-            self, value_or_callback: Never = ...
-        ) -> "SuccessPolicy.BuilderContext": ...
-
-        def success_policy(self, value_or_callback=None, /):
-            """
-                    successPolicy specifies the policy when the Job can be declared as succeeded. If empty, the default behavior applies - the Job is declared as succeeded only when the number of succeeded pods equals to the completions. When the field is specified, it must be immutable and works only for the Indexed Jobs. Once the Job meets the SuccessPolicy, the lingering pods are terminated.
-
-            This field is beta-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (enabled by default).
-            """
-            if self._in_context and value_or_callback is None:
-                context = SuccessPolicy.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "success_policy"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(SuccessPolicy.builder())
-                if isinstance(output, SuccessPolicy.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("success_policy", value)
 
         def suspend(self, value: Optional[bool], /) -> Self:
             """
@@ -1567,12 +1367,6 @@ class JobSpec(BaseModel):
     """
     Specifies the desired number of successfully finished pods the job should be run with.  Setting to null means that the success of any pod signals the success of all pods, and allows parallelism to have any positive value.  Setting to 1 means that parallelism is limited to 1 and the success of that pod signals the success of the job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
     """
-    managed_by: Annotated[Optional[str], Field(alias="managedBy")] = None
-    """
-    ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.
-
-    This field is beta-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (enabled by default).
-    """
     manual_selector: Annotated[Optional[bool], Field(alias="manualSelector")] = None
     """
     manualSelector controls generation of pod labels and pod selectors. Leave `manualSelector` unset unless you are certain what you are doing. When false or unset, the system pick labels unique to this job and appends those labels to the pod template.  When true, the user is responsible for picking unique labels and specifying the selector.  Failure to pick a unique label may cause this and other jobs to not function correctly.  However, You may see `manualSelector=true` in jobs that were created with the old `extensions/v1beta1` API. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector
@@ -1590,6 +1384,8 @@ class JobSpec(BaseModel):
     )
     """
     Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.
+
+    This field is beta-level. It can be used when the `JobPodFailurePolicy` feature gate is enabled (enabled by default).
     """
     pod_replacement_policy: Annotated[Optional[str], Field(alias="podReplacementPolicy")] = None
     """
@@ -1603,12 +1399,6 @@ class JobSpec(BaseModel):
     selector: Optional[apimachinery.LabelSelector] = None
     """
     A label query over pods that should match the pod count. Normally, the system sets this field for you. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-    """
-    success_policy: Annotated[Optional[SuccessPolicy], Field(alias="successPolicy")] = None
-    """
-    successPolicy specifies the policy when the Job can be declared as succeeded. If empty, the default behavior applies - the Job is declared as succeeded only when the number of succeeded pods equals to the completions. When the field is specified, it must be immutable and works only for the Indexed Jobs. Once the Job meets the SuccessPolicy, the lingering pods are terminated.
-
-    This field is beta-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (enabled by default).
     """
     suspend: Optional[bool] = None
     """

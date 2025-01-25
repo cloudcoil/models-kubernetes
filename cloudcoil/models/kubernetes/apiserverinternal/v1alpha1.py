@@ -191,7 +191,7 @@ class StorageVersionCondition(BaseModel):
                     value = output
             return self._set("last_transition_time", value)
 
-        def message(self, value: str, /) -> Self:
+        def message(self, value: Optional[str], /) -> Self:
             """
             A human readable message indicating details about the transition.
             """
@@ -253,7 +253,7 @@ class StorageVersionCondition(BaseModel):
     """
     Last time the condition transitioned from one status to another.
     """
-    message: str
+    message: Optional[str] = None
     """
     A human readable message indicating details about the transition.
     """
