@@ -238,7 +238,7 @@ class IPAddress(Resource):
         def build(self) -> "IPAddress":
             return IPAddress(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["networking.k8s.io/v1beta1"]], /) -> Self:
+        def api_version(self, value: Optional[Literal["networking.k8s.io/v1alpha1"]], /) -> Self:
             """
             APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             """
@@ -350,8 +350,8 @@ class IPAddress(Resource):
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
     api_version: Annotated[
-        Optional[Literal["networking.k8s.io/v1beta1"]], Field(alias="apiVersion")
-    ] = "networking.k8s.io/v1beta1"
+        Optional[Literal["networking.k8s.io/v1alpha1"]], Field(alias="apiVersion")
+    ] = "networking.k8s.io/v1alpha1"
     """
     APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
     """
@@ -462,7 +462,7 @@ class ServiceCIDR(Resource):
         def build(self) -> "ServiceCIDR":
             return ServiceCIDR(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["networking.k8s.io/v1beta1"]], /) -> Self:
+        def api_version(self, value: Optional[Literal["networking.k8s.io/v1alpha1"]], /) -> Self:
             """
             APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             """
@@ -613,8 +613,8 @@ class ServiceCIDR(Resource):
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
     api_version: Annotated[
-        Optional[Literal["networking.k8s.io/v1beta1"]], Field(alias="apiVersion")
-    ] = "networking.k8s.io/v1beta1"
+        Optional[Literal["networking.k8s.io/v1alpha1"]], Field(alias="apiVersion")
+    ] = "networking.k8s.io/v1alpha1"
     """
     APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
     """

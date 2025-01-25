@@ -76,13 +76,13 @@ class LeaseSpec(BaseModel):
 
         def holder_identity(self, value: Optional[str], /) -> Self:
             """
-            holderIdentity contains the identity of the holder of a current lease. If Coordinated Leader Election is used, the holder identity must be equal to the elected LeaseCandidate.metadata.name field.
+            holderIdentity contains the identity of the holder of a current lease.
             """
             return self._set("holder_identity", value)
 
         def lease_duration_seconds(self, value: Optional[int], /) -> Self:
             """
-            leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measured against the time of last observed renewTime.
+            leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measure against time of last observed renewTime.
             """
             return self._set("lease_duration_seconds", value)
 
@@ -91,12 +91,6 @@ class LeaseSpec(BaseModel):
             leaseTransitions is the number of transitions of a lease between holders.
             """
             return self._set("lease_transitions", value)
-
-        def preferred_holder(self, value: Optional[str], /) -> Self:
-            """
-            PreferredHolder signals to a lease holder that the lease has a more optimal holder and should be given up. This field can only be set if Strategy is also set.
-            """
-            return self._set("preferred_holder", value)
 
         @overload
         def renew_time(
@@ -137,12 +131,6 @@ class LeaseSpec(BaseModel):
                     value = output
             return self._set("renew_time", value)
 
-        def strategy(self, value: Optional[str], /) -> Self:
-            """
-            Strategy indicates the strategy for picking the leader for coordinated leader election. If the field is not specified, there is no active coordination for this lease. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
-            """
-            return self._set("strategy", value)
-
     class BuilderContext(BuilderContextBase["LeaseSpec.Builder"]):
         def model_post_init(self, __context) -> None:
             self._builder = LeaseSpec.Builder()
@@ -175,27 +163,19 @@ class LeaseSpec(BaseModel):
     """
     holder_identity: Annotated[Optional[str], Field(alias="holderIdentity")] = None
     """
-    holderIdentity contains the identity of the holder of a current lease. If Coordinated Leader Election is used, the holder identity must be equal to the elected LeaseCandidate.metadata.name field.
+    holderIdentity contains the identity of the holder of a current lease.
     """
     lease_duration_seconds: Annotated[Optional[int], Field(alias="leaseDurationSeconds")] = None
     """
-    leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measured against the time of last observed renewTime.
+    leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measure against time of last observed renewTime.
     """
     lease_transitions: Annotated[Optional[int], Field(alias="leaseTransitions")] = None
     """
     leaseTransitions is the number of transitions of a lease between holders.
     """
-    preferred_holder: Annotated[Optional[str], Field(alias="preferredHolder")] = None
-    """
-    PreferredHolder signals to a lease holder that the lease has a more optimal holder and should be given up. This field can only be set if Strategy is also set.
-    """
     renew_time: Annotated[Optional[apimachinery.MicroTime], Field(alias="renewTime")] = None
     """
     renewTime is a time when the current holder of a lease has last updated the lease.
-    """
-    strategy: Optional[str] = None
-    """
-    Strategy indicates the strategy for picking the leader for coordinated leader election. If the field is not specified, there is no active coordination for this lease. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
     """
 
 

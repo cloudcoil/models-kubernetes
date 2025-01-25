@@ -28,51 +28,40 @@ from cloudcoil.pydantic import (
 from cloudcoil.resources import Resource, ResourceList
 
 
-class ApplyConfiguration(BaseModel):
+class AuditAnnotation(BaseModel):
     class Builder(BaseModelBuilder):
         @property
-        def cls(self) -> Type["ApplyConfiguration"]:
-            return ApplyConfiguration
+        def cls(self) -> Type["AuditAnnotation"]:
+            return AuditAnnotation
 
-        def build(self) -> "ApplyConfiguration":
-            return ApplyConfiguration(**self._attrs)
+        def build(self) -> "AuditAnnotation":
+            return AuditAnnotation(**self._attrs)
 
-        def expression(self, value: Optional[str], /) -> Self:
+        def key(self, value: str, /) -> Self:
             """
-                    expression will be evaluated by CEL to create an apply configuration. ref: https://github.com/google/cel-spec
+                    key specifies the audit annotation key. The audit annotation keys of a ValidatingAdmissionPolicy must be unique. The key must be a qualified name ([A-Za-z0-9][-A-Za-z0-9_.]*) no more than 63 bytes in length.
 
-            Apply configurations are declared in CEL using object initialization. For example, this CEL expression returns an apply configuration to set a single field:
+            The key is combined with the resource name of the ValidatingAdmissionPolicy to construct an audit annotation key: "{ValidatingAdmissionPolicy name}/{key}".
 
-                Object{
-                  spec: Object.spec{
-                    serviceAccountName: "example"
-                  }
-                }
+            If an admission webhook uses the same resource name as this ValidatingAdmissionPolicy and the same audit annotation key, the annotation key will be identical. In this case, the first annotation written with the key will be included in the audit event and all subsequent annotations with the same key will be discarded.
 
-            Apply configurations may not modify atomic structs, maps or arrays due to the risk of accidental deletion of values not included in the apply configuration.
-
-            CEL expressions have access to the object types needed to create apply configurations:
-
-            - 'Object' - CEL type of the resource object. - 'Object.<fieldName>' - CEL type of object field (such as 'Object.spec') - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of nested field (such as 'Object.spec.containers')
-
-            CEL expressions have access to the contents of the API request, organized into CEL variables as well as some other useful variables:
-
-            - 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
-              For example, a variable named 'foo' can be accessed as 'variables.foo'.
-            - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-              See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
-            - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
-              request resource.
-
-            The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.
-
-            Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required.
+            Required.
             """
-            return self._set("expression", value)
+            return self._set("key", value)
 
-    class BuilderContext(BuilderContextBase["ApplyConfiguration.Builder"]):
+        def value_expression(self, value: str, /) -> Self:
+            """
+                    valueExpression represents the expression which is evaluated by CEL to produce an audit annotation value. The expression must evaluate to either a string or null value. If the expression evaluates to a string, the audit annotation is included with the string value. If the expression evaluates to null or empty string the audit annotation will be omitted. The valueExpression may be no longer than 5kb in length. If the result of the valueExpression is more than 10kb in length, it will be truncated to 10kb.
+
+            If multiple ValidatingAdmissionPolicyBinding resources match an API request, then the valueExpression will be evaluated for each binding. All unique values produced by the valueExpressions will be joined together in a comma-separated list.
+
+            Required.
+            """
+            return self._set("value_expression", value)
+
+    class BuilderContext(BuilderContextBase["AuditAnnotation.Builder"]):
         def model_post_init(self, __context) -> None:
-            self._builder = ApplyConfiguration.Builder()
+            self._builder = AuditAnnotation.Builder()
             self._builder._in_context = True
             self._parent_builder = None
             self._field_name = None
@@ -83,123 +72,63 @@ class ApplyConfiguration(BaseModel):
 
     @classmethod
     def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for ApplyConfiguration."""
+        """Creates a new context manager builder for AuditAnnotation."""
         return cls.BuilderContext()
 
-    class ListBuilder(GenericListBuilder["ApplyConfiguration", Builder]):
+    class ListBuilder(GenericListBuilder["AuditAnnotation", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use ApplyConfiguration.list_builder() instead."
+                "This class is not meant to be instantiated. Use AuditAnnotation.list_builder() instead."
             )
 
     @classmethod
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    expression: Optional[str] = None
+    key: str
     """
-    expression will be evaluated by CEL to create an apply configuration. ref: https://github.com/google/cel-spec
+    key specifies the audit annotation key. The audit annotation keys of a ValidatingAdmissionPolicy must be unique. The key must be a qualified name ([A-Za-z0-9][-A-Za-z0-9_.]*) no more than 63 bytes in length.
 
-    Apply configurations are declared in CEL using object initialization. For example, this CEL expression returns an apply configuration to set a single field:
+    The key is combined with the resource name of the ValidatingAdmissionPolicy to construct an audit annotation key: "{ValidatingAdmissionPolicy name}/{key}".
 
-        Object{
-          spec: Object.spec{
-            serviceAccountName: "example"
-          }
-        }
+    If an admission webhook uses the same resource name as this ValidatingAdmissionPolicy and the same audit annotation key, the annotation key will be identical. In this case, the first annotation written with the key will be included in the audit event and all subsequent annotations with the same key will be discarded.
 
-    Apply configurations may not modify atomic structs, maps or arrays due to the risk of accidental deletion of values not included in the apply configuration.
+    Required.
+    """
+    value_expression: Annotated[str, Field(alias="valueExpression")]
+    """
+    valueExpression represents the expression which is evaluated by CEL to produce an audit annotation value. The expression must evaluate to either a string or null value. If the expression evaluates to a string, the audit annotation is included with the string value. If the expression evaluates to null or empty string the audit annotation will be omitted. The valueExpression may be no longer than 5kb in length. If the result of the valueExpression is more than 10kb in length, it will be truncated to 10kb.
 
-    CEL expressions have access to the object types needed to create apply configurations:
+    If multiple ValidatingAdmissionPolicyBinding resources match an API request, then the valueExpression will be evaluated for each binding. All unique values produced by the valueExpressions will be joined together in a comma-separated list.
 
-    - 'Object' - CEL type of the resource object. - 'Object.<fieldName>' - CEL type of object field (such as 'Object.spec') - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of nested field (such as 'Object.spec.containers')
-
-    CEL expressions have access to the contents of the API request, organized into CEL variables as well as some other useful variables:
-
-    - 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
-      For example, a variable named 'foo' can be accessed as 'variables.foo'.
-    - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-      See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
-    - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
-      request resource.
-
-    The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.
-
-    Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required.
+    Required.
     """
 
 
-class JSONPatch(BaseModel):
+class ExpressionWarning(BaseModel):
     class Builder(BaseModelBuilder):
         @property
-        def cls(self) -> Type["JSONPatch"]:
-            return JSONPatch
+        def cls(self) -> Type["ExpressionWarning"]:
+            return ExpressionWarning
 
-        def build(self) -> "JSONPatch":
-            return JSONPatch(**self._attrs)
+        def build(self) -> "ExpressionWarning":
+            return ExpressionWarning(**self._attrs)
 
-        def expression(self, value: Optional[str], /) -> Self:
+        def field_ref(self, value: str, /) -> Self:
             """
-                    expression will be evaluated by CEL to create a [JSON patch](https://jsonpatch.com/). ref: https://github.com/google/cel-spec
-
-            expression must return an array of JSONPatch values.
-
-            For example, this CEL expression returns a JSON patch to conditionally modify a value:
-
-                  [
-                    JSONPatch{op: "test", path: "/spec/example", value: "Red"},
-                    JSONPatch{op: "replace", path: "/spec/example", value: "Green"}
-                  ]
-
-            To define an object for the patch value, use Object types. For example:
-
-                  [
-                    JSONPatch{
-                      op: "add",
-                      path: "/spec/selector",
-                      value: Object.spec.selector{matchLabels: {"environment": "test"}}
-                    }
-                  ]
-
-            To use strings containing '/' and '~' as JSONPatch path keys, use "jsonpatch.escapeKey". For example:
-
-                  [
-                    JSONPatch{
-                      op: "add",
-                      path: "/metadata/labels/" + jsonpatch.escapeKey("example.com/environment"),
-                      value: "test"
-                    },
-                  ]
-
-            CEL expressions have access to the types needed to create JSON patches and objects:
-
-            - 'JSONPatch' - CEL type of JSON Patch operations. JSONPatch has the fields 'op', 'from', 'path' and 'value'.
-              See [JSON patch](https://jsonpatch.com/) for more details. The 'value' field may be set to any of: string,
-              integer, array, map or object.  If set, the 'path' and 'from' fields must be set to a
-              [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901/) string, where the 'jsonpatch.escapeKey()' CEL
-              function may be used to escape path keys containing '/' and '~'.
-            - 'Object' - CEL type of the resource object. - 'Object.<fieldName>' - CEL type of object field (such as 'Object.spec') - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of nested field (such as 'Object.spec.containers')
-
-            CEL expressions have access to the contents of the API request, organized into CEL variables as well as some other useful variables:
-
-            - 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
-              For example, a variable named 'foo' can be accessed as 'variables.foo'.
-            - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-              See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
-            - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
-              request resource.
-
-            CEL expressions have access to [Kubernetes CEL function libraries](https://kubernetes.io/docs/reference/using-api/cel/#cel-options-language-features-and-libraries) as well as:
-
-            - 'jsonpatch.escapeKey' - Performs JSONPatch key escaping. '~' and  '/' are escaped as '~0' and `~1' respectively).
-
-            Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required.
+            The path to the field that refers the expression. For example, the reference to the expression of the first item of validations is "spec.validations[0].expression"
             """
-            return self._set("expression", value)
+            return self._set("field_ref", value)
 
-    class BuilderContext(BuilderContextBase["JSONPatch.Builder"]):
+        def warning(self, value: str, /) -> Self:
+            """
+            The content of type checking information in a human-readable form. Each line of the warning contains the type that the expression is checked against, followed by the type check error from the compiler.
+            """
+            return self._set("warning", value)
+
+    class BuilderContext(BuilderContextBase["ExpressionWarning.Builder"]):
         def model_post_init(self, __context) -> None:
-            self._builder = JSONPatch.Builder()
+            self._builder = ExpressionWarning.Builder()
             self._builder._in_context = True
             self._parent_builder = None
             self._field_name = None
@@ -210,75 +139,26 @@ class JSONPatch(BaseModel):
 
     @classmethod
     def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for JSONPatch."""
+        """Creates a new context manager builder for ExpressionWarning."""
         return cls.BuilderContext()
 
-    class ListBuilder(GenericListBuilder["JSONPatch", Builder]):
+    class ListBuilder(GenericListBuilder["ExpressionWarning", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use JSONPatch.list_builder() instead."
+                "This class is not meant to be instantiated. Use ExpressionWarning.list_builder() instead."
             )
 
     @classmethod
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    expression: Optional[str] = None
+    field_ref: Annotated[str, Field(alias="fieldRef")]
     """
-    expression will be evaluated by CEL to create a [JSON patch](https://jsonpatch.com/). ref: https://github.com/google/cel-spec
-
-    expression must return an array of JSONPatch values.
-
-    For example, this CEL expression returns a JSON patch to conditionally modify a value:
-
-          [
-            JSONPatch{op: "test", path: "/spec/example", value: "Red"},
-            JSONPatch{op: "replace", path: "/spec/example", value: "Green"}
-          ]
-
-    To define an object for the patch value, use Object types. For example:
-
-          [
-            JSONPatch{
-              op: "add",
-              path: "/spec/selector",
-              value: Object.spec.selector{matchLabels: {"environment": "test"}}
-            }
-          ]
-
-    To use strings containing '/' and '~' as JSONPatch path keys, use "jsonpatch.escapeKey". For example:
-
-          [
-            JSONPatch{
-              op: "add",
-              path: "/metadata/labels/" + jsonpatch.escapeKey("example.com/environment"),
-              value: "test"
-            },
-          ]
-
-    CEL expressions have access to the types needed to create JSON patches and objects:
-
-    - 'JSONPatch' - CEL type of JSON Patch operations. JSONPatch has the fields 'op', 'from', 'path' and 'value'.
-      See [JSON patch](https://jsonpatch.com/) for more details. The 'value' field may be set to any of: string,
-      integer, array, map or object.  If set, the 'path' and 'from' fields must be set to a
-      [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901/) string, where the 'jsonpatch.escapeKey()' CEL
-      function may be used to escape path keys containing '/' and '~'.
-    - 'Object' - CEL type of the resource object. - 'Object.<fieldName>' - CEL type of object field (such as 'Object.spec') - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of nested field (such as 'Object.spec.containers')
-
-    CEL expressions have access to the contents of the API request, organized into CEL variables as well as some other useful variables:
-
-    - 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
-      For example, a variable named 'foo' can be accessed as 'variables.foo'.
-    - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-      See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
-    - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
-      request resource.
-
-    CEL expressions have access to [Kubernetes CEL function libraries](https://kubernetes.io/docs/reference/using-api/cel/#cel-options-language-features-and-libraries) as well as:
-
-    - 'jsonpatch.escapeKey' - Performs JSONPatch key escaping. '~' and  '/' are escaped as '~0' and `~1' respectively).
-
-    Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required.
+    The path to the field that refers the expression. For example, the reference to the expression of the first item of validations is "spec.validations[0].expression"
+    """
+    warning: str
+    """
+    The content of type checking information in a human-readable form. Each line of the warning contains the type that the expression is checked against, followed by the type check error from the compiler.
     """
 
 
@@ -356,134 +236,6 @@ class MatchCondition(BaseModel):
     Name is an identifier for this match condition, used for strategic merging of MatchConditions, as well as providing an identifier for logging purposes. A good name should be descriptive of the associated expression. Name must be a qualified name consisting of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')
 
     Required.
-    """
-
-
-class Mutation(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["Mutation"]:
-            return Mutation
-
-        def build(self) -> "Mutation":
-            return Mutation(**self._attrs)
-
-        @overload
-        def apply_configuration(
-            self, value_or_callback: Optional[ApplyConfiguration], /
-        ) -> "Mutation.Builder": ...
-
-        @overload
-        def apply_configuration(
-            self,
-            value_or_callback: Callable[
-                [ApplyConfiguration.Builder],
-                ApplyConfiguration.Builder | ApplyConfiguration,
-            ],
-            /,
-        ) -> "Mutation.Builder": ...
-
-        @overload
-        def apply_configuration(
-            self, value_or_callback: Never = ...
-        ) -> "ApplyConfiguration.BuilderContext": ...
-
-        def apply_configuration(self, value_or_callback=None, /):
-            """
-            applyConfiguration defines the desired configuration values of an object. The configuration is applied to the admission object using [structured merge diff](https://github.com/kubernetes-sigs/structured-merge-diff). A CEL expression is used to create apply configuration.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ApplyConfiguration.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "apply_configuration"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ApplyConfiguration.builder())
-                if isinstance(output, ApplyConfiguration.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("apply_configuration", value)
-
-        @overload
-        def json_patch(self, value_or_callback: Optional[JSONPatch], /) -> "Mutation.Builder": ...
-
-        @overload
-        def json_patch(
-            self,
-            value_or_callback: Callable[[JSONPatch.Builder], JSONPatch.Builder | JSONPatch],
-            /,
-        ) -> "Mutation.Builder": ...
-
-        @overload
-        def json_patch(self, value_or_callback: Never = ...) -> "JSONPatch.BuilderContext": ...
-
-        def json_patch(self, value_or_callback=None, /):
-            """
-            jsonPatch defines a [JSON patch](https://jsonpatch.com/) operation to perform a mutation to the object. A CEL expression is used to create the JSON patch.
-            """
-            if self._in_context and value_or_callback is None:
-                context = JSONPatch.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "json_patch"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(JSONPatch.builder())
-                if isinstance(output, JSONPatch.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("json_patch", value)
-
-        def patch_type(self, value: str, /) -> Self:
-            """
-            patchType indicates the patch strategy used. Allowed values are "ApplyConfiguration" and "JSONPatch". Required.
-            """
-            return self._set("patch_type", value)
-
-    class BuilderContext(BuilderContextBase["Mutation.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = Mutation.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for Mutation."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["Mutation", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use Mutation.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    apply_configuration: Annotated[
-        Optional[ApplyConfiguration], Field(alias="applyConfiguration")
-    ] = None
-    """
-    applyConfiguration defines the desired configuration values of an object. The configuration is applied to the admission object using [structured merge diff](https://github.com/kubernetes-sigs/structured-merge-diff). A CEL expression is used to create apply configuration.
-    """
-    json_patch: Annotated[Optional[JSONPatch], Field(alias="jsonPatch")] = None
-    """
-    jsonPatch defines a [JSON patch](https://jsonpatch.com/) operation to perform a mutation to the object. A CEL expression is used to create the JSON patch.
-    """
-    patch_type: Annotated[str, Field(alias="patchType")]
-    """
-    patchType indicates the patch strategy used. Allowed values are "ApplyConfiguration" and "JSONPatch". Required.
     """
 
 
@@ -650,6 +402,216 @@ class ParamKind(BaseModel):
     kind: Optional[str] = None
     """
     Kind is the API kind the resources belong to. Required.
+    """
+
+
+class TypeChecking(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["TypeChecking"]:
+            return TypeChecking
+
+        def build(self) -> "TypeChecking":
+            return TypeChecking(**self._attrs)
+
+        @overload
+        def expression_warnings(
+            self, value_or_callback: List[ExpressionWarning], /
+        ) -> "TypeChecking.Builder": ...
+
+        @overload
+        def expression_warnings(
+            self,
+            value_or_callback: Callable[
+                [GenericListBuilder[ExpressionWarning, ExpressionWarning.Builder]],
+                GenericListBuilder[ExpressionWarning, ExpressionWarning.Builder]
+                | List[ExpressionWarning],
+            ],
+            /,
+        ) -> "TypeChecking.Builder": ...
+
+        @overload
+        def expression_warnings(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[ExpressionWarning.Builder]: ...
+
+        def expression_warnings(self, value_or_callback=None, /):
+            """
+            The type checking warnings for each expression.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[ExpressionWarning.Builder]()
+                context._parent_builder = self
+                context._field_name = "expression_warnings"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ExpressionWarning.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("expression_warnings", value)
+
+    class BuilderContext(BuilderContextBase["TypeChecking.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = TypeChecking.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for TypeChecking."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["TypeChecking", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use TypeChecking.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    expression_warnings: Annotated[
+        Optional[List[ExpressionWarning]], Field(alias="expressionWarnings")
+    ] = None
+    """
+    The type checking warnings for each expression.
+    """
+
+
+class Validation(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["Validation"]:
+            return Validation
+
+        def build(self) -> "Validation":
+            return Validation(**self._attrs)
+
+        def expression(self, value: str, /) -> Self:
+            """
+                    Expression represents the expression which will be evaluated by CEL. ref: https://github.com/google/cel-spec CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:
+
+            - 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
+              For example, a variable named 'foo' can be accessed as 'variables.foo'.
+            - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+              See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+            - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+              request resource.
+
+            The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.
+
+            Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Accessible property names are escaped according to the following rules when accessed in the expression: - '__' escapes to '__underscores__' - '.' escapes to '__dot__' - '-' escapes to '__dash__' - '/' escapes to '__slash__' - Property names that exactly match a CEL RESERVED keyword escape to '__{keyword}__'. The keywords are:
+                  "true", "false", "null", "in", "as", "break", "const", "continue", "else", "for", "function", "if",
+                  "import", "let", "loop", "package", "namespace", "return".
+            Examples:
+              - Expression accessing a property named "namespace": {"Expression": "object.__namespace__ > 0"}
+              - Expression accessing a property named "x-prop": {"Expression": "object.x__dash__prop > 0"}
+              - Expression accessing a property named "redact__d": {"Expression": "object.redact__underscores__d > 0"}
+
+            Equality on arrays with list type of 'set' or 'map' ignores element order, i.e. [1, 2] == [2, 1]. Concatenation on arrays with x-kubernetes-list-type use the semantics of the list type:
+              - 'set': `X + Y` performs a union where the array positions of all elements in `X` are preserved and
+                non-intersecting elements in `Y` are appended, retaining their partial order.
+              - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values
+                are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with
+                non-intersecting keys are appended, retaining their partial order.
+            Required.
+            """
+            return self._set("expression", value)
+
+        def message(self, value: Optional[str], /) -> Self:
+            """
+            Message represents the message displayed when validation fails. The message is required if the Expression contains line breaks. The message must not contain line breaks. If unset, the message is "failed rule: {Rule}". e.g. "must be a URL with the host matching spec.host" If the Expression contains line breaks. Message is required. The message must not contain line breaks. If unset, the message is "failed Expression: {Expression}".
+            """
+            return self._set("message", value)
+
+        def message_expression(self, value: Optional[str], /) -> Self:
+            """
+            messageExpression declares a CEL expression that evaluates to the validation failure message that is returned when this rule fails. Since messageExpression is used as a failure message, it must evaluate to a string. If both message and messageExpression are present on a validation, then messageExpression will be used if validation fails. If messageExpression results in a runtime error, the runtime error is logged, and the validation failure message is produced as if the messageExpression field were unset. If messageExpression evaluates to an empty string, a string with only spaces, or a string that contains line breaks, then the validation failure message will also be produced as if the messageExpression field were unset, and the fact that messageExpression produced an empty string/string with only spaces/string with line breaks will be logged. messageExpression has access to all the same variables as the `expression` except for 'authorizer' and 'authorizer.requestResource'. Example: "object.x must be less than max ("+string(params.max)+")"
+            """
+            return self._set("message_expression", value)
+
+        def reason(self, value: Optional[str], /) -> Self:
+            """
+            Reason represents a machine-readable description of why this validation failed. If this is the first validation in the list to fail, this reason, as well as the corresponding HTTP response code, are used in the HTTP response to the client. The currently supported reasons are: "Unauthorized", "Forbidden", "Invalid", "RequestEntityTooLarge". If not set, StatusReasonInvalid is used in the response to the client.
+            """
+            return self._set("reason", value)
+
+    class BuilderContext(BuilderContextBase["Validation.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = Validation.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for Validation."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["Validation", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use Validation.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    expression: str
+    """
+    Expression represents the expression which will be evaluated by CEL. ref: https://github.com/google/cel-spec CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:
+
+    - 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
+      For example, a variable named 'foo' can be accessed as 'variables.foo'.
+    - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+      See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+    - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+      request resource.
+
+    The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.
+
+    Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Accessible property names are escaped according to the following rules when accessed in the expression: - '__' escapes to '__underscores__' - '.' escapes to '__dot__' - '-' escapes to '__dash__' - '/' escapes to '__slash__' - Property names that exactly match a CEL RESERVED keyword escape to '__{keyword}__'. The keywords are:
+          "true", "false", "null", "in", "as", "break", "const", "continue", "else", "for", "function", "if",
+          "import", "let", "loop", "package", "namespace", "return".
+    Examples:
+      - Expression accessing a property named "namespace": {"Expression": "object.__namespace__ > 0"}
+      - Expression accessing a property named "x-prop": {"Expression": "object.x__dash__prop > 0"}
+      - Expression accessing a property named "redact__d": {"Expression": "object.redact__underscores__d > 0"}
+
+    Equality on arrays with list type of 'set' or 'map' ignores element order, i.e. [1, 2] == [2, 1]. Concatenation on arrays with x-kubernetes-list-type use the semantics of the list type:
+      - 'set': `X + Y` performs a union where the array positions of all elements in `X` are preserved and
+        non-intersecting elements in `Y` are appended, retaining their partial order.
+      - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values
+        are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with
+        non-intersecting keys are appended, retaining their partial order.
+    Required.
+    """
+    message: Optional[str] = None
+    """
+    Message represents the message displayed when validation fails. The message is required if the Expression contains line breaks. The message must not contain line breaks. If unset, the message is "failed rule: {Rule}". e.g. "must be a URL with the host matching spec.host" If the Expression contains line breaks. Message is required. The message must not contain line breaks. If unset, the message is "failed Expression: {Expression}".
+    """
+    message_expression: Annotated[Optional[str], Field(alias="messageExpression")] = None
+    """
+    messageExpression declares a CEL expression that evaluates to the validation failure message that is returned when this rule fails. Since messageExpression is used as a failure message, it must evaluate to a string. If both message and messageExpression are present on a validation, then messageExpression will be used if validation fails. If messageExpression results in a runtime error, the runtime error is logged, and the validation failure message is produced as if the messageExpression field were unset. If messageExpression evaluates to an empty string, a string with only spaces, or a string that contains line breaks, then the validation failure message will also be produced as if the messageExpression field were unset, and the fact that messageExpression produced an empty string/string with only spaces/string with line breaks will be logged. messageExpression has access to all the same variables as the `expression` except for 'authorizer' and 'authorizer.requestResource'. Example: "object.x must be less than max ("+string(params.max)+")"
+    """
+    reason: Optional[str] = None
+    """
+    Reason represents a machine-readable description of why this validation failed. If this is the first validation in the list to fail, this reason, as well as the corresponding HTTP response code, are used in the HTTP response to the client. The currently supported reasons are: "Unauthorized", "Forbidden", "Invalid", "RequestEntityTooLarge". If not set, StatusReasonInvalid is used in the response to the client.
     """
 
 
@@ -1011,316 +973,6 @@ class MatchResources(BaseModel):
     """
 
 
-class MutatingAdmissionPolicySpec(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["MutatingAdmissionPolicySpec"]:
-            return MutatingAdmissionPolicySpec
-
-        def build(self) -> "MutatingAdmissionPolicySpec":
-            return MutatingAdmissionPolicySpec(**self._attrs)
-
-        def failure_policy(self, value: Optional[str], /) -> Self:
-            """
-                    failurePolicy defines how to handle failures for the admission policy. Failures can occur from CEL expression parse errors, type check errors, runtime errors and invalid or mis-configured policy definitions or bindings.
-
-            A policy is invalid if paramKind refers to a non-existent Kind. A binding is invalid if paramRef.name refers to a non-existent resource.
-
-            failurePolicy does not define how validations that evaluate to false are handled.
-
-            Allowed values are Ignore or Fail. Defaults to Fail.
-            """
-            return self._set("failure_policy", value)
-
-        @overload
-        def match_conditions(
-            self, value_or_callback: List[MatchCondition], /
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def match_conditions(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[MatchCondition, MatchCondition.Builder]],
-                GenericListBuilder[MatchCondition, MatchCondition.Builder] | List[MatchCondition],
-            ],
-            /,
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def match_conditions(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[MatchCondition.Builder]: ...
-
-        def match_conditions(self, value_or_callback=None, /):
-            """
-                    matchConditions is a list of conditions that must be met for a request to be validated. Match conditions filter requests that have already been matched by the matchConstraints. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.
-
-            If a parameter object is provided, it can be accessed via the `params` handle in the same manner as validation expressions.
-
-            The exact matching logic is (in order):
-              1. If ANY matchCondition evaluates to FALSE, the policy is skipped.
-              2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.
-              3. If any matchCondition evaluates to an error (but none are FALSE):
-                 - If failurePolicy=Fail, reject the request
-                 - If failurePolicy=Ignore, the policy is skipped
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[MatchCondition.Builder]()
-                context._parent_builder = self
-                context._field_name = "match_conditions"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(MatchCondition.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("match_conditions", value)
-
-        @overload
-        def match_constraints(
-            self, value_or_callback: Optional[MatchResources], /
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def match_constraints(
-            self,
-            value_or_callback: Callable[
-                [MatchResources.Builder], MatchResources.Builder | MatchResources
-            ],
-            /,
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def match_constraints(
-            self, value_or_callback: Never = ...
-        ) -> "MatchResources.BuilderContext": ...
-
-        def match_constraints(self, value_or_callback=None, /):
-            """
-            matchConstraints specifies what resources this policy is designed to validate. The MutatingAdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding. The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched. '*' matches CREATE, UPDATE and CONNECT. Required.
-            """
-            if self._in_context and value_or_callback is None:
-                context = MatchResources.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "match_constraints"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(MatchResources.builder())
-                if isinstance(output, MatchResources.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("match_constraints", value)
-
-        @overload
-        def mutations(
-            self, value_or_callback: List[Mutation], /
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def mutations(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[Mutation, Mutation.Builder]],
-                GenericListBuilder[Mutation, Mutation.Builder] | List[Mutation],
-            ],
-            /,
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def mutations(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[Mutation.Builder]: ...
-
-        def mutations(self, value_or_callback=None, /):
-            """
-            mutations contain operations to perform on matching objects. mutations may not be empty; a minimum of one mutation is required. mutations are evaluated in order, and are reinvoked according to the reinvocationPolicy. The mutations of a policy are invoked for each binding of this policy and reinvocation of mutations occurs on a per binding basis.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[Mutation.Builder]()
-                context._parent_builder = self
-                context._field_name = "mutations"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(Mutation.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("mutations", value)
-
-        @overload
-        def param_kind(
-            self, value_or_callback: Optional[ParamKind], /
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def param_kind(
-            self,
-            value_or_callback: Callable[[ParamKind.Builder], ParamKind.Builder | ParamKind],
-            /,
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def param_kind(self, value_or_callback: Never = ...) -> "ParamKind.BuilderContext": ...
-
-        def param_kind(self, value_or_callback=None, /):
-            """
-            paramKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ParamKind.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "param_kind"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ParamKind.builder())
-                if isinstance(output, ParamKind.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("param_kind", value)
-
-        def reinvocation_policy(self, value: Optional[str], /) -> Self:
-            """
-                    reinvocationPolicy indicates whether mutations may be called multiple times per MutatingAdmissionPolicyBinding as part of a single admission evaluation. Allowed values are "Never" and "IfNeeded".
-
-            Never: These mutations will not be called more than once per binding in a single admission evaluation.
-
-            IfNeeded: These mutations may be invoked more than once per binding for a single admission request and there is no guarantee of order with respect to other admission plugins, admission webhooks, bindings of this policy and admission policies.  Mutations are only reinvoked when mutations change the object after this mutation is invoked. Required.
-            """
-            return self._set("reinvocation_policy", value)
-
-        @overload
-        def variables(
-            self, value_or_callback: List[Variable], /
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def variables(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[Variable, Variable.Builder]],
-                GenericListBuilder[Variable, Variable.Builder] | List[Variable],
-            ],
-            /,
-        ) -> "MutatingAdmissionPolicySpec.Builder": ...
-
-        @overload
-        def variables(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[Variable.Builder]: ...
-
-        def variables(self, value_or_callback=None, /):
-            """
-                    variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except matchConditions because matchConditions are evaluated before the rest of the policy.
-
-            The expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, variables must be sorted by the order of first appearance and acyclic.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[Variable.Builder]()
-                context._parent_builder = self
-                context._field_name = "variables"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(Variable.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("variables", value)
-
-    class BuilderContext(BuilderContextBase["MutatingAdmissionPolicySpec.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = MutatingAdmissionPolicySpec.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for MutatingAdmissionPolicySpec."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["MutatingAdmissionPolicySpec", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use MutatingAdmissionPolicySpec.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    failure_policy: Annotated[Optional[str], Field(alias="failurePolicy")] = None
-    """
-    failurePolicy defines how to handle failures for the admission policy. Failures can occur from CEL expression parse errors, type check errors, runtime errors and invalid or mis-configured policy definitions or bindings.
-
-    A policy is invalid if paramKind refers to a non-existent Kind. A binding is invalid if paramRef.name refers to a non-existent resource.
-
-    failurePolicy does not define how validations that evaluate to false are handled.
-
-    Allowed values are Ignore or Fail. Defaults to Fail.
-    """
-    match_conditions: Annotated[Optional[List[MatchCondition]], Field(alias="matchConditions")] = (
-        None
-    )
-    """
-    matchConditions is a list of conditions that must be met for a request to be validated. Match conditions filter requests that have already been matched by the matchConstraints. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.
-
-    If a parameter object is provided, it can be accessed via the `params` handle in the same manner as validation expressions.
-
-    The exact matching logic is (in order):
-      1. If ANY matchCondition evaluates to FALSE, the policy is skipped.
-      2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.
-      3. If any matchCondition evaluates to an error (but none are FALSE):
-         - If failurePolicy=Fail, reject the request
-         - If failurePolicy=Ignore, the policy is skipped
-    """
-    match_constraints: Annotated[Optional[MatchResources], Field(alias="matchConstraints")] = None
-    """
-    matchConstraints specifies what resources this policy is designed to validate. The MutatingAdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding. The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched. '*' matches CREATE, UPDATE and CONNECT. Required.
-    """
-    mutations: Optional[List[Mutation]] = None
-    """
-    mutations contain operations to perform on matching objects. mutations may not be empty; a minimum of one mutation is required. mutations are evaluated in order, and are reinvoked according to the reinvocationPolicy. The mutations of a policy are invoked for each binding of this policy and reinvocation of mutations occurs on a per binding basis.
-    """
-    param_kind: Annotated[Optional[ParamKind], Field(alias="paramKind")] = None
-    """
-    paramKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.
-    """
-    reinvocation_policy: Annotated[Optional[str], Field(alias="reinvocationPolicy")] = None
-    """
-    reinvocationPolicy indicates whether mutations may be called multiple times per MutatingAdmissionPolicyBinding as part of a single admission evaluation. Allowed values are "Never" and "IfNeeded".
-
-    Never: These mutations will not be called more than once per binding in a single admission evaluation.
-
-    IfNeeded: These mutations may be invoked more than once per binding for a single admission request and there is no guarantee of order with respect to other admission plugins, admission webhooks, bindings of this policy and admission policies.  Mutations are only reinvoked when mutations change the object after this mutation is invoked. Required.
-    """
-    variables: Optional[List[Variable]] = None
-    """
-    variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except matchConditions because matchConditions are evaluated before the rest of the policy.
-
-    The expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, variables must be sorted by the order of first appearance and acyclic.
-    """
-
-
 class ParamRef(BaseModel):
     class Builder(BaseModelBuilder):
         @property
@@ -1461,167 +1113,19 @@ class ParamRef(BaseModel):
     """
 
 
-class MutatingAdmissionPolicy(Resource):
+class ValidatingAdmissionPolicyBindingSpec(BaseModel):
     class Builder(BaseModelBuilder):
         @property
-        def cls(self) -> Type["MutatingAdmissionPolicy"]:
-            return MutatingAdmissionPolicy
+        def cls(self) -> Type["ValidatingAdmissionPolicyBindingSpec"]:
+            return ValidatingAdmissionPolicyBindingSpec
 
-        def build(self) -> "MutatingAdmissionPolicy":
-            return MutatingAdmissionPolicy(**self._attrs)
-
-        def api_version(
-            self, value: Optional[Literal["admissionregistration.k8s.io/v1alpha1"]], /
-        ) -> Self:
-            """
-            APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-            """
-            return self._set("api_version", value)
-
-        def kind(self, value: Optional[Literal["MutatingAdmissionPolicy"]], /) -> Self:
-            """
-            Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-            """
-            return self._set("kind", value)
-
-        @overload
-        def metadata(
-            self, value_or_callback: Optional[apimachinery.ObjectMeta], /
-        ) -> "MutatingAdmissionPolicy.Builder": ...
-
-        @overload
-        def metadata(
-            self,
-            value_or_callback: Callable[
-                [apimachinery.ObjectMeta.Builder],
-                apimachinery.ObjectMeta.Builder | apimachinery.ObjectMeta,
-            ],
-            /,
-        ) -> "MutatingAdmissionPolicy.Builder": ...
-
-        @overload
-        def metadata(
-            self, value_or_callback: Never = ...
-        ) -> "apimachinery.ObjectMeta.BuilderContext": ...
-
-        def metadata(self, value_or_callback=None, /):
-            """
-            Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
-            """
-            if self._in_context and value_or_callback is None:
-                context = apimachinery.ObjectMeta.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "metadata"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(apimachinery.ObjectMeta.builder())
-                if isinstance(output, apimachinery.ObjectMeta.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("metadata", value)
-
-        @overload
-        def spec(
-            self, value_or_callback: Optional[MutatingAdmissionPolicySpec], /
-        ) -> "MutatingAdmissionPolicy.Builder": ...
-
-        @overload
-        def spec(
-            self,
-            value_or_callback: Callable[
-                [MutatingAdmissionPolicySpec.Builder],
-                MutatingAdmissionPolicySpec.Builder | MutatingAdmissionPolicySpec,
-            ],
-            /,
-        ) -> "MutatingAdmissionPolicy.Builder": ...
-
-        @overload
-        def spec(
-            self, value_or_callback: Never = ...
-        ) -> "MutatingAdmissionPolicySpec.BuilderContext": ...
-
-        def spec(self, value_or_callback=None, /):
-            """
-            Specification of the desired behavior of the MutatingAdmissionPolicy.
-            """
-            if self._in_context and value_or_callback is None:
-                context = MutatingAdmissionPolicySpec.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "spec"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(MutatingAdmissionPolicySpec.builder())
-                if isinstance(output, MutatingAdmissionPolicySpec.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("spec", value)
-
-    class BuilderContext(BuilderContextBase["MutatingAdmissionPolicy.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = MutatingAdmissionPolicy.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for MutatingAdmissionPolicy."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["MutatingAdmissionPolicy", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use MutatingAdmissionPolicy.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    api_version: Annotated[
-        Optional[Literal["admissionregistration.k8s.io/v1alpha1"]],
-        Field(alias="apiVersion"),
-    ] = "admissionregistration.k8s.io/v1alpha1"
-    """
-    APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-    """
-    kind: Optional[Literal["MutatingAdmissionPolicy"]] = "MutatingAdmissionPolicy"
-    """
-    Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-    """
-    metadata: Optional[apimachinery.ObjectMeta] = None
-    """
-    Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
-    """
-    spec: Optional[MutatingAdmissionPolicySpec] = None
-    """
-    Specification of the desired behavior of the MutatingAdmissionPolicy.
-    """
-
-
-class MutatingAdmissionPolicyBindingSpec(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["MutatingAdmissionPolicyBindingSpec"]:
-            return MutatingAdmissionPolicyBindingSpec
-
-        def build(self) -> "MutatingAdmissionPolicyBindingSpec":
-            return MutatingAdmissionPolicyBindingSpec(**self._attrs)
+        def build(self) -> "ValidatingAdmissionPolicyBindingSpec":
+            return ValidatingAdmissionPolicyBindingSpec(**self._attrs)
 
         @overload
         def match_resources(
             self, value_or_callback: Optional[MatchResources], /
-        ) -> "MutatingAdmissionPolicyBindingSpec.Builder": ...
+        ) -> "ValidatingAdmissionPolicyBindingSpec.Builder": ...
 
         @overload
         def match_resources(
@@ -1630,7 +1134,7 @@ class MutatingAdmissionPolicyBindingSpec(BaseModel):
                 [MatchResources.Builder], MatchResources.Builder | MatchResources
             ],
             /,
-        ) -> "MutatingAdmissionPolicyBindingSpec.Builder": ...
+        ) -> "ValidatingAdmissionPolicyBindingSpec.Builder": ...
 
         @overload
         def match_resources(
@@ -1639,7 +1143,7 @@ class MutatingAdmissionPolicyBindingSpec(BaseModel):
 
         def match_resources(self, value_or_callback=None, /):
             """
-            matchResources limits what resources match this binding and may be mutated by it. Note that if matchResources matches a resource, the resource must also match a policy's matchConstraints and matchConditions before the resource may be mutated. When matchResources is unset, it does not constrain resource matching, and only the policy's matchConstraints and matchConditions must match for the resource to be mutated. Additionally, matchResources.resourceRules are optional and do not constraint matching when unset. Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required. The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched. '*' matches CREATE, UPDATE and CONNECT.
+            MatchResources declares what resources match this binding and will be validated by it. Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this. If this is unset, all resources matched by the policy are validated by this binding When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated. Note that this is differs from ValidatingAdmissionPolicy matchConstraints, where resourceRules are required.
             """
             if self._in_context and value_or_callback is None:
                 context = MatchResources.BuilderContext()
@@ -1659,21 +1163,21 @@ class MutatingAdmissionPolicyBindingSpec(BaseModel):
         @overload
         def param_ref(
             self, value_or_callback: Optional[ParamRef], /
-        ) -> "MutatingAdmissionPolicyBindingSpec.Builder": ...
+        ) -> "ValidatingAdmissionPolicyBindingSpec.Builder": ...
 
         @overload
         def param_ref(
             self,
             value_or_callback: Callable[[ParamRef.Builder], ParamRef.Builder | ParamRef],
             /,
-        ) -> "MutatingAdmissionPolicyBindingSpec.Builder": ...
+        ) -> "ValidatingAdmissionPolicyBindingSpec.Builder": ...
 
         @overload
         def param_ref(self, value_or_callback: Never = ...) -> "ParamRef.BuilderContext": ...
 
         def param_ref(self, value_or_callback=None, /):
             """
-            paramRef specifies the parameter resource used to configure the admission control policy. It should point to a resource of the type specified in spec.ParamKind of the bound MutatingAdmissionPolicy. If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the MutatingAdmissionPolicy applied. If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
+            paramRef specifies the parameter resource used to configure the admission control policy. It should point to a resource of the type specified in ParamKind of the bound ValidatingAdmissionPolicy. If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the ValidatingAdmissionPolicy applied. If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
             """
             if self._in_context and value_or_callback is None:
                 context = ParamRef.BuilderContext()
@@ -1692,13 +1196,37 @@ class MutatingAdmissionPolicyBindingSpec(BaseModel):
 
         def policy_name(self, value: Optional[str], /) -> Self:
             """
-            policyName references a MutatingAdmissionPolicy name which the MutatingAdmissionPolicyBinding binds to. If the referenced resource does not exist, this binding is considered invalid and will be ignored Required.
+            PolicyName references a ValidatingAdmissionPolicy name which the ValidatingAdmissionPolicyBinding binds to. If the referenced resource does not exist, this binding is considered invalid and will be ignored Required.
             """
             return self._set("policy_name", value)
 
-    class BuilderContext(BuilderContextBase["MutatingAdmissionPolicyBindingSpec.Builder"]):
+        def validation_actions(self, value: Optional[List[str]], /) -> Self:
+            """
+                    validationActions declares how Validations of the referenced ValidatingAdmissionPolicy are enforced. If a validation evaluates to false it is always enforced according to these actions.
+
+            Failures defined by the ValidatingAdmissionPolicy's FailurePolicy are enforced according to these actions only if the FailurePolicy is set to Fail, otherwise the failures are ignored. This includes compilation errors, runtime errors and misconfigurations of the policy.
+
+            validationActions is declared as a set of action values. Order does not matter. validationActions may not contain duplicates of the same action.
+
+            The supported actions values are:
+
+            "Deny" specifies that a validation failure results in a denied request.
+
+            "Warn" specifies that a validation failure is reported to the request client in HTTP Warning headers, with a warning code of 299. Warnings can be sent both for allowed or denied admission responses.
+
+            "Audit" specifies that a validation failure is included in the published audit event for the request. The audit event will contain a `validation.policy.admission.k8s.io/validation_failure` audit annotation with a value containing the details of the validation failures, formatted as a JSON list of objects, each with the following fields: - message: The validation failure message string - policy: The resource name of the ValidatingAdmissionPolicy - binding: The resource name of the ValidatingAdmissionPolicyBinding - expressionIndex: The index of the failed validations in the ValidatingAdmissionPolicy - validationActions: The enforcement actions enacted for the validation failure Example audit annotation: `"validation.policy.admission.k8s.io/validation_failure": "[{"message": "Invalid value", {"policy": "policy.example.com", {"binding": "policybinding.example.com", {"expressionIndex": "1", {"validationActions": ["Audit"]}]"`
+
+            Clients should expect to handle additional values by ignoring any values not recognized.
+
+            "Deny" and "Warn" may not be used together since this combination needlessly duplicates the validation failure both in the API response body and the HTTP warning headers.
+
+            Required.
+            """
+            return self._set("validation_actions", value)
+
+    class BuilderContext(BuilderContextBase["ValidatingAdmissionPolicyBindingSpec.Builder"]):
         def model_post_init(self, __context) -> None:
-            self._builder = MutatingAdmissionPolicyBindingSpec.Builder()
+            self._builder = ValidatingAdmissionPolicyBindingSpec.Builder()
             self._builder._in_context = True
             self._parent_builder = None
             self._field_name = None
@@ -1709,13 +1237,13 @@ class MutatingAdmissionPolicyBindingSpec(BaseModel):
 
     @classmethod
     def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for MutatingAdmissionPolicyBindingSpec."""
+        """Creates a new context manager builder for ValidatingAdmissionPolicyBindingSpec."""
         return cls.BuilderContext()
 
-    class ListBuilder(GenericListBuilder["MutatingAdmissionPolicyBindingSpec", Builder]):
+    class ListBuilder(GenericListBuilder["ValidatingAdmissionPolicyBindingSpec", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use MutatingAdmissionPolicyBindingSpec.list_builder() instead."
+                "This class is not meant to be instantiated. Use ValidatingAdmissionPolicyBindingSpec.list_builder() instead."
             )
 
     @classmethod
@@ -1724,29 +1252,523 @@ class MutatingAdmissionPolicyBindingSpec(BaseModel):
 
     match_resources: Annotated[Optional[MatchResources], Field(alias="matchResources")] = None
     """
-    matchResources limits what resources match this binding and may be mutated by it. Note that if matchResources matches a resource, the resource must also match a policy's matchConstraints and matchConditions before the resource may be mutated. When matchResources is unset, it does not constrain resource matching, and only the policy's matchConstraints and matchConditions must match for the resource to be mutated. Additionally, matchResources.resourceRules are optional and do not constraint matching when unset. Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required. The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched. '*' matches CREATE, UPDATE and CONNECT.
+    MatchResources declares what resources match this binding and will be validated by it. Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this. If this is unset, all resources matched by the policy are validated by this binding When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated. Note that this is differs from ValidatingAdmissionPolicy matchConstraints, where resourceRules are required.
     """
     param_ref: Annotated[Optional[ParamRef], Field(alias="paramRef")] = None
     """
-    paramRef specifies the parameter resource used to configure the admission control policy. It should point to a resource of the type specified in spec.ParamKind of the bound MutatingAdmissionPolicy. If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the MutatingAdmissionPolicy applied. If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
+    paramRef specifies the parameter resource used to configure the admission control policy. It should point to a resource of the type specified in ParamKind of the bound ValidatingAdmissionPolicy. If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the ValidatingAdmissionPolicy applied. If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
     """
     policy_name: Annotated[Optional[str], Field(alias="policyName")] = None
     """
-    policyName references a MutatingAdmissionPolicy name which the MutatingAdmissionPolicyBinding binds to. If the referenced resource does not exist, this binding is considered invalid and will be ignored Required.
+    PolicyName references a ValidatingAdmissionPolicy name which the ValidatingAdmissionPolicyBinding binds to. If the referenced resource does not exist, this binding is considered invalid and will be ignored Required.
+    """
+    validation_actions: Annotated[Optional[List[str]], Field(alias="validationActions")] = None
+    """
+    validationActions declares how Validations of the referenced ValidatingAdmissionPolicy are enforced. If a validation evaluates to false it is always enforced according to these actions.
+
+    Failures defined by the ValidatingAdmissionPolicy's FailurePolicy are enforced according to these actions only if the FailurePolicy is set to Fail, otherwise the failures are ignored. This includes compilation errors, runtime errors and misconfigurations of the policy.
+
+    validationActions is declared as a set of action values. Order does not matter. validationActions may not contain duplicates of the same action.
+
+    The supported actions values are:
+
+    "Deny" specifies that a validation failure results in a denied request.
+
+    "Warn" specifies that a validation failure is reported to the request client in HTTP Warning headers, with a warning code of 299. Warnings can be sent both for allowed or denied admission responses.
+
+    "Audit" specifies that a validation failure is included in the published audit event for the request. The audit event will contain a `validation.policy.admission.k8s.io/validation_failure` audit annotation with a value containing the details of the validation failures, formatted as a JSON list of objects, each with the following fields: - message: The validation failure message string - policy: The resource name of the ValidatingAdmissionPolicy - binding: The resource name of the ValidatingAdmissionPolicyBinding - expressionIndex: The index of the failed validations in the ValidatingAdmissionPolicy - validationActions: The enforcement actions enacted for the validation failure Example audit annotation: `"validation.policy.admission.k8s.io/validation_failure": "[{"message": "Invalid value", {"policy": "policy.example.com", {"binding": "policybinding.example.com", {"expressionIndex": "1", {"validationActions": ["Audit"]}]"`
+
+    Clients should expect to handle additional values by ignoring any values not recognized.
+
+    "Deny" and "Warn" may not be used together since this combination needlessly duplicates the validation failure both in the API response body and the HTTP warning headers.
+
+    Required.
     """
 
 
-MutatingAdmissionPolicyList = ResourceList["MutatingAdmissionPolicy"]
-
-
-class MutatingAdmissionPolicyBinding(Resource):
+class ValidatingAdmissionPolicySpec(BaseModel):
     class Builder(BaseModelBuilder):
         @property
-        def cls(self) -> Type["MutatingAdmissionPolicyBinding"]:
-            return MutatingAdmissionPolicyBinding
+        def cls(self) -> Type["ValidatingAdmissionPolicySpec"]:
+            return ValidatingAdmissionPolicySpec
 
-        def build(self) -> "MutatingAdmissionPolicyBinding":
-            return MutatingAdmissionPolicyBinding(**self._attrs)
+        def build(self) -> "ValidatingAdmissionPolicySpec":
+            return ValidatingAdmissionPolicySpec(**self._attrs)
+
+        @overload
+        def audit_annotations(
+            self, value_or_callback: List[AuditAnnotation], /
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def audit_annotations(
+            self,
+            value_or_callback: Callable[
+                [GenericListBuilder[AuditAnnotation, AuditAnnotation.Builder]],
+                GenericListBuilder[AuditAnnotation, AuditAnnotation.Builder]
+                | List[AuditAnnotation],
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def audit_annotations(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[AuditAnnotation.Builder]: ...
+
+        def audit_annotations(self, value_or_callback=None, /):
+            """
+            auditAnnotations contains CEL expressions which are used to produce audit annotations for the audit event of the API request. validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is required.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[AuditAnnotation.Builder]()
+                context._parent_builder = self
+                context._field_name = "audit_annotations"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(AuditAnnotation.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("audit_annotations", value)
+
+        def failure_policy(self, value: Optional[str], /) -> Self:
+            """
+                    failurePolicy defines how to handle failures for the admission policy. Failures can occur from CEL expression parse errors, type check errors, runtime errors and invalid or mis-configured policy definitions or bindings.
+
+            A policy is invalid if spec.paramKind refers to a non-existent Kind. A binding is invalid if spec.paramRef.name refers to a non-existent resource.
+
+            failurePolicy does not define how validations that evaluate to false are handled.
+
+            When failurePolicy is set to Fail, ValidatingAdmissionPolicyBinding validationActions define how failures are enforced.
+
+            Allowed values are Ignore or Fail. Defaults to Fail.
+            """
+            return self._set("failure_policy", value)
+
+        @overload
+        def match_conditions(
+            self, value_or_callback: List[MatchCondition], /
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def match_conditions(
+            self,
+            value_or_callback: Callable[
+                [GenericListBuilder[MatchCondition, MatchCondition.Builder]],
+                GenericListBuilder[MatchCondition, MatchCondition.Builder] | List[MatchCondition],
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def match_conditions(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[MatchCondition.Builder]: ...
+
+        def match_conditions(self, value_or_callback=None, /):
+            """
+                    MatchConditions is a list of conditions that must be met for a request to be validated. Match conditions filter requests that have already been matched by the rules, namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.
+
+            If a parameter object is provided, it can be accessed via the `params` handle in the same manner as validation expressions.
+
+            The exact matching logic is (in order):
+              1. If ANY matchCondition evaluates to FALSE, the policy is skipped.
+              2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.
+              3. If any matchCondition evaluates to an error (but none are FALSE):
+                 - If failurePolicy=Fail, reject the request
+                 - If failurePolicy=Ignore, the policy is skipped
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[MatchCondition.Builder]()
+                context._parent_builder = self
+                context._field_name = "match_conditions"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(MatchCondition.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("match_conditions", value)
+
+        @overload
+        def match_constraints(
+            self, value_or_callback: Optional[MatchResources], /
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def match_constraints(
+            self,
+            value_or_callback: Callable[
+                [MatchResources.Builder], MatchResources.Builder | MatchResources
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def match_constraints(
+            self, value_or_callback: Never = ...
+        ) -> "MatchResources.BuilderContext": ...
+
+        def match_constraints(self, value_or_callback=None, /):
+            """
+            MatchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API ValidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy and ValidatingAdmissionPolicyBinding. Required.
+            """
+            if self._in_context and value_or_callback is None:
+                context = MatchResources.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "match_constraints"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(MatchResources.builder())
+                if isinstance(output, MatchResources.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("match_constraints", value)
+
+        @overload
+        def param_kind(
+            self, value_or_callback: Optional[ParamKind], /
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def param_kind(
+            self,
+            value_or_callback: Callable[[ParamKind.Builder], ParamKind.Builder | ParamKind],
+            /,
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def param_kind(self, value_or_callback: Never = ...) -> "ParamKind.BuilderContext": ...
+
+        def param_kind(self, value_or_callback=None, /):
+            """
+            ParamKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in ValidatingAdmissionPolicyBinding, the params variable will be null.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ParamKind.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "param_kind"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ParamKind.builder())
+                if isinstance(output, ParamKind.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("param_kind", value)
+
+        @overload
+        def validations(
+            self, value_or_callback: List[Validation], /
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def validations(
+            self,
+            value_or_callback: Callable[
+                [GenericListBuilder[Validation, Validation.Builder]],
+                GenericListBuilder[Validation, Validation.Builder] | List[Validation],
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def validations(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[Validation.Builder]: ...
+
+        def validations(self, value_or_callback=None, /):
+            """
+            Validations contain CEL expressions which is used to apply the validation. Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is required.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[Validation.Builder]()
+                context._parent_builder = self
+                context._field_name = "validations"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(Validation.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("validations", value)
+
+        @overload
+        def variables(
+            self, value_or_callback: List[Variable], /
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def variables(
+            self,
+            value_or_callback: Callable[
+                [GenericListBuilder[Variable, Variable.Builder]],
+                GenericListBuilder[Variable, Variable.Builder] | List[Variable],
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicySpec.Builder": ...
+
+        @overload
+        def variables(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[Variable.Builder]: ...
+
+        def variables(self, value_or_callback=None, /):
+            """
+                    Variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except MatchConditions because MatchConditions are evaluated before the rest of the policy.
+
+            The expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, Variables must be sorted by the order of first appearance and acyclic.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[Variable.Builder]()
+                context._parent_builder = self
+                context._field_name = "variables"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(Variable.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("variables", value)
+
+    class BuilderContext(BuilderContextBase["ValidatingAdmissionPolicySpec.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = ValidatingAdmissionPolicySpec.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for ValidatingAdmissionPolicySpec."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["ValidatingAdmissionPolicySpec", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use ValidatingAdmissionPolicySpec.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    audit_annotations: Annotated[
+        Optional[List[AuditAnnotation]], Field(alias="auditAnnotations")
+    ] = None
+    """
+    auditAnnotations contains CEL expressions which are used to produce audit annotations for the audit event of the API request. validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is required.
+    """
+    failure_policy: Annotated[Optional[str], Field(alias="failurePolicy")] = None
+    """
+    failurePolicy defines how to handle failures for the admission policy. Failures can occur from CEL expression parse errors, type check errors, runtime errors and invalid or mis-configured policy definitions or bindings.
+
+    A policy is invalid if spec.paramKind refers to a non-existent Kind. A binding is invalid if spec.paramRef.name refers to a non-existent resource.
+
+    failurePolicy does not define how validations that evaluate to false are handled.
+
+    When failurePolicy is set to Fail, ValidatingAdmissionPolicyBinding validationActions define how failures are enforced.
+
+    Allowed values are Ignore or Fail. Defaults to Fail.
+    """
+    match_conditions: Annotated[Optional[List[MatchCondition]], Field(alias="matchConditions")] = (
+        None
+    )
+    """
+    MatchConditions is a list of conditions that must be met for a request to be validated. Match conditions filter requests that have already been matched by the rules, namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.
+
+    If a parameter object is provided, it can be accessed via the `params` handle in the same manner as validation expressions.
+
+    The exact matching logic is (in order):
+      1. If ANY matchCondition evaluates to FALSE, the policy is skipped.
+      2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.
+      3. If any matchCondition evaluates to an error (but none are FALSE):
+         - If failurePolicy=Fail, reject the request
+         - If failurePolicy=Ignore, the policy is skipped
+    """
+    match_constraints: Annotated[Optional[MatchResources], Field(alias="matchConstraints")] = None
+    """
+    MatchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API ValidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy and ValidatingAdmissionPolicyBinding. Required.
+    """
+    param_kind: Annotated[Optional[ParamKind], Field(alias="paramKind")] = None
+    """
+    ParamKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in ValidatingAdmissionPolicyBinding, the params variable will be null.
+    """
+    validations: Optional[List[Validation]] = None
+    """
+    Validations contain CEL expressions which is used to apply the validation. Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is required.
+    """
+    variables: Optional[List[Variable]] = None
+    """
+    Variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except MatchConditions because MatchConditions are evaluated before the rest of the policy.
+
+    The expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, Variables must be sorted by the order of first appearance and acyclic.
+    """
+
+
+class ValidatingAdmissionPolicyStatus(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["ValidatingAdmissionPolicyStatus"]:
+            return ValidatingAdmissionPolicyStatus
+
+        def build(self) -> "ValidatingAdmissionPolicyStatus":
+            return ValidatingAdmissionPolicyStatus(**self._attrs)
+
+        @overload
+        def conditions(
+            self, value_or_callback: List[apimachinery.Condition], /
+        ) -> "ValidatingAdmissionPolicyStatus.Builder": ...
+
+        @overload
+        def conditions(
+            self,
+            value_or_callback: Callable[
+                [GenericListBuilder[apimachinery.Condition, apimachinery.Condition.Builder]],
+                GenericListBuilder[apimachinery.Condition, apimachinery.Condition.Builder]
+                | List[apimachinery.Condition],
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicyStatus.Builder": ...
+
+        @overload
+        def conditions(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[apimachinery.Condition.Builder]: ...
+
+        def conditions(self, value_or_callback=None, /):
+            """
+            The conditions represent the latest available observations of a policy's current state.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[apimachinery.Condition.Builder]()
+                context._parent_builder = self
+                context._field_name = "conditions"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(apimachinery.Condition.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("conditions", value)
+
+        def observed_generation(self, value: Optional[int], /) -> Self:
+            """
+            The generation observed by the controller.
+            """
+            return self._set("observed_generation", value)
+
+        @overload
+        def type_checking(
+            self, value_or_callback: Optional[TypeChecking], /
+        ) -> "ValidatingAdmissionPolicyStatus.Builder": ...
+
+        @overload
+        def type_checking(
+            self,
+            value_or_callback: Callable[
+                [TypeChecking.Builder], TypeChecking.Builder | TypeChecking
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicyStatus.Builder": ...
+
+        @overload
+        def type_checking(
+            self, value_or_callback: Never = ...
+        ) -> "TypeChecking.BuilderContext": ...
+
+        def type_checking(self, value_or_callback=None, /):
+            """
+            The results of type checking for each expression. Presence of this field indicates the completion of the type checking.
+            """
+            if self._in_context and value_or_callback is None:
+                context = TypeChecking.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "type_checking"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(TypeChecking.builder())
+                if isinstance(output, TypeChecking.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("type_checking", value)
+
+    class BuilderContext(BuilderContextBase["ValidatingAdmissionPolicyStatus.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = ValidatingAdmissionPolicyStatus.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for ValidatingAdmissionPolicyStatus."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["ValidatingAdmissionPolicyStatus", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use ValidatingAdmissionPolicyStatus.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    conditions: Optional[List[apimachinery.Condition]] = None
+    """
+    The conditions represent the latest available observations of a policy's current state.
+    """
+    observed_generation: Annotated[Optional[int], Field(alias="observedGeneration")] = None
+    """
+    The generation observed by the controller.
+    """
+    type_checking: Annotated[Optional[TypeChecking], Field(alias="typeChecking")] = None
+    """
+    The results of type checking for each expression. Presence of this field indicates the completion of the type checking.
+    """
+
+
+class ValidatingAdmissionPolicy(Resource):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["ValidatingAdmissionPolicy"]:
+            return ValidatingAdmissionPolicy
+
+        def build(self) -> "ValidatingAdmissionPolicy":
+            return ValidatingAdmissionPolicy(**self._attrs)
 
         def api_version(
             self, value: Optional[Literal["admissionregistration.k8s.io/v1alpha1"]], /
@@ -1756,7 +1778,7 @@ class MutatingAdmissionPolicyBinding(Resource):
             """
             return self._set("api_version", value)
 
-        def kind(self, value: Optional[Literal["MutatingAdmissionPolicyBinding"]], /) -> Self:
+        def kind(self, value: Optional[Literal["ValidatingAdmissionPolicy"]], /) -> Self:
             """
             Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             """
@@ -1765,7 +1787,7 @@ class MutatingAdmissionPolicyBinding(Resource):
         @overload
         def metadata(
             self, value_or_callback: Optional[apimachinery.ObjectMeta], /
-        ) -> "MutatingAdmissionPolicyBinding.Builder": ...
+        ) -> "ValidatingAdmissionPolicy.Builder": ...
 
         @overload
         def metadata(
@@ -1775,7 +1797,7 @@ class MutatingAdmissionPolicyBinding(Resource):
                 apimachinery.ObjectMeta.Builder | apimachinery.ObjectMeta,
             ],
             /,
-        ) -> "MutatingAdmissionPolicyBinding.Builder": ...
+        ) -> "ValidatingAdmissionPolicy.Builder": ...
 
         @overload
         def metadata(
@@ -1803,46 +1825,85 @@ class MutatingAdmissionPolicyBinding(Resource):
 
         @overload
         def spec(
-            self, value_or_callback: Optional[MutatingAdmissionPolicyBindingSpec], /
-        ) -> "MutatingAdmissionPolicyBinding.Builder": ...
+            self, value_or_callback: Optional[ValidatingAdmissionPolicySpec], /
+        ) -> "ValidatingAdmissionPolicy.Builder": ...
 
         @overload
         def spec(
             self,
             value_or_callback: Callable[
-                [MutatingAdmissionPolicyBindingSpec.Builder],
-                MutatingAdmissionPolicyBindingSpec.Builder | MutatingAdmissionPolicyBindingSpec,
+                [ValidatingAdmissionPolicySpec.Builder],
+                ValidatingAdmissionPolicySpec.Builder | ValidatingAdmissionPolicySpec,
             ],
             /,
-        ) -> "MutatingAdmissionPolicyBinding.Builder": ...
+        ) -> "ValidatingAdmissionPolicy.Builder": ...
 
         @overload
         def spec(
             self, value_or_callback: Never = ...
-        ) -> "MutatingAdmissionPolicyBindingSpec.BuilderContext": ...
+        ) -> "ValidatingAdmissionPolicySpec.BuilderContext": ...
 
         def spec(self, value_or_callback=None, /):
             """
-            Specification of the desired behavior of the MutatingAdmissionPolicyBinding.
+            Specification of the desired behavior of the ValidatingAdmissionPolicy.
             """
             if self._in_context and value_or_callback is None:
-                context = MutatingAdmissionPolicyBindingSpec.BuilderContext()
+                context = ValidatingAdmissionPolicySpec.BuilderContext()
                 context._parent_builder = self
                 context._field_name = "spec"
                 return context
 
             value = value_or_callback
             if callable(value_or_callback):
-                output = value_or_callback(MutatingAdmissionPolicyBindingSpec.builder())
-                if isinstance(output, MutatingAdmissionPolicyBindingSpec.Builder):
+                output = value_or_callback(ValidatingAdmissionPolicySpec.builder())
+                if isinstance(output, ValidatingAdmissionPolicySpec.Builder):
                     value = output.build()
                 else:
                     value = output
             return self._set("spec", value)
 
-    class BuilderContext(BuilderContextBase["MutatingAdmissionPolicyBinding.Builder"]):
+        @overload
+        def status(
+            self, value_or_callback: Optional[ValidatingAdmissionPolicyStatus], /
+        ) -> "ValidatingAdmissionPolicy.Builder": ...
+
+        @overload
+        def status(
+            self,
+            value_or_callback: Callable[
+                [ValidatingAdmissionPolicyStatus.Builder],
+                ValidatingAdmissionPolicyStatus.Builder | ValidatingAdmissionPolicyStatus,
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicy.Builder": ...
+
+        @overload
+        def status(
+            self, value_or_callback: Never = ...
+        ) -> "ValidatingAdmissionPolicyStatus.BuilderContext": ...
+
+        def status(self, value_or_callback=None, /):
+            """
+            The status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy behaves in the expected way. Populated by the system. Read-only.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ValidatingAdmissionPolicyStatus.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "status"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ValidatingAdmissionPolicyStatus.builder())
+                if isinstance(output, ValidatingAdmissionPolicyStatus.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("status", value)
+
+    class BuilderContext(BuilderContextBase["ValidatingAdmissionPolicy.Builder"]):
         def model_post_init(self, __context) -> None:
-            self._builder = MutatingAdmissionPolicyBinding.Builder()
+            self._builder = ValidatingAdmissionPolicy.Builder()
             self._builder._in_context = True
             self._parent_builder = None
             self._field_name = None
@@ -1853,13 +1914,13 @@ class MutatingAdmissionPolicyBinding(Resource):
 
     @classmethod
     def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for MutatingAdmissionPolicyBinding."""
+        """Creates a new context manager builder for ValidatingAdmissionPolicy."""
         return cls.BuilderContext()
 
-    class ListBuilder(GenericListBuilder["MutatingAdmissionPolicyBinding", Builder]):
+    class ListBuilder(GenericListBuilder["ValidatingAdmissionPolicy", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use MutatingAdmissionPolicyBinding.list_builder() instead."
+                "This class is not meant to be instantiated. Use ValidatingAdmissionPolicy.list_builder() instead."
             )
 
     @classmethod
@@ -1873,7 +1934,7 @@ class MutatingAdmissionPolicyBinding(Resource):
     """
     APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
     """
-    kind: Optional[Literal["MutatingAdmissionPolicyBinding"]] = "MutatingAdmissionPolicyBinding"
+    kind: Optional[Literal["ValidatingAdmissionPolicy"]] = "ValidatingAdmissionPolicy"
     """
     Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
     """
@@ -1881,10 +1942,165 @@ class MutatingAdmissionPolicyBinding(Resource):
     """
     Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
     """
-    spec: Optional[MutatingAdmissionPolicyBindingSpec] = None
+    spec: Optional[ValidatingAdmissionPolicySpec] = None
     """
-    Specification of the desired behavior of the MutatingAdmissionPolicyBinding.
+    Specification of the desired behavior of the ValidatingAdmissionPolicy.
+    """
+    status: Optional[ValidatingAdmissionPolicyStatus] = None
+    """
+    The status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy behaves in the expected way. Populated by the system. Read-only.
     """
 
 
-MutatingAdmissionPolicyBindingList = ResourceList["MutatingAdmissionPolicyBinding"]
+class ValidatingAdmissionPolicyBinding(Resource):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["ValidatingAdmissionPolicyBinding"]:
+            return ValidatingAdmissionPolicyBinding
+
+        def build(self) -> "ValidatingAdmissionPolicyBinding":
+            return ValidatingAdmissionPolicyBinding(**self._attrs)
+
+        def api_version(
+            self, value: Optional[Literal["admissionregistration.k8s.io/v1alpha1"]], /
+        ) -> Self:
+            """
+            APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            """
+            return self._set("api_version", value)
+
+        def kind(self, value: Optional[Literal["ValidatingAdmissionPolicyBinding"]], /) -> Self:
+            """
+            Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            """
+            return self._set("kind", value)
+
+        @overload
+        def metadata(
+            self, value_or_callback: Optional[apimachinery.ObjectMeta], /
+        ) -> "ValidatingAdmissionPolicyBinding.Builder": ...
+
+        @overload
+        def metadata(
+            self,
+            value_or_callback: Callable[
+                [apimachinery.ObjectMeta.Builder],
+                apimachinery.ObjectMeta.Builder | apimachinery.ObjectMeta,
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicyBinding.Builder": ...
+
+        @overload
+        def metadata(
+            self, value_or_callback: Never = ...
+        ) -> "apimachinery.ObjectMeta.BuilderContext": ...
+
+        def metadata(self, value_or_callback=None, /):
+            """
+            Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
+            """
+            if self._in_context and value_or_callback is None:
+                context = apimachinery.ObjectMeta.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "metadata"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(apimachinery.ObjectMeta.builder())
+                if isinstance(output, apimachinery.ObjectMeta.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("metadata", value)
+
+        @overload
+        def spec(
+            self, value_or_callback: Optional[ValidatingAdmissionPolicyBindingSpec], /
+        ) -> "ValidatingAdmissionPolicyBinding.Builder": ...
+
+        @overload
+        def spec(
+            self,
+            value_or_callback: Callable[
+                [ValidatingAdmissionPolicyBindingSpec.Builder],
+                ValidatingAdmissionPolicyBindingSpec.Builder | ValidatingAdmissionPolicyBindingSpec,
+            ],
+            /,
+        ) -> "ValidatingAdmissionPolicyBinding.Builder": ...
+
+        @overload
+        def spec(
+            self, value_or_callback: Never = ...
+        ) -> "ValidatingAdmissionPolicyBindingSpec.BuilderContext": ...
+
+        def spec(self, value_or_callback=None, /):
+            """
+            Specification of the desired behavior of the ValidatingAdmissionPolicyBinding.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ValidatingAdmissionPolicyBindingSpec.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "spec"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ValidatingAdmissionPolicyBindingSpec.builder())
+                if isinstance(output, ValidatingAdmissionPolicyBindingSpec.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("spec", value)
+
+    class BuilderContext(BuilderContextBase["ValidatingAdmissionPolicyBinding.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = ValidatingAdmissionPolicyBinding.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for ValidatingAdmissionPolicyBinding."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["ValidatingAdmissionPolicyBinding", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use ValidatingAdmissionPolicyBinding.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    api_version: Annotated[
+        Optional[Literal["admissionregistration.k8s.io/v1alpha1"]],
+        Field(alias="apiVersion"),
+    ] = "admissionregistration.k8s.io/v1alpha1"
+    """
+    APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+    """
+    kind: Optional[Literal["ValidatingAdmissionPolicyBinding"]] = "ValidatingAdmissionPolicyBinding"
+    """
+    Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+    """
+    metadata: Optional[apimachinery.ObjectMeta] = None
+    """
+    Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
+    """
+    spec: Optional[ValidatingAdmissionPolicyBindingSpec] = None
+    """
+    Specification of the desired behavior of the ValidatingAdmissionPolicyBinding.
+    """
+
+
+ValidatingAdmissionPolicyBindingList = ResourceList["ValidatingAdmissionPolicyBinding"]
+
+
+ValidatingAdmissionPolicyList = ResourceList["ValidatingAdmissionPolicy"]

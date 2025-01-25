@@ -909,7 +909,7 @@ class JobStatus(BaseModel):
 
         def ready(self, value: Optional[int], /) -> Self:
             """
-            The number of active pods which have a Ready condition and are not terminating (without a deletionTimestamp).
+            The number of pods which have a Ready condition.
             """
             return self._set("ready", value)
 
@@ -1072,7 +1072,7 @@ class JobStatus(BaseModel):
     """
     ready: Optional[int] = None
     """
-    The number of active pods which have a Ready condition and are not terminating (without a deletionTimestamp).
+    The number of pods which have a Ready condition.
     """
     start_time: Annotated[Optional[apimachinery.Time], Field(alias="startTime")] = None
     """
@@ -1314,9 +1314,9 @@ class JobSpec(BaseModel):
 
         def managed_by(self, value: Optional[str], /) -> Self:
             """
-                    ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.
+                    ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 64 characters.
 
-            This field is beta-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (enabled by default).
+            This field is alpha-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (disabled by default).
             """
             return self._set("managed_by", value)
 
@@ -1359,7 +1359,9 @@ class JobSpec(BaseModel):
 
         def pod_failure_policy(self, value_or_callback=None, /):
             """
-            Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.
+                    Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.
+
+            This field is beta-level. It can be used when the `JobPodFailurePolicy` feature gate is enabled (enabled by default).
             """
             if self._in_context and value_or_callback is None:
                 context = PodFailurePolicy.BuilderContext()
@@ -1449,7 +1451,7 @@ class JobSpec(BaseModel):
             """
                     successPolicy specifies the policy when the Job can be declared as succeeded. If empty, the default behavior applies - the Job is declared as succeeded only when the number of succeeded pods equals to the completions. When the field is specified, it must be immutable and works only for the Indexed Jobs. Once the Job meets the SuccessPolicy, the lingering pods are terminated.
 
-            This field is beta-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (enabled by default).
+            This field  is alpha-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (disabled by default).
             """
             if self._in_context and value_or_callback is None:
                 context = SuccessPolicy.BuilderContext()
@@ -1569,9 +1571,9 @@ class JobSpec(BaseModel):
     """
     managed_by: Annotated[Optional[str], Field(alias="managedBy")] = None
     """
-    ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.
+    ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 64 characters.
 
-    This field is beta-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (enabled by default).
+    This field is alpha-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (disabled by default).
     """
     manual_selector: Annotated[Optional[bool], Field(alias="manualSelector")] = None
     """
@@ -1590,6 +1592,8 @@ class JobSpec(BaseModel):
     )
     """
     Specifies the policy of handling failed pods. In particular, it allows to specify the set of actions and conditions which need to be satisfied to take the associated action. If empty, the default behaviour applies - the counter of failed pods, represented by the jobs's .status.failed field, is incremented and it is checked against the backoffLimit. This field cannot be used in combination with restartPolicy=OnFailure.
+
+    This field is beta-level. It can be used when the `JobPodFailurePolicy` feature gate is enabled (enabled by default).
     """
     pod_replacement_policy: Annotated[Optional[str], Field(alias="podReplacementPolicy")] = None
     """
@@ -1608,7 +1612,7 @@ class JobSpec(BaseModel):
     """
     successPolicy specifies the policy when the Job can be declared as succeeded. If empty, the default behavior applies - the Job is declared as succeeded only when the number of succeeded pods equals to the completions. When the field is specified, it must be immutable and works only for the Indexed Jobs. Once the Job meets the SuccessPolicy, the lingering pods are terminated.
 
-    This field is beta-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (enabled by default).
+    This field  is alpha-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (disabled by default).
     """
     suspend: Optional[bool] = None
     """
