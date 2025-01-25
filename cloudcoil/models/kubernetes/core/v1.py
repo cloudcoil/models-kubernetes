@@ -3675,14 +3675,11 @@ class PodDNSConfigOption(BaseModel):
 
         def name(self, value: Optional[str], /) -> Self:
             """
-            Name is this DNS resolver option's name. Required.
+            Required.
             """
             return self._set("name", value)
 
         def value(self, value: Optional[str], /) -> Self:
-            """
-            Value is this DNS resolver option's value.
-            """
             return self._set("value", value)
 
     class BuilderContext(BuilderContextBase["PodDNSConfigOption.Builder"]):
@@ -3713,12 +3710,9 @@ class PodDNSConfigOption(BaseModel):
 
     name: Optional[str] = None
     """
-    Name is this DNS resolver option's name. Required.
+    Required.
     """
     value: Optional[str] = None
-    """
-    Value is this DNS resolver option's value.
-    """
 
 
 class PodIP(BaseModel):
@@ -4668,7 +4662,7 @@ class ResourceStatus(BaseModel):
 
         def name(self, value: str, /) -> Self:
             """
-            Name of the resource. Must be unique within the pod and in case of non-DRA resource, match one of the resources from the pod spec. For DRA resources, the value must be "claim:<claim_name>/<request>". When this status is reported about a container, the "claim_name" and "request" must match one of the claims of this container.
+            Name of the resource. Must be unique within the pod and match one of the resources from the pod spec.
             """
             return self._set("name", value)
 
@@ -4694,7 +4688,7 @@ class ResourceStatus(BaseModel):
 
         def resources(self, value_or_callback=None, /):
             """
-            List of unique resources health. Each element in the list contains an unique resource ID and its health. At a minimum, for the lifetime of a Pod, resource ID must uniquely identify the resource allocated to the Pod on the Node. If other Pod on the same Node reports the status with the same resource ID, it must be the same resource they share. See ResourceID type definition for a specific format it has in various use cases.
+            List of unique Resources health. Each element in the list contains an unique resource ID and resource health. At a minimum, ResourceID must uniquely identify the Resource allocated to the Pod on the Node for the lifetime of a Pod. See ResourceID type for it's definition.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ResourceHealth.Builder]()
@@ -4739,11 +4733,11 @@ class ResourceStatus(BaseModel):
 
     name: str
     """
-    Name of the resource. Must be unique within the pod and in case of non-DRA resource, match one of the resources from the pod spec. For DRA resources, the value must be "claim:<claim_name>/<request>". When this status is reported about a container, the "claim_name" and "request" must match one of the claims of this container.
+    Name of the resource. Must be unique within the pod and match one of the resources from the pod spec.
     """
     resources: Optional[List[ResourceHealth]] = None
     """
-    List of unique resources health. Each element in the list contains an unique resource ID and its health. At a minimum, for the lifetime of a Pod, resource ID must uniquely identify the resource allocated to the Pod on the Node. If other Pod on the same Node reports the status with the same resource ID, it must be the same resource they share. See ResourceID type definition for a specific format it has in various use cases.
+    List of unique Resources health. Each element in the list contains an unique resource ID and resource health. At a minimum, ResourceID must uniquely identify the Resource allocated to the Pod on the Node for the lifetime of a Pod. See ResourceID type for it's definition.
     """
 
 
@@ -9981,9 +9975,6 @@ class NamespaceCondition(BaseModel):
         ) -> "apimachinery.Time.BuilderContext": ...
 
         def last_transition_time(self, value_or_callback=None, /):
-            """
-            Last time the condition transitioned from one status to another.
-            """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.Time.BuilderContext()
                 context._parent_builder = self
@@ -10000,15 +9991,9 @@ class NamespaceCondition(BaseModel):
             return self._set("last_transition_time", value)
 
         def message(self, value: Optional[str], /) -> Self:
-            """
-            Human-readable message indicating details about last transition.
-            """
             return self._set("message", value)
 
         def reason(self, value: Optional[str], /) -> Self:
-            """
-            Unique, one-word, CamelCase reason for the condition's last transition.
-            """
             return self._set("reason", value)
 
         def status(self, value: str, /) -> Self:
@@ -10052,17 +10037,8 @@ class NamespaceCondition(BaseModel):
     last_transition_time: Annotated[
         Optional[apimachinery.Time], Field(alias="lastTransitionTime")
     ] = None
-    """
-    Last time the condition transitioned from one status to another.
-    """
     message: Optional[str] = None
-    """
-    Human-readable message indicating details about last transition.
-    """
     reason: Optional[str] = None
-    """
-    Unique, one-word, CamelCase reason for the condition's last transition.
-    """
     status: str
     """
     Status of the condition, one of True, False, Unknown.
@@ -10531,7 +10507,7 @@ class NodeStatus(BaseModel):
 
         def addresses(self, value_or_callback=None, /):
             """
-            List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/reference/node/node-status/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
+            List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[NodeAddress.Builder]()
@@ -10580,7 +10556,7 @@ class NodeStatus(BaseModel):
 
         def conditions(self, value_or_callback=None, /):
             """
-            Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/reference/node/node-status/#condition
+            Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[NodeCondition.Builder]()
@@ -10764,7 +10740,7 @@ class NodeStatus(BaseModel):
 
         def node_info(self, value_or_callback=None, /):
             """
-            Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/reference/node/node-status/#info
+            Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info
             """
             if self._in_context and value_or_callback is None:
                 context = NodeSystemInfo.BuilderContext()
@@ -10900,7 +10876,7 @@ class NodeStatus(BaseModel):
 
     addresses: Optional[List[NodeAddress]] = None
     """
-    List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/reference/node/node-status/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
+    List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See https://pr.k8s.io/79391 for an example. Consumers should assume that addresses can change during the lifetime of a Node. However, there are some exceptions where this may not be possible, such as Pods that inherit a Node's address in its own status or consumers of the downward API (status.hostIP).
     """
     allocatable: Optional[Dict[str, apimachinery.Quantity]] = None
     """
@@ -10912,7 +10888,7 @@ class NodeStatus(BaseModel):
     """
     conditions: Optional[List[NodeCondition]] = None
     """
-    Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/reference/node/node-status/#condition
+    Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition
     """
     config: Optional[NodeConfigStatus] = None
     """
@@ -10934,7 +10910,7 @@ class NodeStatus(BaseModel):
     """
     node_info: Annotated[Optional[NodeSystemInfo], Field(alias="nodeInfo")] = None
     """
-    Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/reference/node/node-status/#info
+    Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info
     """
     phase: Optional[str] = None
     """
@@ -11058,15 +11034,9 @@ class PersistentVolumeClaimCondition(BaseModel):
             return self._set("reason", value)
 
         def status(self, value: str, /) -> Self:
-            """
-            Status is the status of the condition. Can be True, False, Unknown. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
-            """
             return self._set("status", value)
 
         def type(self, value: str, /) -> Self:
-            """
-            Type is the type of the condition. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
-            """
             return self._set("type", value)
 
     class BuilderContext(BuilderContextBase["PersistentVolumeClaimCondition.Builder"]):
@@ -11114,13 +11084,7 @@ class PersistentVolumeClaimCondition(BaseModel):
     reason is a unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports "Resizing" that means the underlying persistent volume is being resized.
     """
     status: str
-    """
-    Status is the status of the condition. Can be True, False, Unknown. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
-    """
     type: str
-    """
-    Type is the type of the condition. More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
-    """
 
 
 class PersistentVolumeClaimStatus(BaseModel):
@@ -11860,22 +11824,6 @@ class PodSecurityContext(BaseModel):
             """
             return self._set("run_as_user", value)
 
-        def se_linux_change_policy(self, value: Optional[str], /) -> Self:
-            """
-                    seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod. It has no effect on nodes that do not support SELinux or to volumes does not support SELinux. Valid values are "MountOption" and "Recursive".
-
-            "Recursive" means relabeling of all files on all Pod volumes by the container runtime. This may be slow for large volumes, but allows mixing privileged and unprivileged Pods sharing the same volume on the same node.
-
-            "MountOption" mounts all eligible Pod volumes with `-o context` mount option. This requires all Pods that share the same volume to use the same SELinux label. It is not possible to share the same volume among privileged and unprivileged Pods. Eligible volumes are in-tree FibreChannel and iSCSI volumes, and all CSI volumes whose CSI driver announces SELinux support by setting spec.seLinuxMount: true in their CSIDriver instance. Other volumes are always re-labelled recursively. "MountOption" value is allowed only when SELinuxMount feature gate is enabled.
-
-            If not specified and SELinuxMount feature gate is enabled, "MountOption" is used. If not specified and SELinuxMount feature gate is disabled, "MountOption" is used for ReadWriteOncePod volumes and "Recursive" for all other volumes.
-
-            This field affects only Pods that have SELinux label set, either in PodSecurityContext or in SecurityContext of all containers.
-
-            All Pods that use the same volume should use the same seLinuxChangePolicy, otherwise some pods can get stuck in ContainerCreating state. Note that this field cannot be set when spec.os.name is windows.
-            """
-            return self._set("se_linux_change_policy", value)
-
         @overload
         def se_linux_options(
             self, value_or_callback: Optional[SELinuxOptions], /
@@ -12091,20 +12039,6 @@ class PodSecurityContext(BaseModel):
     run_as_user: Annotated[Optional[int], Field(alias="runAsUser")] = None
     """
     The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
-    """
-    se_linux_change_policy: Annotated[Optional[str], Field(alias="seLinuxChangePolicy")] = None
-    """
-    seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod. It has no effect on nodes that do not support SELinux or to volumes does not support SELinux. Valid values are "MountOption" and "Recursive".
-
-    "Recursive" means relabeling of all files on all Pod volumes by the container runtime. This may be slow for large volumes, but allows mixing privileged and unprivileged Pods sharing the same volume on the same node.
-
-    "MountOption" mounts all eligible Pod volumes with `-o context` mount option. This requires all Pods that share the same volume to use the same SELinux label. It is not possible to share the same volume among privileged and unprivileged Pods. Eligible volumes are in-tree FibreChannel and iSCSI volumes, and all CSI volumes whose CSI driver announces SELinux support by setting spec.seLinuxMount: true in their CSIDriver instance. Other volumes are always re-labelled recursively. "MountOption" value is allowed only when SELinuxMount feature gate is enabled.
-
-    If not specified and SELinuxMount feature gate is enabled, "MountOption" is used. If not specified and SELinuxMount feature gate is disabled, "MountOption" is used for ReadWriteOncePod volumes and "Recursive" for all other volumes.
-
-    This field affects only Pods that have SELinux label set, either in PodSecurityContext or in SecurityContext of all containers.
-
-    All Pods that use the same volume should use the same seLinuxChangePolicy, otherwise some pods can get stuck in ContainerCreating state. Note that this field cannot be set when spec.os.name is windows.
     """
     se_linux_options: Annotated[Optional[SELinuxOptions], Field(alias="seLinuxOptions")] = None
     """
@@ -13729,7 +13663,7 @@ class ServiceSpec(BaseModel):
 
         def traffic_distribution(self, value: Optional[str], /) -> Self:
             """
-            TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to "PreferClose", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is a beta field and requires enabling ServiceTrafficDistribution feature.
+            TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to "PreferClose", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is an alpha field and requires enabling ServiceTrafficDistribution feature.
             """
             return self._set("traffic_distribution", value)
 
@@ -13851,7 +13785,7 @@ class ServiceSpec(BaseModel):
     """
     traffic_distribution: Annotated[Optional[str], Field(alias="trafficDistribution")] = None
     """
-    TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to "PreferClose", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is a beta field and requires enabling ServiceTrafficDistribution feature.
+    TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to "PreferClose", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is an alpha field and requires enabling ServiceTrafficDistribution feature.
     """
     type: Optional[str] = None
     """
@@ -16345,7 +16279,7 @@ class LifecycleHandler(BaseModel):
 
         def exec(self, value_or_callback=None, /):
             """
-            Exec specifies a command to execute in the container.
+            Exec specifies the action to take.
             """
             if self._in_context and value_or_callback is None:
                 context = ExecAction.BuilderContext()
@@ -16381,7 +16315,7 @@ class LifecycleHandler(BaseModel):
 
         def http_get(self, value_or_callback=None, /):
             """
-            HTTPGet specifies an HTTP GET request to perform.
+            HTTPGet specifies the http request to perform.
             """
             if self._in_context and value_or_callback is None:
                 context = HTTPGetAction.BuilderContext()
@@ -16415,7 +16349,7 @@ class LifecycleHandler(BaseModel):
 
         def sleep(self, value_or_callback=None, /):
             """
-            Sleep represents a duration that the container should sleep.
+            Sleep represents the duration that the container should sleep before being terminated.
             """
             if self._in_context and value_or_callback is None:
                 context = SleepAction.BuilderContext()
@@ -16453,7 +16387,7 @@ class LifecycleHandler(BaseModel):
 
         def tcp_socket(self, value_or_callback=None, /):
             """
-            Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for backward compatibility. There is no validation of this field and lifecycle hooks will fail at runtime when it is specified.
+            Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for the backward compatibility. There are no validation of this field and lifecycle hooks will fail in runtime when tcp handler is specified.
             """
             if self._in_context and value_or_callback is None:
                 context = TCPSocketAction.BuilderContext()
@@ -16498,19 +16432,19 @@ class LifecycleHandler(BaseModel):
 
     exec: Optional[ExecAction] = None
     """
-    Exec specifies a command to execute in the container.
+    Exec specifies the action to take.
     """
     http_get: Annotated[Optional[HTTPGetAction], Field(alias="httpGet")] = None
     """
-    HTTPGet specifies an HTTP GET request to perform.
+    HTTPGet specifies the http request to perform.
     """
     sleep: Optional[SleepAction] = None
     """
-    Sleep represents a duration that the container should sleep.
+    Sleep represents the duration that the container should sleep before being terminated.
     """
     tcp_socket: Annotated[Optional[TCPSocketAction], Field(alias="tcpSocket")] = None
     """
-    Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for backward compatibility. There is no validation of this field and lifecycle hooks will fail at runtime when it is specified.
+    Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for the backward compatibility. There are no validation of this field and lifecycle hooks will fail in runtime when tcp handler is specified.
     """
 
 
@@ -17568,7 +17502,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def aws_elastic_block_store(self, value_or_callback=None, /):
             """
-            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
             """
             if self._in_context and value_or_callback is None:
                 context = AWSElasticBlockStoreVolumeSource.BuilderContext()
@@ -17607,7 +17541,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def azure_disk(self, value_or_callback=None, /):
             """
-            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureDiskVolumeSource.BuilderContext()
@@ -17646,7 +17580,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def azure_file(self, value_or_callback=None, /):
             """
-            azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+            azureFile represents an Azure File Service mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureFilePersistentVolumeSource.BuilderContext()
@@ -17691,7 +17625,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def cephfs(self, value_or_callback=None, /):
             """
-            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = CephFSPersistentVolumeSource.BuilderContext()
@@ -17730,7 +17664,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def cinder(self, value_or_callback=None, /):
             """
-            cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+            cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = CinderPersistentVolumeSource.BuilderContext()
@@ -17805,7 +17739,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def csi(self, value_or_callback=None, /):
             """
-            csi represents storage that is handled by an external CSI driver.
+            csi represents storage that is handled by an external CSI driver (Beta feature).
             """
             if self._in_context and value_or_callback is None:
                 context = CSIPersistentVolumeSource.BuilderContext()
@@ -17880,7 +17814,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def flex_volume(self, value_or_callback=None, /):
             """
-            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
             """
             if self._in_context and value_or_callback is None:
                 context = FlexPersistentVolumeSource.BuilderContext()
@@ -17919,7 +17853,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def flocker(self, value_or_callback=None, /):
             """
-            flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+            flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running
             """
             if self._in_context and value_or_callback is None:
                 context = FlockerVolumeSource.BuilderContext()
@@ -17958,7 +17892,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def gce_persistent_disk(self, value_or_callback=None, /):
             """
-            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
             """
             if self._in_context and value_or_callback is None:
                 context = GCEPersistentDiskVolumeSource.BuilderContext()
@@ -17997,7 +17931,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def glusterfs(self, value_or_callback=None, /):
             """
-            glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+            glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. More info: https://examples.k8s.io/volumes/glusterfs/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = GlusterfsPersistentVolumeSource.BuilderContext()
@@ -18238,7 +18172,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def photon_persistent_disk(self, value_or_callback=None, /):
             """
-            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PhotonPersistentDiskVolumeSource.BuilderContext()
@@ -18277,7 +18211,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def portworx_volume(self, value_or_callback=None, /):
             """
-            portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+            portworxVolume represents a portworx volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PortworxVolumeSource.BuilderContext()
@@ -18316,7 +18250,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def quobyte(self, value_or_callback=None, /):
             """
-            quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+            quobyte represents a Quobyte mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = QuobyteVolumeSource.BuilderContext()
@@ -18355,7 +18289,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def rbd(self, value_or_callback=None, /):
             """
-            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = RBDPersistentVolumeSource.BuilderContext()
@@ -18394,7 +18328,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def scale_io(self, value_or_callback=None, /):
             """
-            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
             """
             if self._in_context and value_or_callback is None:
                 context = ScaleIOPersistentVolumeSource.BuilderContext()
@@ -18439,7 +18373,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def storageos(self, value_or_callback=None, /):
             """
-            storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported. More info: https://examples.k8s.io/volumes/storageos/README.md
+            storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod More info: https://examples.k8s.io/volumes/storageos/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = StorageOSPersistentVolumeSource.BuilderContext()
@@ -18490,7 +18424,7 @@ class PersistentVolumeSpec(BaseModel):
 
         def vsphere_volume(self, value_or_callback=None, /):
             """
-            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = VsphereVirtualDiskVolumeSource.BuilderContext()
@@ -18541,17 +18475,17 @@ class PersistentVolumeSpec(BaseModel):
         Optional[AWSElasticBlockStoreVolumeSource], Field(alias="awsElasticBlockStore")
     ] = None
     """
-    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
     """
     azure_disk: Annotated[Optional[AzureDiskVolumeSource], Field(alias="azureDisk")] = None
     """
-    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
     """
     azure_file: Annotated[Optional[AzureFilePersistentVolumeSource], Field(alias="azureFile")] = (
         None
     )
     """
-    azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+    azureFile represents an Azure File Service mount on the host and bind mount to the pod.
     """
     capacity: Optional[Dict[str, apimachinery.Quantity]] = None
     """
@@ -18559,11 +18493,11 @@ class PersistentVolumeSpec(BaseModel):
     """
     cephfs: Optional[CephFSPersistentVolumeSource] = None
     """
-    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
     """
     cinder: Optional[CinderPersistentVolumeSource] = None
     """
-    cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+    cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
     """
     claim_ref: Annotated[Optional[ObjectReference], Field(alias="claimRef")] = None
     """
@@ -18571,7 +18505,7 @@ class PersistentVolumeSpec(BaseModel):
     """
     csi: Optional[CSIPersistentVolumeSource] = None
     """
-    csi represents storage that is handled by an external CSI driver.
+    csi represents storage that is handled by an external CSI driver (Beta feature).
     """
     fc: Optional[FCVolumeSource] = None
     """
@@ -18579,21 +18513,21 @@ class PersistentVolumeSpec(BaseModel):
     """
     flex_volume: Annotated[Optional[FlexPersistentVolumeSource], Field(alias="flexVolume")] = None
     """
-    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
     """
     flocker: Optional[FlockerVolumeSource] = None
     """
-    flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+    flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running
     """
     gce_persistent_disk: Annotated[
         Optional[GCEPersistentDiskVolumeSource], Field(alias="gcePersistentDisk")
     ] = None
     """
-    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Provisioned by an admin. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
     """
     glusterfs: Optional[GlusterfsPersistentVolumeSource] = None
     """
-    glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+    glusterfs represents a Glusterfs volume that is attached to a host and exposed to the pod. Provisioned by an admin. More info: https://examples.k8s.io/volumes/glusterfs/README.md
     """
     host_path: Annotated[Optional[HostPathVolumeSource], Field(alias="hostPath")] = None
     """
@@ -18629,23 +18563,23 @@ class PersistentVolumeSpec(BaseModel):
         Optional[PhotonPersistentDiskVolumeSource], Field(alias="photonPersistentDisk")
     ] = None
     """
-    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
     """
     portworx_volume: Annotated[Optional[PortworxVolumeSource], Field(alias="portworxVolume")] = None
     """
-    portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+    portworxVolume represents a portworx volume attached and mounted on kubelets host machine
     """
     quobyte: Optional[QuobyteVolumeSource] = None
     """
-    quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+    quobyte represents a Quobyte mount on the host that shares a pod's lifetime
     """
     rbd: Optional[RBDPersistentVolumeSource] = None
     """
-    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
     """
     scale_io: Annotated[Optional[ScaleIOPersistentVolumeSource], Field(alias="scaleIO")] = None
     """
-    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
     """
     storage_class_name: Annotated[Optional[str], Field(alias="storageClassName")] = None
     """
@@ -18653,7 +18587,7 @@ class PersistentVolumeSpec(BaseModel):
     """
     storageos: Optional[StorageOSPersistentVolumeSource] = None
     """
-    storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported. More info: https://examples.k8s.io/volumes/storageos/README.md
+    storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod More info: https://examples.k8s.io/volumes/storageos/README.md
     """
     volume_attributes_class_name: Annotated[
         Optional[str], Field(alias="volumeAttributesClassName")
@@ -18669,7 +18603,7 @@ class PersistentVolumeSpec(BaseModel):
         Optional[VsphereVirtualDiskVolumeSource], Field(alias="vsphereVolume")
     ] = None
     """
-    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
     """
 
 
@@ -18909,7 +18843,7 @@ class PodStatus(BaseModel):
 
         def container_statuses(self, value_or_callback=None, /):
             """
-            Statuses of containers in this pod. Each container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+            The list has one entry per container in the manifest. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ContainerStatus.Builder]()
@@ -18949,7 +18883,7 @@ class PodStatus(BaseModel):
 
         def ephemeral_container_statuses(self, value_or_callback=None, /):
             """
-            Statuses for any ephemeral containers that have run in this pod. Each ephemeral container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+            Status for any ephemeral containers that have run in this pod.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ContainerStatus.Builder]()
@@ -19032,7 +18966,7 @@ class PodStatus(BaseModel):
 
         def init_container_statuses(self, value_or_callback=None, /):
             """
-            Statuses of init containers in this pod. The most recent successful non-restartable init container will have ready = true, the most recently started container will have startTime set. Each init container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
+            The list has one entry per init container in the manifest. The most recent successful init container will have ready = true, the most recently started container will have startTime set. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ContainerStatus.Builder]()
@@ -19243,13 +19177,13 @@ class PodStatus(BaseModel):
         Optional[List[ContainerStatus]], Field(alias="containerStatuses")
     ] = None
     """
-    Statuses of containers in this pod. Each container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+    The list has one entry per container in the manifest. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
     """
     ephemeral_container_statuses: Annotated[
         Optional[List[ContainerStatus]], Field(alias="ephemeralContainerStatuses")
     ] = None
     """
-    Statuses for any ephemeral containers that have run in this pod. Each ephemeral container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+    Status for any ephemeral containers that have run in this pod.
     """
     host_ip: Annotated[Optional[str], Field(alias="hostIP")] = None
     """
@@ -19263,7 +19197,7 @@ class PodStatus(BaseModel):
         Optional[List[ContainerStatus]], Field(alias="initContainerStatuses")
     ] = None
     """
-    Statuses of init containers in this pod. The most recent successful non-restartable init container will have ready = true, the most recently started container will have startTime set. Each init container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
+    The list has one entry per init container in the manifest. The most recent successful init container will have ready = true, the most recently started container will have startTime set. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
     """
     message: Optional[str] = None
     """
@@ -19337,7 +19271,7 @@ class Probe(BaseModel):
 
         def exec(self, value_or_callback=None, /):
             """
-            Exec specifies a command to execute in the container.
+            Exec specifies the action to take.
             """
             if self._in_context and value_or_callback is None:
                 context = ExecAction.BuilderContext()
@@ -19375,7 +19309,7 @@ class Probe(BaseModel):
 
         def grpc(self, value_or_callback=None, /):
             """
-            GRPC specifies a GRPC HealthCheckRequest.
+            GRPC specifies an action involving a GRPC port.
             """
             if self._in_context and value_or_callback is None:
                 context = GRPCAction.BuilderContext()
@@ -19409,7 +19343,7 @@ class Probe(BaseModel):
 
         def http_get(self, value_or_callback=None, /):
             """
-            HTTPGet specifies an HTTP GET request to perform.
+            HTTPGet specifies the http request to perform.
             """
             if self._in_context and value_or_callback is None:
                 context = HTTPGetAction.BuilderContext()
@@ -19465,7 +19399,7 @@ class Probe(BaseModel):
 
         def tcp_socket(self, value_or_callback=None, /):
             """
-            TCPSocket specifies a connection to a TCP port.
+            TCPSocket specifies an action involving a TCP port.
             """
             if self._in_context and value_or_callback is None:
                 context = TCPSocketAction.BuilderContext()
@@ -19522,7 +19456,7 @@ class Probe(BaseModel):
 
     exec: Optional[ExecAction] = None
     """
-    Exec specifies a command to execute in the container.
+    Exec specifies the action to take.
     """
     failure_threshold: Annotated[Optional[int], Field(alias="failureThreshold")] = None
     """
@@ -19530,11 +19464,11 @@ class Probe(BaseModel):
     """
     grpc: Optional[GRPCAction] = None
     """
-    GRPC specifies a GRPC HealthCheckRequest.
+    GRPC specifies an action involving a GRPC port.
     """
     http_get: Annotated[Optional[HTTPGetAction], Field(alias="httpGet")] = None
     """
-    HTTPGet specifies an HTTP GET request to perform.
+    HTTPGet specifies the http request to perform.
     """
     initial_delay_seconds: Annotated[Optional[int], Field(alias="initialDelaySeconds")] = None
     """
@@ -19550,7 +19484,7 @@ class Probe(BaseModel):
     """
     tcp_socket: Annotated[Optional[TCPSocketAction], Field(alias="tcpSocket")] = None
     """
-    TCPSocket specifies a connection to a TCP port.
+    TCPSocket specifies an action involving a TCP port.
     """
     termination_grace_period_seconds: Annotated[
         Optional[int], Field(alias="terminationGracePeriodSeconds")
@@ -19935,7 +19869,7 @@ class ServiceAccount(Resource):
 
         def secrets(self, value_or_callback=None, /):
             """
-            Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". The "kubernetes.io/enforce-mountable-secrets" annotation is deprecated since v1.32. Prefer separate namespaces to isolate access to mounted secrets. This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
+            Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ObjectReference.Builder]()
@@ -20004,7 +19938,7 @@ class ServiceAccount(Resource):
     """
     secrets: Optional[List[ObjectReference]] = None
     """
-    Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". The "kubernetes.io/enforce-mountable-secrets" annotation is deprecated since v1.32. Prefer separate namespaces to isolate access to mounted secrets. This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
+    Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use. Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true". This field should not be used to find auto-generated service account token secrets for use outside of pods. Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created. More info: https://kubernetes.io/docs/concepts/configuration/secret
     """
 
 
@@ -23804,7 +23738,7 @@ class Volume(BaseModel):
 
         def aws_elastic_block_store(self, value_or_callback=None, /):
             """
-            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+            awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
             """
             if self._in_context and value_or_callback is None:
                 context = AWSElasticBlockStoreVolumeSource.BuilderContext()
@@ -23843,7 +23777,7 @@ class Volume(BaseModel):
 
         def azure_disk(self, value_or_callback=None, /):
             """
-            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+            azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureDiskVolumeSource.BuilderContext()
@@ -23882,7 +23816,7 @@ class Volume(BaseModel):
 
         def azure_file(self, value_or_callback=None, /):
             """
-            azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+            azureFile represents an Azure File Service mount on the host and bind mount to the pod.
             """
             if self._in_context and value_or_callback is None:
                 context = AzureFileVolumeSource.BuilderContext()
@@ -23919,7 +23853,7 @@ class Volume(BaseModel):
 
         def cephfs(self, value_or_callback=None, /):
             """
-            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+            cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = CephFSVolumeSource.BuilderContext()
@@ -23956,7 +23890,7 @@ class Volume(BaseModel):
 
         def cinder(self, value_or_callback=None, /):
             """
-            cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+            cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = CinderVolumeSource.BuilderContext()
@@ -24029,7 +23963,7 @@ class Volume(BaseModel):
 
         def csi(self, value_or_callback=None, /):
             """
-            csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+            csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
             """
             if self._in_context and value_or_callback is None:
                 context = CSIVolumeSource.BuilderContext()
@@ -24231,7 +24165,7 @@ class Volume(BaseModel):
 
         def flex_volume(self, value_or_callback=None, /):
             """
-            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+            flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
             """
             if self._in_context and value_or_callback is None:
                 context = FlexVolumeSource.BuilderContext()
@@ -24270,7 +24204,7 @@ class Volume(BaseModel):
 
         def flocker(self, value_or_callback=None, /):
             """
-            flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+            flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running
             """
             if self._in_context and value_or_callback is None:
                 context = FlockerVolumeSource.BuilderContext()
@@ -24309,7 +24243,7 @@ class Volume(BaseModel):
 
         def gce_persistent_disk(self, value_or_callback=None, /):
             """
-            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+            gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
             """
             if self._in_context and value_or_callback is None:
                 context = GCEPersistentDiskVolumeSource.BuilderContext()
@@ -24348,7 +24282,7 @@ class Volume(BaseModel):
 
         def git_repo(self, value_or_callback=None, /):
             """
-            gitRepo represents a git repository at a particular revision. Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
+            gitRepo represents a git repository at a particular revision. DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
             """
             if self._in_context and value_or_callback is None:
                 context = GitRepoVolumeSource.BuilderContext()
@@ -24387,7 +24321,7 @@ class Volume(BaseModel):
 
         def glusterfs(self, value_or_callback=None, /):
             """
-            glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+            glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/glusterfs/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = GlusterfsVolumeSource.BuilderContext()
@@ -24618,7 +24552,7 @@ class Volume(BaseModel):
 
         def photon_persistent_disk(self, value_or_callback=None, /):
             """
-            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+            photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PhotonPersistentDiskVolumeSource.BuilderContext()
@@ -24657,7 +24591,7 @@ class Volume(BaseModel):
 
         def portworx_volume(self, value_or_callback=None, /):
             """
-            portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+            portworxVolume represents a portworx volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = PortworxVolumeSource.BuilderContext()
@@ -24735,7 +24669,7 @@ class Volume(BaseModel):
 
         def quobyte(self, value_or_callback=None, /):
             """
-            quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+            quobyte represents a Quobyte mount on the host that shares a pod's lifetime
             """
             if self._in_context and value_or_callback is None:
                 context = QuobyteVolumeSource.BuilderContext()
@@ -24769,7 +24703,7 @@ class Volume(BaseModel):
 
         def rbd(self, value_or_callback=None, /):
             """
-            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+            rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
             """
             if self._in_context and value_or_callback is None:
                 context = RBDVolumeSource.BuilderContext()
@@ -24808,7 +24742,7 @@ class Volume(BaseModel):
 
         def scale_io(self, value_or_callback=None, /):
             """
-            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+            scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
             """
             if self._in_context and value_or_callback is None:
                 context = ScaleIOVolumeSource.BuilderContext()
@@ -24884,7 +24818,7 @@ class Volume(BaseModel):
 
         def storageos(self, value_or_callback=None, /):
             """
-            storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+            storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
             """
             if self._in_context and value_or_callback is None:
                 context = StorageOSVolumeSource.BuilderContext()
@@ -24923,7 +24857,7 @@ class Volume(BaseModel):
 
         def vsphere_volume(self, value_or_callback=None, /):
             """
-            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+            vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
             """
             if self._in_context and value_or_callback is None:
                 context = VsphereVirtualDiskVolumeSource.BuilderContext()
@@ -24970,23 +24904,23 @@ class Volume(BaseModel):
         Optional[AWSElasticBlockStoreVolumeSource], Field(alias="awsElasticBlockStore")
     ] = None
     """
-    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+    awsElasticBlockStore represents an AWS Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
     """
     azure_disk: Annotated[Optional[AzureDiskVolumeSource], Field(alias="azureDisk")] = None
     """
-    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod. Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type are redirected to the disk.csi.azure.com CSI driver.
+    azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
     """
     azure_file: Annotated[Optional[AzureFileVolumeSource], Field(alias="azureFile")] = None
     """
-    azureFile represents an Azure File Service mount on the host and bind mount to the pod. Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type are redirected to the file.csi.azure.com CSI driver.
+    azureFile represents an Azure File Service mount on the host and bind mount to the pod.
     """
     cephfs: Optional[CephFSVolumeSource] = None
     """
-    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime. Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+    cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
     """
     cinder: Optional[CinderVolumeSource] = None
     """
-    cinder represents a cinder volume attached and mounted on kubelets host machine. Deprecated: Cinder is deprecated. All operations for the in-tree cinder type are redirected to the cinder.csi.openstack.org CSI driver. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+    cinder represents a cinder volume attached and mounted on kubelets host machine. More info: https://examples.k8s.io/mysql-cinder-pd/README.md
     """
     config_map: Annotated[Optional[ConfigMapVolumeSource], Field(alias="configMap")] = None
     """
@@ -24994,7 +24928,7 @@ class Volume(BaseModel):
     """
     csi: Optional[CSIVolumeSource] = None
     """
-    csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+    csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
     """
     downward_api: Annotated[Optional[DownwardAPIVolumeSource], Field(alias="downwardAPI")] = None
     """
@@ -25027,25 +24961,25 @@ class Volume(BaseModel):
     """
     flex_volume: Annotated[Optional[FlexVolumeSource], Field(alias="flexVolume")] = None
     """
-    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin. Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+    flexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
     """
     flocker: Optional[FlockerVolumeSource] = None
     """
-    flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running. Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+    flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running
     """
     gce_persistent_disk: Annotated[
         Optional[GCEPersistentDiskVolumeSource], Field(alias="gcePersistentDisk")
     ] = None
     """
-    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+    gcePersistentDisk represents a GCE Disk resource that is attached to a kubelet's host machine and then exposed to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
     """
     git_repo: Annotated[Optional[GitRepoVolumeSource], Field(alias="gitRepo")] = None
     """
-    gitRepo represents a git repository at a particular revision. Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
+    gitRepo represents a git repository at a particular revision. DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
     """
     glusterfs: Optional[GlusterfsVolumeSource] = None
     """
-    glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported. More info: https://examples.k8s.io/volumes/glusterfs/README.md
+    glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/glusterfs/README.md
     """
     host_path: Annotated[Optional[HostPathVolumeSource], Field(alias="hostPath")] = None
     """
@@ -25082,11 +25016,11 @@ class Volume(BaseModel):
         Optional[PhotonPersistentDiskVolumeSource], Field(alias="photonPersistentDisk")
     ] = None
     """
-    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine. Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+    photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
     """
     portworx_volume: Annotated[Optional[PortworxVolumeSource], Field(alias="portworxVolume")] = None
     """
-    portworxVolume represents a portworx volume attached and mounted on kubelets host machine. Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate is on.
+    portworxVolume represents a portworx volume attached and mounted on kubelets host machine
     """
     projected: Optional[ProjectedVolumeSource] = None
     """
@@ -25094,15 +25028,15 @@ class Volume(BaseModel):
     """
     quobyte: Optional[QuobyteVolumeSource] = None
     """
-    quobyte represents a Quobyte mount on the host that shares a pod's lifetime. Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+    quobyte represents a Quobyte mount on the host that shares a pod's lifetime
     """
     rbd: Optional[RBDVolumeSource] = None
     """
-    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported. More info: https://examples.k8s.io/volumes/rbd/README.md
+    rbd represents a Rados Block Device mount on the host that shares a pod's lifetime. More info: https://examples.k8s.io/volumes/rbd/README.md
     """
     scale_io: Annotated[Optional[ScaleIOVolumeSource], Field(alias="scaleIO")] = None
     """
-    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes. Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+    scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
     """
     secret: Optional[SecretVolumeSource] = None
     """
@@ -25110,13 +25044,13 @@ class Volume(BaseModel):
     """
     storageos: Optional[StorageOSVolumeSource] = None
     """
-    storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes. Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+    storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
     """
     vsphere_volume: Annotated[
         Optional[VsphereVirtualDiskVolumeSource], Field(alias="vsphereVolume")
     ] = None
     """
-    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine. Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type are redirected to the csi.vsphere.vmware.com CSI driver.
+    vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
     """
 
 
@@ -25594,49 +25528,6 @@ class PodSpec(BaseModel):
                     value = output
             return self._set("resource_claims", value)
 
-        @overload
-        def resources(
-            self, value_or_callback: Optional[ResourceRequirements], /
-        ) -> "PodSpec.Builder": ...
-
-        @overload
-        def resources(
-            self,
-            value_or_callback: Callable[
-                [ResourceRequirements.Builder],
-                ResourceRequirements.Builder | ResourceRequirements,
-            ],
-            /,
-        ) -> "PodSpec.Builder": ...
-
-        @overload
-        def resources(
-            self, value_or_callback: Never = ...
-        ) -> "ResourceRequirements.BuilderContext": ...
-
-        def resources(self, value_or_callback=None, /):
-            """
-                    Resources is the total amount of CPU and Memory resources required by all containers in the pod. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. ResourceClaims are not supported.
-
-            This field enables fine-grained control over resource allocation for the entire pod, allowing resource sharing among containers in a pod.
-
-            This is an alpha field and requires enabling the PodLevelResources feature gate.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ResourceRequirements.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "resources"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(ResourceRequirements.builder())
-                if isinstance(output, ResourceRequirements.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("resources", value)
-
         def restart_policy(self, value: Optional[str], /) -> Self:
             """
             Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
@@ -25750,7 +25641,7 @@ class PodSpec(BaseModel):
 
         def set_hostname_as_fqdn(self, value: Optional[bool], /) -> Self:
             """
-            If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
+            If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
             """
             return self._set("set_hostname_as_fqdn", value)
 
@@ -26028,14 +25919,6 @@ class PodSpec(BaseModel):
 
     This field is immutable.
     """
-    resources: Optional[ResourceRequirements] = None
-    """
-    Resources is the total amount of CPU and Memory resources required by all containers in the pod. It supports specifying Requests and Limits for "cpu" and "memory" resource names only. ResourceClaims are not supported.
-
-    This field enables fine-grained control over resource allocation for the entire pod, allowing resource sharing among containers in a pod.
-
-    This is an alpha field and requires enabling the PodLevelResources feature gate.
-    """
     restart_policy: Annotated[Optional[str], Field(alias="restartPolicy")] = None
     """
     Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
@@ -26070,7 +25953,7 @@ class PodSpec(BaseModel):
     """
     set_hostname_as_fqdn: Annotated[Optional[bool], Field(alias="setHostnameAsFQDN")] = None
     """
-    If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
+    If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.
     """
     share_process_namespace: Annotated[Optional[bool], Field(alias="shareProcessNamespace")] = None
     """

@@ -69,8 +69,6 @@ class CELDeviceSelector(BaseModel):
             For ease of use, the cel.bind() function is enabled, and can be used to simplify expressions that access multiple attributes with the same domain. For example:
 
                 cel.bind(dra, device.attributes["dra.example.com"], dra.someBool && dra.anotherBool)
-
-            The length of the expression must be smaller or equal to 10 Ki. The cost of evaluating it is also limited based on the estimated number of logical steps.
             """
             return self._set("expression", value)
 
@@ -129,8 +127,6 @@ class CELDeviceSelector(BaseModel):
     For ease of use, the cel.bind() function is enabled, and can be used to simplify expressions that access multiple attributes with the same domain. For example:
 
         cel.bind(dra, device.attributes["dra.example.com"], dra.someBool && dra.anotherBool)
-
-    The length of the expression must be smaller or equal to 10 Ki. The cost of evaluating it is also limited based on the estimated number of logical steps.
     """
 
 
@@ -285,14 +281,6 @@ class DeviceRequestAllocationResult(BaseModel):
         def build(self) -> "DeviceRequestAllocationResult":
             return DeviceRequestAllocationResult(**self._attrs)
 
-        def admin_access(self, value: Optional[bool], /) -> Self:
-            """
-                    AdminAccess indicates that this device was allocated for administrative access. See the corresponding request field for a definition of mode.
-
-            This is an alpha field and requires enabling the DRAAdminAccess feature gate. Admin access is disabled if this field is unset or set to false, otherwise it is enabled.
-            """
-            return self._set("admin_access", value)
-
         def device(self, value: str, /) -> Self:
             """
             Device references one device instance via its name in the driver's resource pool. It must be a DNS label.
@@ -347,12 +335,6 @@ class DeviceRequestAllocationResult(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    admin_access: Annotated[Optional[bool], Field(alias="adminAccess")] = None
-    """
-    AdminAccess indicates that this device was allocated for administrative access. See the corresponding request field for a definition of mode.
-
-    This is an alpha field and requires enabling the DRAAdminAccess feature gate. Admin access is disabled if this field is unset or set to false, otherwise it is enabled.
-    """
     device: str
     """
     Device references one device instance via its name in the driver's resource pool. It must be a DNS label.
@@ -453,40 +435,32 @@ class DeviceSelector(BaseModel):
     """
 
 
-class NetworkDeviceData(BaseModel):
+class PodSchedulingContextSpec(BaseModel):
     class Builder(BaseModelBuilder):
         @property
-        def cls(self) -> Type["NetworkDeviceData"]:
-            return NetworkDeviceData
+        def cls(self) -> Type["PodSchedulingContextSpec"]:
+            return PodSchedulingContextSpec
 
-        def build(self) -> "NetworkDeviceData":
-            return NetworkDeviceData(**self._attrs)
+        def build(self) -> "PodSchedulingContextSpec":
+            return PodSchedulingContextSpec(**self._attrs)
 
-        def hardware_address(self, value: Optional[str], /) -> Self:
+        def potential_nodes(self, value: Optional[List[str]], /) -> Self:
             """
-                    HardwareAddress represents the hardware address (e.g. MAC Address) of the device's network interface.
+                    PotentialNodes lists nodes where the Pod might be able to run.
 
-            Must not be longer than 128 characters.
+            The size of this field is limited to 128. This is large enough for many clusters. Larger clusters may need more attempts to find a node that suits all pending resources. This may get increased in the future, but not reduced.
             """
-            return self._set("hardware_address", value)
+            return self._set("potential_nodes", value)
 
-        def interface_name(self, value: Optional[str], /) -> Self:
+        def selected_node(self, value: Optional[str], /) -> Self:
             """
-                    InterfaceName specifies the name of the network interface associated with the allocated device. This might be the name of a physical or virtual network interface being configured in the pod.
+            SelectedNode is the node for which allocation of ResourceClaims that are referenced by the Pod and that use "WaitForFirstConsumer" allocation is to be attempted.
+            """
+            return self._set("selected_node", value)
 
-            Must not be longer than 256 characters.
-            """
-            return self._set("interface_name", value)
-
-        def ips(self, value: Optional[List[str]], /) -> Self:
-            """
-            IPs lists the network addresses assigned to the device's network interface. This can include both IPv4 and IPv6 addresses. The IPs are in the CIDR notation, which includes both the address and the associated subnet mask. e.g.: "192.0.2.5/24" for IPv4 and "2001:db8::5/64" for IPv6.
-            """
-            return self._set("ips", value)
-
-    class BuilderContext(BuilderContextBase["NetworkDeviceData.Builder"]):
+    class BuilderContext(BuilderContextBase["PodSchedulingContextSpec.Builder"]):
         def model_post_init(self, __context) -> None:
-            self._builder = NetworkDeviceData.Builder()
+            self._builder = PodSchedulingContextSpec.Builder()
             self._builder._in_context = True
             self._parent_builder = None
             self._field_name = None
@@ -497,34 +471,28 @@ class NetworkDeviceData(BaseModel):
 
     @classmethod
     def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for NetworkDeviceData."""
+        """Creates a new context manager builder for PodSchedulingContextSpec."""
         return cls.BuilderContext()
 
-    class ListBuilder(GenericListBuilder["NetworkDeviceData", Builder]):
+    class ListBuilder(GenericListBuilder["PodSchedulingContextSpec", Builder]):
         def __init__(self):
             raise NotImplementedError(
-                "This class is not meant to be instantiated. Use NetworkDeviceData.list_builder() instead."
+                "This class is not meant to be instantiated. Use PodSchedulingContextSpec.list_builder() instead."
             )
 
     @classmethod
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    hardware_address: Annotated[Optional[str], Field(alias="hardwareAddress")] = None
+    potential_nodes: Annotated[Optional[List[str]], Field(alias="potentialNodes")] = None
     """
-    HardwareAddress represents the hardware address (e.g. MAC Address) of the device's network interface.
+    PotentialNodes lists nodes where the Pod might be able to run.
 
-    Must not be longer than 128 characters.
+    The size of this field is limited to 128. This is large enough for many clusters. Larger clusters may need more attempts to find a node that suits all pending resources. This may get increased in the future, but not reduced.
     """
-    interface_name: Annotated[Optional[str], Field(alias="interfaceName")] = None
+    selected_node: Annotated[Optional[str], Field(alias="selectedNode")] = None
     """
-    InterfaceName specifies the name of the network interface associated with the allocated device. This might be the name of a physical or virtual network interface being configured in the pod.
-
-    Must not be longer than 256 characters.
-    """
-    ips: Optional[List[str]] = None
-    """
-    IPs lists the network addresses assigned to the device's network interface. This can include both IPv4 and IPv6 addresses. The IPs are in the CIDR notation, which includes both the address and the associated subnet mask. e.g.: "192.0.2.5/24" for IPv4 and "2001:db8::5/64" for IPv6.
+    SelectedNode is the node for which allocation of ResourceClaims that are referenced by the Pod and that use "WaitForFirstConsumer" allocation is to be attempted.
     """
 
 
@@ -602,6 +570,67 @@ class ResourceClaimConsumerReference(BaseModel):
     uid: str
     """
     UID identifies exactly one incarnation of the resource.
+    """
+
+
+class ResourceClaimSchedulingStatus(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["ResourceClaimSchedulingStatus"]:
+            return ResourceClaimSchedulingStatus
+
+        def build(self) -> "ResourceClaimSchedulingStatus":
+            return ResourceClaimSchedulingStatus(**self._attrs)
+
+        def name(self, value: str, /) -> Self:
+            """
+            Name matches the pod.spec.resourceClaims[*].Name field.
+            """
+            return self._set("name", value)
+
+        def unsuitable_nodes(self, value: Optional[List[str]], /) -> Self:
+            """
+                    UnsuitableNodes lists nodes that the ResourceClaim cannot be allocated for.
+
+            The size of this field is limited to 128, the same as for PodSchedulingSpec.PotentialNodes. This may get increased in the future, but not reduced.
+            """
+            return self._set("unsuitable_nodes", value)
+
+    class BuilderContext(BuilderContextBase["ResourceClaimSchedulingStatus.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = ResourceClaimSchedulingStatus.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for ResourceClaimSchedulingStatus."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["ResourceClaimSchedulingStatus", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use ResourceClaimSchedulingStatus.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    name: str
+    """
+    Name matches the pod.spec.resourceClaims[*].Name field.
+    """
+    unsuitable_nodes: Annotated[Optional[List[str]], Field(alias="unsuitableNodes")] = None
+    """
+    UnsuitableNodes lists nodes that the ResourceClaim cannot be allocated for.
+
+    The size of this field is limited to 128, the same as for PodSchedulingSpec.PotentialNodes. This may get increased in the future, but not reduced.
     """
 
 
@@ -843,9 +872,7 @@ class DeviceRequest(BaseModel):
 
         def admin_access(self, value: Optional[bool], /) -> Self:
             """
-                    AdminAccess indicates that this is a claim for administrative access to the device(s). Claims with AdminAccess are expected to be used for monitoring or other management services for a device.  They ignore all ordinary claims to the device with respect to access modes and any resource allocations.
-
-            This is an alpha field and requires enabling the DRAAdminAccess feature gate. Admin access is disabled if this field is unset or set to false, otherwise it is enabled.
+            AdminAccess indicates that this is a claim for administrative access to the device(s). Claims with AdminAccess are expected to be used for monitoring or other management services for a device.  They ignore all ordinary claims to the device with respect to access modes and any resource allocations.
             """
             return self._set("admin_access", value)
 
@@ -959,8 +986,6 @@ class DeviceRequest(BaseModel):
     admin_access: Annotated[Optional[bool], Field(alias="adminAccess")] = None
     """
     AdminAccess indicates that this is a claim for administrative access to the device(s). Claims with AdminAccess are expected to be used for monitoring or other management services for a device.  They ignore all ordinary claims to the device with respect to access modes and any resource allocations.
-
-    This is an alpha field and requires enabling the DRAAdminAccess feature gate. Admin access is disabled if this field is unset or set to false, otherwise it is enabled.
     """
     allocation_mode: Annotated[Optional[str], Field(alias="allocationMode")] = None
     """
@@ -1043,9 +1068,7 @@ class OpaqueDeviceConfiguration(BaseModel):
 
         def parameters(self, value_or_callback=None, /):
             """
-                    Parameters can contain arbitrary data. It is the responsibility of the driver developer to handle validation and versioning. Typically this includes self-identification and a version ("kind" + "apiVersion" for Kubernetes types), with conversion between different versions.
-
-            The length of the raw data must be smaller or equal to 10 Ki.
+            Parameters can contain arbitrary data. It is the responsibility of the driver developer to handle validation and versioning. Typically this includes self-identification and a version ("kind" + "apiVersion" for Kubernetes types), with conversion between different versions.
             """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.RawExtension.BuilderContext()
@@ -1099,8 +1122,96 @@ class OpaqueDeviceConfiguration(BaseModel):
     parameters: apimachinery.RawExtension
     """
     Parameters can contain arbitrary data. It is the responsibility of the driver developer to handle validation and versioning. Typically this includes self-identification and a version ("kind" + "apiVersion" for Kubernetes types), with conversion between different versions.
+    """
 
-    The length of the raw data must be smaller or equal to 10 Ki.
+
+class PodSchedulingContextStatus(BaseModel):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["PodSchedulingContextStatus"]:
+            return PodSchedulingContextStatus
+
+        def build(self) -> "PodSchedulingContextStatus":
+            return PodSchedulingContextStatus(**self._attrs)
+
+        @overload
+        def resource_claims(
+            self, value_or_callback: List[ResourceClaimSchedulingStatus], /
+        ) -> "PodSchedulingContextStatus.Builder": ...
+
+        @overload
+        def resource_claims(
+            self,
+            value_or_callback: Callable[
+                [
+                    GenericListBuilder[
+                        ResourceClaimSchedulingStatus,
+                        ResourceClaimSchedulingStatus.Builder,
+                    ]
+                ],
+                GenericListBuilder[
+                    ResourceClaimSchedulingStatus, ResourceClaimSchedulingStatus.Builder
+                ]
+                | List[ResourceClaimSchedulingStatus],
+            ],
+            /,
+        ) -> "PodSchedulingContextStatus.Builder": ...
+
+        @overload
+        def resource_claims(
+            self, value_or_callback: Never = ...
+        ) -> ListBuilderContext[ResourceClaimSchedulingStatus.Builder]: ...
+
+        def resource_claims(self, value_or_callback=None, /):
+            """
+            ResourceClaims describes resource availability for each pod.spec.resourceClaim entry where the corresponding ResourceClaim uses "WaitForFirstConsumer" allocation mode.
+            """
+            if self._in_context and value_or_callback is None:
+                context = ListBuilderContext[ResourceClaimSchedulingStatus.Builder]()
+                context._parent_builder = self
+                context._field_name = "resource_claims"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(ResourceClaimSchedulingStatus.list_builder())
+                if isinstance(output, GenericListBuilder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("resource_claims", value)
+
+    class BuilderContext(BuilderContextBase["PodSchedulingContextStatus.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = PodSchedulingContextStatus.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for PodSchedulingContextStatus."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["PodSchedulingContextStatus", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use PodSchedulingContextStatus.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    resource_claims: Annotated[
+        Optional[List[ResourceClaimSchedulingStatus]], Field(alias="resourceClaims")
+    ] = None
+    """
+    ResourceClaims describes resource availability for each pod.spec.resourceClaim entry where the corresponding ResourceClaim uses "WaitForFirstConsumer" allocation mode.
     """
 
 
@@ -1315,215 +1426,6 @@ class ResourceSliceSpec(BaseModel):
     pool: ResourcePool
     """
     Pool describes the pool that this ResourceSlice belongs to.
-    """
-
-
-class AllocatedDeviceStatus(BaseModel):
-    class Builder(BaseModelBuilder):
-        @property
-        def cls(self) -> Type["AllocatedDeviceStatus"]:
-            return AllocatedDeviceStatus
-
-        def build(self) -> "AllocatedDeviceStatus":
-            return AllocatedDeviceStatus(**self._attrs)
-
-        @overload
-        def conditions(
-            self, value_or_callback: List[apimachinery.Condition], /
-        ) -> "AllocatedDeviceStatus.Builder": ...
-
-        @overload
-        def conditions(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[apimachinery.Condition, apimachinery.Condition.Builder]],
-                GenericListBuilder[apimachinery.Condition, apimachinery.Condition.Builder]
-                | List[apimachinery.Condition],
-            ],
-            /,
-        ) -> "AllocatedDeviceStatus.Builder": ...
-
-        @overload
-        def conditions(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[apimachinery.Condition.Builder]: ...
-
-        def conditions(self, value_or_callback=None, /):
-            """
-            Conditions contains the latest observation of the device's state. If the device has been configured according to the class and claim config references, the `Ready` condition should be True.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[apimachinery.Condition.Builder]()
-                context._parent_builder = self
-                context._field_name = "conditions"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(apimachinery.Condition.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("conditions", value)
-
-        @overload
-        def data(
-            self, value_or_callback: Optional[apimachinery.RawExtension], /
-        ) -> "AllocatedDeviceStatus.Builder": ...
-
-        @overload
-        def data(
-            self,
-            value_or_callback: Callable[
-                [apimachinery.RawExtension.Builder],
-                apimachinery.RawExtension.Builder | apimachinery.RawExtension,
-            ],
-            /,
-        ) -> "AllocatedDeviceStatus.Builder": ...
-
-        @overload
-        def data(
-            self, value_or_callback: Never = ...
-        ) -> "apimachinery.RawExtension.BuilderContext": ...
-
-        def data(self, value_or_callback=None, /):
-            """
-                    Data contains arbitrary driver-specific data.
-
-            The length of the raw data must be smaller or equal to 10 Ki.
-            """
-            if self._in_context and value_or_callback is None:
-                context = apimachinery.RawExtension.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "data"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(apimachinery.RawExtension.builder())
-                if isinstance(output, apimachinery.RawExtension.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("data", value)
-
-        def device(self, value: str, /) -> Self:
-            """
-            Device references one device instance via its name in the driver's resource pool. It must be a DNS label.
-            """
-            return self._set("device", value)
-
-        def driver(self, value: str, /) -> Self:
-            """
-                    Driver specifies the name of the DRA driver whose kubelet plugin should be invoked to process the allocation once the claim is needed on a node.
-
-            Must be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.
-            """
-            return self._set("driver", value)
-
-        @overload
-        def network_data(
-            self, value_or_callback: Optional[NetworkDeviceData], /
-        ) -> "AllocatedDeviceStatus.Builder": ...
-
-        @overload
-        def network_data(
-            self,
-            value_or_callback: Callable[
-                [NetworkDeviceData.Builder],
-                NetworkDeviceData.Builder | NetworkDeviceData,
-            ],
-            /,
-        ) -> "AllocatedDeviceStatus.Builder": ...
-
-        @overload
-        def network_data(
-            self, value_or_callback: Never = ...
-        ) -> "NetworkDeviceData.BuilderContext": ...
-
-        def network_data(self, value_or_callback=None, /):
-            """
-            NetworkData contains network-related information specific to the device.
-            """
-            if self._in_context and value_or_callback is None:
-                context = NetworkDeviceData.BuilderContext()
-                context._parent_builder = self
-                context._field_name = "network_data"
-                return context
-
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(NetworkDeviceData.builder())
-                if isinstance(output, NetworkDeviceData.Builder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("network_data", value)
-
-        def pool(self, value: str, /) -> Self:
-            """
-                    This name together with the driver name and the device name field identify which device was allocated (`<driver name>/<pool name>/<device name>`).
-
-            Must not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes.
-            """
-            return self._set("pool", value)
-
-    class BuilderContext(BuilderContextBase["AllocatedDeviceStatus.Builder"]):
-        def model_post_init(self, __context) -> None:
-            self._builder = AllocatedDeviceStatus.Builder()
-            self._builder._in_context = True
-            self._parent_builder = None
-            self._field_name = None
-
-    @classmethod
-    def builder(cls) -> Builder:
-        return cls.Builder()
-
-    @classmethod
-    def new(cls) -> BuilderContext:
-        """Creates a new context manager builder for AllocatedDeviceStatus."""
-        return cls.BuilderContext()
-
-    class ListBuilder(GenericListBuilder["AllocatedDeviceStatus", Builder]):
-        def __init__(self):
-            raise NotImplementedError(
-                "This class is not meant to be instantiated. Use AllocatedDeviceStatus.list_builder() instead."
-            )
-
-    @classmethod
-    def list_builder(cls) -> ListBuilder:
-        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
-
-    conditions: Optional[List[apimachinery.Condition]] = None
-    """
-    Conditions contains the latest observation of the device's state. If the device has been configured according to the class and claim config references, the `Ready` condition should be True.
-    """
-    data: Optional[apimachinery.RawExtension] = None
-    """
-    Data contains arbitrary driver-specific data.
-
-    The length of the raw data must be smaller or equal to 10 Ki.
-    """
-    device: str
-    """
-    Device references one device instance via its name in the driver's resource pool. It must be a DNS label.
-    """
-    driver: str
-    """
-    Driver specifies the name of the DRA driver whose kubelet plugin should be invoked to process the allocation once the claim is needed on a node.
-
-    Must be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.
-    """
-    network_data: Annotated[Optional[NetworkDeviceData], Field(alias="networkData")] = None
-    """
-    NetworkData contains network-related information specific to the device.
-    """
-    pool: str
-    """
-    This name together with the driver name and the device name field identify which device was allocated (`<driver name>/<pool name>/<device name>`).
-
-    Must not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes.
     """
 
 
@@ -2030,6 +1932,48 @@ class DeviceClassSpec(BaseModel):
                     value = output
             return self._set("selectors", value)
 
+        @overload
+        def suitable_nodes(
+            self, value_or_callback: Optional[v1.NodeSelector], /
+        ) -> "DeviceClassSpec.Builder": ...
+
+        @overload
+        def suitable_nodes(
+            self,
+            value_or_callback: Callable[
+                [v1.NodeSelector.Builder], v1.NodeSelector.Builder | v1.NodeSelector
+            ],
+            /,
+        ) -> "DeviceClassSpec.Builder": ...
+
+        @overload
+        def suitable_nodes(
+            self, value_or_callback: Never = ...
+        ) -> "v1.NodeSelector.BuilderContext": ...
+
+        def suitable_nodes(self, value_or_callback=None, /):
+            """
+                    Only nodes matching the selector will be considered by the scheduler when trying to find a Node that fits a Pod when that Pod uses a claim that has not been allocated yet *and* that claim gets allocated through a control plane controller. It is ignored when the claim does not use a control plane controller for allocation.
+
+            Setting this field is optional. If unset, all Nodes are candidates.
+
+            This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+            """
+            if self._in_context and value_or_callback is None:
+                context = v1.NodeSelector.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "suitable_nodes"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(v1.NodeSelector.builder())
+                if isinstance(output, v1.NodeSelector.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("suitable_nodes", value)
+
     class BuilderContext(BuilderContextBase["DeviceClassSpec.Builder"]):
         def model_post_init(self, __context) -> None:
             self._builder = DeviceClassSpec.Builder()
@@ -2066,6 +2010,205 @@ class DeviceClassSpec(BaseModel):
     """
     Each selector must be satisfied by a device which is claimed via this class.
     """
+    suitable_nodes: Annotated[Optional[v1.NodeSelector], Field(alias="suitableNodes")] = None
+    """
+    Only nodes matching the selector will be considered by the scheduler when trying to find a Node that fits a Pod when that Pod uses a claim that has not been allocated yet *and* that claim gets allocated through a control plane controller. It is ignored when the claim does not use a control plane controller for allocation.
+
+    Setting this field is optional. If unset, all Nodes are candidates.
+
+    This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+    """
+
+
+class PodSchedulingContext(Resource):
+    class Builder(BaseModelBuilder):
+        @property
+        def cls(self) -> Type["PodSchedulingContext"]:
+            return PodSchedulingContext
+
+        def build(self) -> "PodSchedulingContext":
+            return PodSchedulingContext(**self._attrs)
+
+        def api_version(self, value: Optional[Literal["resource.k8s.io/v1alpha3"]], /) -> Self:
+            """
+            APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            """
+            return self._set("api_version", value)
+
+        def kind(self, value: Optional[Literal["PodSchedulingContext"]], /) -> Self:
+            """
+            Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            """
+            return self._set("kind", value)
+
+        @overload
+        def metadata(
+            self, value_or_callback: Optional[apimachinery.ObjectMeta], /
+        ) -> "PodSchedulingContext.Builder": ...
+
+        @overload
+        def metadata(
+            self,
+            value_or_callback: Callable[
+                [apimachinery.ObjectMeta.Builder],
+                apimachinery.ObjectMeta.Builder | apimachinery.ObjectMeta,
+            ],
+            /,
+        ) -> "PodSchedulingContext.Builder": ...
+
+        @overload
+        def metadata(
+            self, value_or_callback: Never = ...
+        ) -> "apimachinery.ObjectMeta.BuilderContext": ...
+
+        def metadata(self, value_or_callback=None, /):
+            """
+            Standard object metadata
+            """
+            if self._in_context and value_or_callback is None:
+                context = apimachinery.ObjectMeta.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "metadata"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(apimachinery.ObjectMeta.builder())
+                if isinstance(output, apimachinery.ObjectMeta.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("metadata", value)
+
+        @overload
+        def spec(
+            self, value_or_callback: PodSchedulingContextSpec, /
+        ) -> "PodSchedulingContext.Builder": ...
+
+        @overload
+        def spec(
+            self,
+            value_or_callback: Callable[
+                [PodSchedulingContextSpec.Builder],
+                PodSchedulingContextSpec.Builder | PodSchedulingContextSpec,
+            ],
+            /,
+        ) -> "PodSchedulingContext.Builder": ...
+
+        @overload
+        def spec(
+            self, value_or_callback: Never = ...
+        ) -> "PodSchedulingContextSpec.BuilderContext": ...
+
+        def spec(self, value_or_callback=None, /):
+            """
+            Spec describes where resources for the Pod are needed.
+            """
+            if self._in_context and value_or_callback is None:
+                context = PodSchedulingContextSpec.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "spec"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(PodSchedulingContextSpec.builder())
+                if isinstance(output, PodSchedulingContextSpec.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("spec", value)
+
+        @overload
+        def status(
+            self, value_or_callback: Optional[PodSchedulingContextStatus], /
+        ) -> "PodSchedulingContext.Builder": ...
+
+        @overload
+        def status(
+            self,
+            value_or_callback: Callable[
+                [PodSchedulingContextStatus.Builder],
+                PodSchedulingContextStatus.Builder | PodSchedulingContextStatus,
+            ],
+            /,
+        ) -> "PodSchedulingContext.Builder": ...
+
+        @overload
+        def status(
+            self, value_or_callback: Never = ...
+        ) -> "PodSchedulingContextStatus.BuilderContext": ...
+
+        def status(self, value_or_callback=None, /):
+            """
+            Status describes where resources for the Pod can be allocated.
+            """
+            if self._in_context and value_or_callback is None:
+                context = PodSchedulingContextStatus.BuilderContext()
+                context._parent_builder = self
+                context._field_name = "status"
+                return context
+
+            value = value_or_callback
+            if callable(value_or_callback):
+                output = value_or_callback(PodSchedulingContextStatus.builder())
+                if isinstance(output, PodSchedulingContextStatus.Builder):
+                    value = output.build()
+                else:
+                    value = output
+            return self._set("status", value)
+
+    class BuilderContext(BuilderContextBase["PodSchedulingContext.Builder"]):
+        def model_post_init(self, __context) -> None:
+            self._builder = PodSchedulingContext.Builder()
+            self._builder._in_context = True
+            self._parent_builder = None
+            self._field_name = None
+
+    @classmethod
+    def builder(cls) -> Builder:
+        return cls.Builder()
+
+    @classmethod
+    def new(cls) -> BuilderContext:
+        """Creates a new context manager builder for PodSchedulingContext."""
+        return cls.BuilderContext()
+
+    class ListBuilder(GenericListBuilder["PodSchedulingContext", Builder]):
+        def __init__(self):
+            raise NotImplementedError(
+                "This class is not meant to be instantiated. Use PodSchedulingContext.list_builder() instead."
+            )
+
+    @classmethod
+    def list_builder(cls) -> ListBuilder:
+        return GenericListBuilder[cls, cls.Builder]()  # type: ignore
+
+    api_version: Annotated[
+        Optional[Literal["resource.k8s.io/v1alpha3"]], Field(alias="apiVersion")
+    ] = "resource.k8s.io/v1alpha3"
+    """
+    APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+    """
+    kind: Optional[Literal["PodSchedulingContext"]] = "PodSchedulingContext"
+    """
+    Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+    """
+    metadata: Optional[apimachinery.ObjectMeta] = None
+    """
+    Standard object metadata
+    """
+    spec: PodSchedulingContextSpec
+    """
+    Spec describes where resources for the Pod are needed.
+    """
+    status: Optional[PodSchedulingContextStatus] = None
+    """
+    Status describes where resources for the Pod can be allocated.
+    """
+
+
+PodSchedulingContextList = ResourceList["PodSchedulingContext"]
 
 
 class ResourceSlice(Resource):
@@ -2225,6 +2368,16 @@ class AllocationResult(BaseModel):
         def build(self) -> "AllocationResult":
             return AllocationResult(**self._attrs)
 
+        def controller(self, value: Optional[str], /) -> Self:
+            """
+                    Controller is the name of the DRA driver which handled the allocation. That driver is also responsible for deallocating the claim. It is empty when the claim can be deallocated without involving a driver.
+
+            A driver may allocate devices provided by other drivers, so this driver name here can be different from the driver names listed for the results.
+
+            This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+            """
+            return self._set("controller", value)
+
         @overload
         def devices(
             self, value_or_callback: Optional[DeviceAllocationResult], /
@@ -2328,6 +2481,14 @@ class AllocationResult(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
+    controller: Optional[str] = None
+    """
+    Controller is the name of the DRA driver which handled the allocation. That driver is also responsible for deallocating the claim. It is empty when the claim can be deallocated without involving a driver.
+
+    A driver may allocate devices provided by other drivers, so this driver name here can be different from the driver names listed for the results.
+
+    This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+    """
     devices: Optional[DeviceAllocationResult] = None
     """
     Devices is the result of allocating devices.
@@ -2664,6 +2825,16 @@ class ResourceClaimSpec(BaseModel):
         def build(self) -> "ResourceClaimSpec":
             return ResourceClaimSpec(**self._attrs)
 
+        def controller(self, value: Optional[str], /) -> Self:
+            """
+                    Controller is the name of the DRA driver that is meant to handle allocation of this claim. If empty, allocation is handled by the scheduler while scheduling a pod.
+
+            Must be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.
+
+            This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+            """
+            return self._set("controller", value)
+
         @overload
         def devices(
             self, value_or_callback: Optional[DeviceClaim], /
@@ -2724,6 +2895,14 @@ class ResourceClaimSpec(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
+    controller: Optional[str] = None
+    """
+    Controller is the name of the DRA driver that is meant to handle allocation of this claim. If empty, allocation is handled by the scheduler while scheduling a pod.
+
+    Must be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.
+
+    This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+    """
     devices: Optional[DeviceClaim] = None
     """
     Devices defines how to request devices.
@@ -2777,45 +2956,15 @@ class ResourceClaimStatus(BaseModel):
                     value = output
             return self._set("allocation", value)
 
-        @overload
-        def devices(
-            self, value_or_callback: List[AllocatedDeviceStatus], /
-        ) -> "ResourceClaimStatus.Builder": ...
-
-        @overload
-        def devices(
-            self,
-            value_or_callback: Callable[
-                [GenericListBuilder[AllocatedDeviceStatus, AllocatedDeviceStatus.Builder]],
-                GenericListBuilder[AllocatedDeviceStatus, AllocatedDeviceStatus.Builder]
-                | List[AllocatedDeviceStatus],
-            ],
-            /,
-        ) -> "ResourceClaimStatus.Builder": ...
-
-        @overload
-        def devices(
-            self, value_or_callback: Never = ...
-        ) -> ListBuilderContext[AllocatedDeviceStatus.Builder]: ...
-
-        def devices(self, value_or_callback=None, /):
+        def deallocation_requested(self, value: Optional[bool], /) -> Self:
             """
-            Devices contains the status of each device allocated for this claim, as reported by the driver. This can include driver-specific information. Entries are owned by their respective drivers.
-            """
-            if self._in_context and value_or_callback is None:
-                context = ListBuilderContext[AllocatedDeviceStatus.Builder]()
-                context._parent_builder = self
-                context._field_name = "devices"
-                return context
+                    Indicates that a claim is to be deallocated. While this is set, no new consumers may be added to ReservedFor.
 
-            value = value_or_callback
-            if callable(value_or_callback):
-                output = value_or_callback(AllocatedDeviceStatus.list_builder())
-                if isinstance(output, GenericListBuilder):
-                    value = output.build()
-                else:
-                    value = output
-            return self._set("devices", value)
+            This is only used if the claim needs to be deallocated by a DRA driver. That driver then must deallocate this claim and reset the field together with clearing the Allocation field.
+
+            This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
+            """
+            return self._set("deallocation_requested", value)
 
         @overload
         def reserved_for(
@@ -2854,7 +3003,7 @@ class ResourceClaimStatus(BaseModel):
 
             Both schedulers try to add their pod to the claim.status.reservedFor field, but only the update that reaches the API server first gets stored. The other one fails with an error and the scheduler which issued it knows that it must put the pod back into the queue, waiting for the ResourceClaim to become usable again.
 
-            There can be at most 256 such reservations. This may get increased in the future, but not reduced.
+            There can be at most 32 such reservations. This may get increased in the future, but not reduced.
             """
             if self._in_context and value_or_callback is None:
                 context = ListBuilderContext[ResourceClaimConsumerReference.Builder]()
@@ -2901,9 +3050,13 @@ class ResourceClaimStatus(BaseModel):
     """
     Allocation is set once the claim has been allocated successfully.
     """
-    devices: Optional[List[AllocatedDeviceStatus]] = None
+    deallocation_requested: Annotated[Optional[bool], Field(alias="deallocationRequested")] = None
     """
-    Devices contains the status of each device allocated for this claim, as reported by the driver. This can include driver-specific information. Entries are owned by their respective drivers.
+    Indicates that a claim is to be deallocated. While this is set, no new consumers may be added to ReservedFor.
+
+    This is only used if the claim needs to be deallocated by a DRA driver. That driver then must deallocate this claim and reset the field together with clearing the Allocation field.
+
+    This is an alpha field and requires enabling the DRAControlPlaneController feature gate.
     """
     reserved_for: Annotated[
         Optional[List[ResourceClaimConsumerReference]], Field(alias="reservedFor")
@@ -2915,7 +3068,7 @@ class ResourceClaimStatus(BaseModel):
 
     Both schedulers try to add their pod to the claim.status.reservedFor field, but only the update that reaches the API server first gets stored. The other one fails with an error and the scheduler which issued it knows that it must put the pod back into the queue, waiting for the ResourceClaim to become usable again.
 
-    There can be at most 256 such reservations. This may get increased in the future, but not reduced.
+    There can be at most 32 such reservations. This may get increased in the future, but not reduced.
     """
 
 
@@ -2950,7 +3103,7 @@ class ResourceClaimTemplateSpec(BaseModel):
 
         def metadata(self, value_or_callback=None, /):
             """
-            ObjectMeta may contain labels and annotations that will be copied into the ResourceClaim when creating it. No other fields are allowed and will be rejected during validation.
+            ObjectMeta may contain labels and annotations that will be copied into the PVC when creating it. No other fields are allowed and will be rejected during validation.
             """
             if self._in_context and value_or_callback is None:
                 context = apimachinery.ObjectMeta.BuilderContext()
@@ -3032,7 +3185,7 @@ class ResourceClaimTemplateSpec(BaseModel):
 
     metadata: Optional[apimachinery.ObjectMeta] = None
     """
-    ObjectMeta may contain labels and annotations that will be copied into the ResourceClaim when creating it. No other fields are allowed and will be rejected during validation.
+    ObjectMeta may contain labels and annotations that will be copied into the PVC when creating it. No other fields are allowed and will be rejected during validation.
     """
     spec: ResourceClaimSpec
     """

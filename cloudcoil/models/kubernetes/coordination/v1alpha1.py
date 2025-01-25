@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import (
     Annotated,
     Callable,
+    List,
     Literal,
     Optional,
     Type,
@@ -35,9 +36,9 @@ class LeaseCandidateSpec(BaseModel):
         def build(self) -> "LeaseCandidateSpec":
             return LeaseCandidateSpec(**self._attrs)
 
-        def binary_version(self, value: str, /) -> Self:
+        def binary_version(self, value: Optional[str], /) -> Self:
             """
-            BinaryVersion is the binary version. It must be in a semver format without leading `v`. This field is required.
+            BinaryVersion is the binary version. It must be in a semver format without leading `v`. This field is required when strategy is "OldestEmulationVersion"
             """
             return self._set("binary_version", value)
 
@@ -92,6 +93,16 @@ class LeaseCandidateSpec(BaseModel):
                     value = output
             return self._set("ping_time", value)
 
+        def preferred_strategies(self, value: List[str], /) -> Self:
+            """
+                    PreferredStrategies indicates the list of strategies for picking the leader for coordinated leader election. The list is ordered, and the first strategy supersedes all other strategies. The list is used by coordinated leader election to make a decision about the final election strategy. This follows as - If all clients have strategy X as the first element in this list, strategy X will be used. - If a candidate has strategy [X] and another candidate has strategy [Y, X], Y supersedes X and strategy Y
+              will be used.
+            - If a candidate has strategy [X, Y] and another candidate has strategy [Y, X], this is a user error and leader
+              election will not operate the Lease until resolved.
+            (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
+            """
+            return self._set("preferred_strategies", value)
+
         @overload
         def renew_time(
             self, value_or_callback: Optional[apimachinery.MicroTime], /
@@ -131,12 +142,6 @@ class LeaseCandidateSpec(BaseModel):
                     value = output
             return self._set("renew_time", value)
 
-        def strategy(self, value: str, /) -> Self:
-            """
-            Strategy is the strategy that coordinated leader election will use for picking the leader. If multiple candidates for the same Lease return different strategies, the strategy provided by the candidate with the latest BinaryVersion will be used. If there is still conflict, this is a user error and coordinated leader election will not operate the Lease until resolved. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
-            """
-            return self._set("strategy", value)
-
     class BuilderContext(BuilderContextBase["LeaseCandidateSpec.Builder"]):
         def model_post_init(self, __context) -> None:
             self._builder = LeaseCandidateSpec.Builder()
@@ -163,9 +168,9 @@ class LeaseCandidateSpec(BaseModel):
     def list_builder(cls) -> ListBuilder:
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
-    binary_version: Annotated[str, Field(alias="binaryVersion")]
+    binary_version: Annotated[Optional[str], Field(alias="binaryVersion")] = None
     """
-    BinaryVersion is the binary version. It must be in a semver format without leading `v`. This field is required.
+    BinaryVersion is the binary version. It must be in a semver format without leading `v`. This field is required when strategy is "OldestEmulationVersion"
     """
     emulation_version: Annotated[Optional[str], Field(alias="emulationVersion")] = None
     """
@@ -179,13 +184,17 @@ class LeaseCandidateSpec(BaseModel):
     """
     PingTime is the last time that the server has requested the LeaseCandidate to renew. It is only done during leader election to check if any LeaseCandidates have become ineligible. When PingTime is updated, the LeaseCandidate will respond by updating RenewTime.
     """
+    preferred_strategies: Annotated[List[str], Field(alias="preferredStrategies")]
+    """
+    PreferredStrategies indicates the list of strategies for picking the leader for coordinated leader election. The list is ordered, and the first strategy supersedes all other strategies. The list is used by coordinated leader election to make a decision about the final election strategy. This follows as - If all clients have strategy X as the first element in this list, strategy X will be used. - If a candidate has strategy [X] and another candidate has strategy [Y, X], Y supersedes X and strategy Y
+      will be used.
+    - If a candidate has strategy [X, Y] and another candidate has strategy [Y, X], this is a user error and leader
+      election will not operate the Lease until resolved.
+    (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
+    """
     renew_time: Annotated[Optional[apimachinery.MicroTime], Field(alias="renewTime")] = None
     """
     RenewTime is the time that the LeaseCandidate was last updated. Any time a Lease needs to do leader election, the PingTime field is updated to signal to the LeaseCandidate that they should update the RenewTime. Old LeaseCandidate objects are also garbage collected if it has been hours since the last renew. The PingTime field is updated regularly to prevent garbage collection for still active LeaseCandidates.
-    """
-    strategy: str
-    """
-    Strategy is the strategy that coordinated leader election will use for picking the leader. If multiple candidates for the same Lease return different strategies, the strategy provided by the candidate with the latest BinaryVersion will be used. If there is still conflict, this is a user error and coordinated leader election will not operate the Lease until resolved. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
     """
 
 
@@ -198,7 +207,7 @@ class LeaseCandidate(Resource):
         def build(self) -> "LeaseCandidate":
             return LeaseCandidate(**self._attrs)
 
-        def api_version(self, value: Optional[Literal["coordination.k8s.io/v1alpha2"]], /) -> Self:
+        def api_version(self, value: Optional[Literal["coordination.k8s.io/v1alpha1"]], /) -> Self:
             """
             APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             """
@@ -313,8 +322,8 @@ class LeaseCandidate(Resource):
         return GenericListBuilder[cls, cls.Builder]()  # type: ignore
 
     api_version: Annotated[
-        Optional[Literal["coordination.k8s.io/v1alpha2"]], Field(alias="apiVersion")
-    ] = "coordination.k8s.io/v1alpha2"
+        Optional[Literal["coordination.k8s.io/v1alpha1"]], Field(alias="apiVersion")
+    ] = "coordination.k8s.io/v1alpha1"
     """
     APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
     """

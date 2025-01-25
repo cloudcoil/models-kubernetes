@@ -2,4 +2,3 @@
 # DO NOT EDIT
 
 from . import v1alpha3 as v1alpha3
-from . import v1beta1 as v1beta1
