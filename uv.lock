@@ -293,7 +293,7 @@ test = [
 
 [[package]]
 name = "cloudcoil-models-kubernetes"
-version = "0.0.0"
+version = "1.36.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "cloudcoil" },
