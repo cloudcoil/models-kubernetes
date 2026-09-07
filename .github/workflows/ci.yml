@@ -7,7 +7,6 @@ on:
   pull_request:
   push:
     branches:
-      - main
       - release-*
 jobs:
   test:
@@ -39,7 +38,7 @@ jobs:
         run: make -j8 lint test
 
       - name: Build package
-        run: uv build
+        run: uv build --no-sources
 
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
